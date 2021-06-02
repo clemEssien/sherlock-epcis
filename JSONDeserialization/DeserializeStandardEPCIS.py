@@ -1,12 +1,16 @@
 # Author: Ryan Oostland
-# Last Modified: June 1, 2021
+# Last Modified: June 2, 2021
 # Script to deserialize standard EPCIS documents.
 # GS1StandardExample1-4 from https://www.mimasu.nl/epcis/xmljson
-from abc import ABC, abstractmethod
 import json
+import pprint
+from typing import Type
+
 # EPCISEvent attributes can be added or removed dependingon what data we plan on keeping
-class EPCISEvent(ABC):
+class EPCISEvent():
     def __init__(self, event_dict):
+        if type(event_dict) != dict:
+            raise TypeError('input must be a dictionary')
         self.event_type = event_dict['isA']
         self.event_time = event_dict['eventTime']
         self.event_time_offset = event_dict['eventTimeZoneOffset']
@@ -52,30 +56,25 @@ class EPCISEvent(ABC):
             self.source_list = event_dict['sourceList']
         if 'destinationList' in event_dict:
             self.destination_list = event_dict['destinationList']
-        
-        
 
-
-def deserializeStandardEPCIS(input_file):
+# driver example
+def main():
     events = []
     event_objects = []
-    with open(input_file) as f:
+    with open('JSONDeserialization/GS1StandardExample1.json') as f:
         epcis_doc = json.load(f)
         if epcis_doc['isA'] != 'EPCISDocument':
             print('{} is an unsupported type'.format(epcis_doc['isA']))
             return
         events = epcis_doc['epcisBody']['eventList']
+
     for event in events:
         temp_event = EPCISEvent(event)
         event_objects.append(temp_event)
 
-    return event_objects
-
-# print events for proof-of-concept
-def main():
-    serial_events = deserializeStandardEPCIS('JSONDeserialization/GS1StandardExample4.json')
-    for event in serial_events:
-        print(event.__dict__)
+    pp = pprint.PrettyPrinter(indent=2)
+    for event in event_objects:
+        pp.pprint(event.__dict__)
         print("")
 
 if __name__ == '__main__':
