@@ -22,11 +22,16 @@ class EPCISEvent(ABC):
             self.output_epc_list = event_dict['outputEpcList']
         if 'xformID' in event_dict:
             self.xform_id = event_dict['xformID']
+        # according to the EPCIS 1.2 standard all events should have an action,
+        # but some of the sample documents do not.
         if 'action' in event_dict:
             self.action = event_dict['action']
-        self.business_step = event_dict['bizStep']
-        self.disposition = event_dict['disposition']
-        self.read_point = event_dict['readPoint']['id']
+        if 'bizStep' in event_dict:
+            self.business_step = event_dict['bizStep']
+        if 'disposition' in event_dict:
+            self.disposition = event_dict['disposition']
+        if 'readPoint' in event_dict:
+            self.read_point = event_dict['readPoint']['id']
         if 'bizLocation' in event_dict:
             self.business_location = event_dict['bizLocation']['id']
         if 'ilmd' in event_dict:
@@ -41,8 +46,8 @@ class EPCISEvent(ABC):
             self.output_quantity_list = event_dict['outputQuantityList']
         if 'bizTransactionList' in event_dict:
             self.business_transaction_list = event_dict['bizTransactionList']
-        elif 'bizTransaction' in event_dict:
-            self.business_transaction_list = [event_dict['bizTransaction']]
+        elif self.event_type == 'TransactionEvent':
+            raise ValueError('Transaction Events must have a bizTransactionList')
         if 'sourceList' in event_dict:
             self.source_list = event_dict['sourceList']
         if 'destinationList' in event_dict:
