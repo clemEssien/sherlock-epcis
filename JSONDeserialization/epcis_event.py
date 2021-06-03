@@ -6,6 +6,8 @@ class URI():
     """ Provides a class for URI objects
 
     Attributes:
+        uri : str
+            Entire uri. Will be present when other attributes cannot be parsed.
         prefix : str
             The first four parts of the URI, denoted by GS1 as the uri prefix.
         epc_scheme : str
@@ -13,16 +15,18 @@ class URI():
         value : str
             The data stored by the URI (the actual SGTIN, SSCC, or biztype, etc.).
     """
-    def __init__(self, input_str:str):
+    def __init__(self, input_str: str):
         """Creates a new URI instance from the given string"""
         self.uri = input_str
+        self.prefix = ''
+        self.epc_scheme = ''
+        self.value = ''
         if re.search("[a-z]+:[a-z]+:[a-z]+:[a-z]+:[a-z0-9.*]+",input_str) is not None:
             uri = input_str.split(':')
             self.prefix = "{}:{}:{}:{}".format(uri[0],uri[1],uri[2],uri[3])
             self.epc_scheme = uri[3]
             self.value = uri[4]
-    def __str__(self):
-        return self.uri
+
 
 #TODO: flesh out event object and replace instances of str where that string represents a URI
 class EPCISEvent():
@@ -37,16 +41,16 @@ class EPCISEvent():
         self._event_time = datetime.datetime(1,1,1)
         self._event_timezone_offset = datetime.timezone(datetime.timedelta(hours=0))
         self._epc_list: list[URI] = []
-        self._parent_id: URI = ''
+        self._parent_id: URI = URI('')
         self._child_epc_list: list[URI] = []
         self._input_epc_list: list[URI] = []
         self._output_epc_list: list[URI] = []
-        self._xform_id: URI = ''
+        self._xform_id: URI = URI('')
         self._action: str = ''
-        self._business_step: URI = ''
-        self._disposition: URI = ''
-        self._business_location: URI = ''
-        self._read_point: URI = ''
+        self._business_step: URI = URI('')
+        self._disposition: URI = URI('')
+        self._business_location: URI = URI('')
+        self._read_point: URI = URI('')
         self._instance_lot_master_data: dict = {}
         self._quantity_list: list[dict] = []
         self._child_quantity_list: list[dict] = []
@@ -56,35 +60,42 @@ class EPCISEvent():
         self._source_list: list[dict] = []
         self._destination_list: list[dict] = []
 
-        @property
-        def event_type(self) -> str:
-            """event_type"""
-            return self._event_type
+    @property
+    def event_type(self) -> str:
+        """event_type"""
+        return self._event_type
 
-        @event_type.setter
-        def event_type(self, value: str):
-            self._event_type = value
+    @event_type.setter
+    def event_type(self, value: str):
+        self._event_type = value
 
-        @property
-        def event_time(self) -> datetime.datetime:
-            """event_time"""
-            return self._event_time
+    @property
+    def event_time(self) -> datetime.datetime:
+        """event_time"""
+        return self._event_time
 
-        @event_time.setter
-        def event_time(self, value: datetime.datetime):
-            self._event_time = value
- 
-uri1 = URI("abc")
-uri2 = URI("urn:epc:class:lgtin:0614141.077777.987")
-uri3 = URI("urn:epcglobal:cbv:bizstep:commissioning")
+    @event_time.setter
+    def event_time(self, value: datetime.datetime):
+        if isinstance(value, str):
+            try:
+                value = datetime.datetime.fromisoformat(value)
+            except:
+                pass
+        self._event_time = value
 
-print(uri1.uri)
-print(uri1.prefix)
+    @property
+    def event_timezone_offset(self) -> datetime.timezone:
+        return self._event_timezone_offset
 
-print(uri2.value)
-print(uri2.prefix)
-print(uri2.epc_scheme)
+    @event_timezone_offset.setter
+    def event_timezone_offset(self, value: datetime.timezone):
+        if re.search("[+-][0-1][0-9]:[0-5][0-9]", value) is not None:
+            offset = value.split(':')
+            # computes hours as a float by taking (|hour| + minutes/60) * -1 or +1 depending on the original sign of the offset
+            value = datetime.timezone(datetime.timedelta(hours=
+                (abs(float(offset[0]))+(float(offset[1])/60)*(abs(float(offset[0]))/float(offset[0])))))
+        self._event_timezone_offset = value
 
-print(uri3.value)
-print(uri3.prefix)
-print(uri3.epc_scheme)
+event = EPCISEvent()
+event.event_timezone_offset = "+02:00"
+print(event.event_timezone_offset)
