@@ -3,7 +3,7 @@ import re
 
 
 class URI():
-    """ Provides a class for URI objects
+    """ Provides a class for URI objects as defined in GS1's [TDS1.9, Section 6]
 
     Attributes:
         uri : str
@@ -26,9 +26,12 @@ class URI():
             self.prefix = "{}:{}:{}:{}".format(uri[0],uri[1],uri[2],uri[3])
             self.epc_scheme = uri[3]
             self.value = uri[4]
+    def __repr__(self) -> str:
+        rep = 'URI(' + self.uri + ' = ' + self.prefix + ':' + self.value + ')'
+        return rep
 
 
-#TODO: flesh out event object and replace instances of str where that string represents a URI
+#TODO: flesh out event object
 class EPCISEvent():
     """ Provides a class for EPCIS Event objects
 
@@ -85,17 +88,186 @@ class EPCISEvent():
 
     @property
     def event_timezone_offset(self) -> datetime.timezone:
+        """event_timezone_offset"""
         return self._event_timezone_offset
 
     @event_timezone_offset.setter
     def event_timezone_offset(self, value: datetime.timezone):
-        if re.search("[+-][0-1][0-9]:[0-5][0-9]", value) is not None:
-            offset = value.split(':')
-            # computes hours as a float by taking (|hour| + minutes/60) * -1 or +1 depending on the original sign of the offset
-            value = datetime.timezone(datetime.timedelta(hours=
-                (abs(float(offset[0]))+(float(offset[1])/60)*(abs(float(offset[0]))/float(offset[0])))))
+        if isinstance(value, str):
+            if re.search("[+-][0-1][0-9]:[0-5][0-9]", value) is not None:
+                offset = value.split(':')
+                # computes hours as a float by taking (|hour| + minutes/60) * -1 or +1 depending on the offset's sign
+                value = datetime.timezone(datetime.timedelta(hours=
+                    (abs(float(offset[0]))+(float(offset[1])/60))*(abs(float(offset[0]))/float(offset[0]))))
         self._event_timezone_offset = value
 
+    @property
+    def epc_list(self) -> list[URI]:
+        """epc_list"""
+        return self._epc_list
+
+    @epc_list.setter
+    def epc_list(self, value: list[URI]):
+        if isinstance(value, list):
+            new_values = []
+            for epc in value:
+                if isinstance(epc, str):
+                    new_values.append(URI(epc))
+            if len(new_values) == len(value):
+                value = new_values
+        self._epc_list = value
+
+    @property
+    def parent_id(self) -> URI:
+        """parent_id"""
+        return self._parent_id
+
+    @parent_id.setter
+    def parent_id(self, value: URI):
+        if isinstance(value, str):
+            value = URI(value)
+        self._parent_id = value
+
+    @property
+    def child_epc_list(self) -> list[URI]:
+        """child_epc_list"""
+        return self._child_epc_list
+
+    @child_epc_list.setter
+    def child_epc_list(self, value: list[URI]):
+        if isinstance(value, list):
+            new_values = []
+            for epc in value:
+                if isinstance(epc, str):
+                    new_values.append(URI(epc))
+            if len(new_values) == len(value):
+                value = new_values
+        self._child_epc_list = value
+
+    @property
+    def output_epc_list(self) -> list[URI]:
+        """output_epc_list"""
+        return self._output_epc_list
+
+    @output_epc_list.setter
+    def output_epc_list(self, value: list[URI]):
+        if isinstance(value, list):
+            new_values = []
+            for epc in value:
+                if isinstance(epc, str):
+                    new_values.append(URI(epc))
+            if len(new_values) == len(value):
+                value = new_values
+        self._output_epc_list = value
+
+    @property
+    def input_epc_list(self) -> list[URI]:
+        """input_epc_list"""
+        return self._input_epc_list
+
+    @input_epc_list.setter
+    def input_epc_list(self, value):
+        if isinstance(value, list):
+            new_values = []
+            for epc in value:
+                if isinstance(epc, str):
+                    new_values.append(URI(epc))
+            if len(new_values) == len(value):
+                value = new_values
+        self._input_epc_list = value
+
+    @property
+    def xform_id(self) -> URI:
+        """transaction_form_id"""
+        return self._xform_id
+
+    @xform_id.setter
+    def xform_id(self, value: URI):
+        if isinstance(value, str):
+            value = URI(value)
+        self._xform_id = value
+
+    @property
+    def action(self) -> str:
+        """action"""
+        return self._action
+
+    @action.setter
+    def action(self, value: str):
+        self._action = value
+
+    @property
+    def business_step(self) -> URI:
+        """business_step"""
+        return self._business_step
+
+    @business_step.setter
+    def business_step(self, value: URI):
+        if isinstance(value, str):
+            value = URI(value)
+
+    @property
+    def business_step(self) -> URI:
+        """business_step"""
+        return self._business_step
+
+    @business_step.setter
+    def business_step(self, value: URI):
+        if isinstance(value, str):
+            value = URI(value)
+        self._business_step = value
+
+    @property
+    def disposition(self) -> URI:
+        """disposition"""
+        return self._disposition
+
+    @disposition.setter
+    def disposition(self, value: URI):
+        if isinstance(value, str):
+            value = URI(value)
+        self._disposition = value
+
+    @property
+    def business_location(self) -> URI:
+        """business_location"""
+        return self._business_location
+
+    @business_location.setter
+    def business_location(self, value: URI):
+        if isinstance(value, str):
+            value = URI(value)
+        self._business_location = value
+
+    @property
+    def read_point(self) -> URI:
+        """read_point"""
+        return self._read_point
+
+    @read_point.setter
+    def read_point(self, value: URI):
+        if isinstance(value, str):
+            value = URI(value)
+        self._read_point = value
+
+    @property
+    def instance_lot_master_data(self) -> dict:
+        """instance_lot_master_data"""
+        return self._instance_lot_master_data
+    
+    @instance_lot_master_data.setter
+    def instance_lot_master_data(self, value: dict):
+        self._instance_lot_master_data = value
+
+    @property
+    def quantity_list(self) -> list[dict]:
+        """quantity_list"""
+        return self._quantity_list
+
+    @quantity_list.setter
+    def quantity_list(self, value: list[dict]):
+        self._quantity_list = value
+
 event = EPCISEvent()
-event.event_timezone_offset = "+02:00"
-print(event.event_timezone_offset)
+event.business_location = "urn:epc:id:sgln:0614141.00888.0"
+print(event.business_location)
