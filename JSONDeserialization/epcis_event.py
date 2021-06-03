@@ -268,6 +268,61 @@ class EPCISEvent():
     def quantity_list(self, value: list[dict]):
         self._quantity_list = value
 
+    @property
+    def child_quantity_list(self) -> list[dict]:
+        """child_quantity_list"""
+        return self._child_quantity_list
+
+    @child_quantity_list.setter
+    def child_quantity_list(self, value: list[dict]):
+        self._child_quantity_list = value
+
+    @property
+    def input_quantity_list(self) -> list[dict]:
+        """input_quantity_list"""
+        return self._input_quantity_list
+
+    @input_quantity_list.setter
+    def input_quantity_list(self, value: list[dict]):
+        self._input_quantity_list = value
+
+    @property
+    def output_quantity_list(self) -> list[dict]:
+        """output_quantity_list"""
+        return self._output_quantity_list
+
+    @output_quantity_list.setter
+    def output_quantity_list(self, value: list[dict]):
+        self._output_quantity_list = value
+
+    @property
+    def business_transaction_list(self) -> list[dict]:
+        """business_transaction_list"""
+        return self._business_transaction_list
+
+    @business_transaction_list.setter
+    def business_transaction_list(self, value: list[dict]):
+        self._business_transaction_list = value
+
+    @property
+    def source_list(self) -> list[dict]:
+        """source_list"""
+        return self._source_list
+
+    @source_list.setter
+    def source_list(self, value: list[dict]):
+        self._source_list = value
+
+    @property
+    def destination_list(self) -> list[dict]:
+        """destination_list"""
+        return self._destination_list
+
+    @destination_list.setter
+    def destination_list(self, value: list[dict]):
+        self._destination_list = value
+
 event = EPCISEvent()
 event.business_location = "urn:epc:id:sgln:0614141.00888.0"
 print(event.business_location)
+
