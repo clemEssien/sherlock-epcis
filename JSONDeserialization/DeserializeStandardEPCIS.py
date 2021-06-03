@@ -2,9 +2,9 @@
 # Last Modified: June 2, 2021
 # Script to deserialize standard EPCIS documents.
 # GS1StandardExample1-4 from https://www.mimasu.nl/epcis/xmljson
+# NOTE: Do not use this file as anything other than a reference
 import json
 import pprint
-from typing import Type
 
 # EPCISEvent attributes can be added or removed dependingon what data we plan on keeping
 class EPCISEvent():
@@ -61,7 +61,7 @@ class EPCISEvent():
 def main():
     events = []
     event_objects = []
-    with open('JSONDeserialization/GS1StandardExample1.json') as f:
+    with open('GS1StandardExample1.json') as f:
         epcis_doc = json.load(f)
         if epcis_doc['isA'] != 'EPCISDocument':
             print('{} is an unsupported type'.format(epcis_doc['isA']))
