@@ -1,3 +1,6 @@
+# Author: Helina Solmn and Kevin Zong
+# Last Modified: June 4, 2021
+# Script to deserialize standard EPCIS documents in XML form.
 import xml
 import xml.etree.ElementTree as ET
 
@@ -5,30 +8,28 @@ def main() :
     tree = ET.parse("XMLDeserialization/GS1StandardExample1.xml")
     root = tree.getroot()
 
-    if root.tag != "{urn:epcglobal:epcis:xsd:1}EPCISDocument" :       
+    if root.tag != "{urn:epcglobal:epcis:xsd:1}EPCISDocument" :                     #Check for the EPCISDocument tag 
         print("Not EPCISDocument")
         return
-    eventDicts = []
-    for event in root.iter('EventList') :
+    eventDicts = []                                                                 #List of Event Dicts
+    for list in root.iter('EventList') :                                           #Iterate through each event
         myDict = {}
-        for ob in event :
-            for child in ob :
+        for event in list :
+            for child in event :
                 print(child.tag)
-                if len(child) :
-                    if(child.tag == "readPoint" or child.tag == "bizLocation") :
-                        myDict[child.tag] = child[0].text
+                if len(child) :                                                     #Check for lists (e.g. epcList, businessTransactionList)
+                    if(child.tag == "readPoint" or child.tag == "bizLocation") :    #Check for specific outliers
+                        myDict[child.tag] = child[0].text                           #Extract the id uris
                     else :
                         childDicts = []
-                        for subchild in child :
+                        for subchild in child :                                     #Create a dict for each list element
                             childDict = {}
                             childDict[subchild.tag] = subchild.text
                             childDicts.append(childDict)
-                        myDict[child.tag] = childDicts
+                        myDict[child.tag] = childDicts                              #Append the list[dict]
                 else :
-                    myDict[child.tag] = child.text
-        print(myDict)
-        break
-        eventDicts.append(myDict)
+                    myDict[child.tag] = child.text                                  #Append the URI
+            eventDicts.append(myDict)
     print(eventDicts)
                 # myDict[ob.tag].append(ob.text)
         #for event in child :
