@@ -1,4 +1,4 @@
-# Author: Helina Solmn and Kevin Zong
+# Author: Helina Solomon and Kevin Zong
 # Last Modified: June 4, 2021
 # Script to deserialize standard EPCIS documents in XML form.
 import xml
@@ -31,16 +31,6 @@ def main() :
                     myDict[child.tag] = child.text                                  #Append the URI
             eventDicts.append(myDict)
     print(eventDicts)                                                               #Printing output for now
-                # myDict[ob.tag].append(ob.text)
-        #for event in child :
-        #    if len(event) :
-         #       for ob in event :
-         #           keyList.append(ob.tag)
-        #myDict = dict.fromkeys(keyList, [])
-        #for event in child :
-          #  for ob in event :
-         #       myDict[ob.tag].append(ob.text)
-   #print(myDict)
 
 if __name__ == '__main__' :
     main()
