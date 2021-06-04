@@ -29,7 +29,8 @@ def main() :
                         myDict[child.tag] = childDicts                              #Append the list[dict]
                 else :
                     myDict[child.tag] = child.text                                  #Append the URI
-            eventDicts.append(myDict)
+            tempDict = myDict.copy()
+            eventDicts.append(tempDict)
     print(eventDicts)                                                               #Printing output for now
 
 if __name__ == '__main__' :
