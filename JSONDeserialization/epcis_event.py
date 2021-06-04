@@ -31,6 +31,63 @@ class URI():
     def __str__(self) -> str:
         return self.uri
 
+class QuantityElement():
+    """ Provides a class for the QuantityElement structure defined in [EPCIS1.2, SEction 7.3.3.3]
+    
+    Attributes:
+        epc_class : URI
+            The identifier for the class to which the specified quantity of objects belongs.
+        quantity : float
+            How many or how much of the specified EPCClass is denoted by this QuantityElement.
+        uom : str
+            The unit of measure the quantity is to be interpreted as.
+    """
+    def __init__(self, epc: URI =URI(''), quant: float=-1, unit: str =''):
+        """Creates a new QuantityElement instance"""
+        self._epc_class: URI = epc
+        self._quantity: float = quant
+        self._uom: str = unit
+
+    def __repr__(self) -> str:
+        return 'QuantityElement('+str(self._epc_class)+', '+str(self._quantity)+', '+self._uom+')'
+
+    @property
+    def epc_class(self) -> URI:
+        return self._epc_class
+
+    @epc_class.setter
+    def epc_class(self, value: URI):
+        if isinstance(value, str):
+            value = URI(value)
+        self._epc_class = value
+
+    @property
+    def quantity(self) -> float:
+        return self._quantity
+
+    @quantity.setter
+    def quantity(self, value: float):
+        if isinstance(value, int):
+            value = float(value)
+        elif isinstance(value, str):
+            try:
+                value = float(value)
+            except:
+                pass
+        self._quantity = value
+
+    @property
+    def uom(self) -> str:
+        return self._uom
+
+    @uom.setter
+    def uom(self, value: str):
+        if not isinstance(value, str):
+            try:
+                value = str(value)
+            except:
+                pass
+        self._uom = value
 
 class EPCISEvent():
     """ Provides a class for EPCIS Event objects
@@ -120,9 +177,6 @@ class EPCISEvent():
         for attr in self.__dict__.keys():
             rep = rep + attr + ' : ' + str(getattr(self, attr)) + '\n'
         return rep + ')'
-
-
-
 
     @property
     def event_type(self) -> str:
@@ -383,18 +437,13 @@ class EPCISEvent():
     def destination_list(self, value: list[dict]):
         self._destination_list = value
 
-event = EPCISEvent()
-event.event_type = "ObservationEvent"
-event.event_time = "2013-10-31T14:58:56.591+00:00"
-event.event_timezone_offset = "+02:00"
-event.input_epc_list = [
-    "urn:epc:id:sgtin:4012345.011122.25",
-    "urn:epc:id:sgtin:4000001.065432.99886655"
-          ]
-event.output_epc_list = [
-    "urn:epc:id:sgtin:4012345.077889.25",
-    "urn:epc:id:sgtin:4012345.077889.26",
-    "urn:epc:id:sgtin:4012345.077889.27",
-    "urn:epc:id:sgtin:4012345.077889.28"
-    ]
-print(repr(event))
+qe = QuantityElement('asdfasdfsadfsfd', 5, 'lbs')
+
+qe.epc_class = URI("urn:epc:class:lgtin:4012345.012345.998877")
+qe.quantity = 200.5
+qe.uom = "KGM"
+
+print(type(qe.epc_class))
+print(type(qe.quantity))
+print(type(qe.uom))
+print(qe)
