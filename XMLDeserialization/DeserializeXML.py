@@ -12,17 +12,16 @@ def main() :
         return
 
     for child in root.iter('EventList') :
+        keyList = []
+        myDict = {}
         for event in child :
             for ob in event :
-                if len(ob) :                    # check if child of root has subchildren
-                    print(ob.tag)
-                    print(ob.text)
-                    for subChild in ob :
-                        print(subChild.tag)
-                        print(subChild.text)
-                else :                          # no subchildren
-                    print(ob.tag)
-                    print(ob.text)
+                keyList.append(ob.tag)
+        myDict = dict.fromkeys(keyList, [])
+        for event in child :
+            for ob in event :
+                myDict[ob.tag].append(ob.text)
+        print(myDict)
 
 if __name__ == '__main__' :
     main()
