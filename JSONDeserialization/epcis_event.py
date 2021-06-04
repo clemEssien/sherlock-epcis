@@ -32,7 +32,7 @@ class URI():
         return self.uri
 
 class QuantityElement():
-    """ Provides a class for the QuantityElement structure defined in [EPCIS1.2, SEction 7.3.3.3]
+    """ Provides a class for the QuantityElement structure defined in [EPCIS1.2, Section 7.3.3.3]
     
     Attributes:
         epc_class : URI
@@ -129,13 +129,13 @@ class EPCISEvent():
         instance_lot_master_data : dict
             Instance/Lot master data that describes objects created during this event. 
             Only used when action is ADD.
-        quantity_list : list[dict]
-            A list of QuantityElements identify objects to which the event pertained.
-        child_quantity_list : list[dict]
+        quantity_list : list[QuantityElement]
+            The QuantityElements identifying the objects to which the event pertained.
+        child_quantity_list : list[QuantityElement]
             The QuantityElements identifying the objects contained in an aggregation event.
-        input_quantity_list : list[dict]
+        input_quantity_list : list[QuantityElement]
             The QuantityElements identifying the objects that were inputs in a transformation event.
-        output_quantity_list : list[dict]
+        output_quantity_list : list[QuantityElement]
             The QuantityElements identifying the objects that were outputs from a transformation event.
         business_transaction_list : list[dict]
             The business transaction(s) in a TransactionEvent.
@@ -163,7 +163,7 @@ class EPCISEvent():
         self._business_location: URI = URI('')
         self._read_point: URI = URI('')
         self._instance_lot_master_data: dict = {}
-        self._quantity_list: list[dict] = []
+        self._quantity_list: list[QuantityElement] = []
         self._child_quantity_list: list[dict] = []
         self._input_quantity_list: list[dict] = []
         self._output_quantity_list: list[dict] = []
@@ -375,39 +375,83 @@ class EPCISEvent():
         self._instance_lot_master_data = value
 
     @property
-    def quantity_list(self) -> list[dict]:
+    def quantity_list(self) -> list[QuantityElement]:
         """quantity_list"""
         return self._quantity_list
 
     @quantity_list.setter
-    def quantity_list(self, value: list[dict]):
+    def quantity_list(self, value: list[QuantityElement]):
+        if isinstance(value, list):
+            new_vals = []
+            for val in value:
+                if isinstance(val, dict) and 'epcClass' in val.keys():
+                    qe = QuantityElement()
+                    for a_k in [('epc_class','epcClass'), ('quantity','quantity'), ('uom','uom')]:
+                        if a_k[1] in val.keys():
+                            setattr(qe,a_k[0],val[a_k[1]])
+                    new_vals.append(qe)
+            if len(new_vals) == len(value):
+                value = new_vals
         self._quantity_list = value
 
     @property
-    def child_quantity_list(self) -> list[dict]:
+    def child_quantity_list(self) -> list[QuantityElement]:
         """child_quantity_list"""
         return self._child_quantity_list
 
     @child_quantity_list.setter
-    def child_quantity_list(self, value: list[dict]):
+    def child_quantity_list(self, value: list[QuantityElement]):
+        if isinstance(value, list):
+            new_vals = []
+            for val in value:
+                if isinstance(val, dict) and 'epcClass' in val.keys():
+                    qe = QuantityElement()
+                    for a_k in [('epc_class','epcClass'), ('quantity','quantity'), ('uom','uom')]:
+                        if a_k[1] in val.keys():
+                            setattr(qe,a_k[0],val[a_k[1]])
+                    new_vals.append(qe)
+            if len(new_vals) == len(value):
+                value = new_vals
         self._child_quantity_list = value
 
     @property
-    def input_quantity_list(self) -> list[dict]:
+    def input_quantity_list(self) -> list[QuantityElement]:
         """input_quantity_list"""
         return self._input_quantity_list
 
     @input_quantity_list.setter
-    def input_quantity_list(self, value: list[dict]):
+    def input_quantity_list(self, value: list[QuantityElement]):
+        if isinstance(value, list):
+            new_vals = []
+            for val in value:
+                if isinstance(val, dict) and 'epcClass' in val.keys():
+                    qe = QuantityElement()
+                    for a_k in [('epc_class','epcClass'), ('quantity','quantity'), ('uom','uom')]:
+                        if a_k[1] in val.keys():
+                            setattr(qe,a_k[0],val[a_k[1]])
+                    new_vals.append(qe)
+            if len(new_vals) == len(value):
+                value = new_vals
         self._input_quantity_list = value
 
     @property
-    def output_quantity_list(self) -> list[dict]:
+    def output_quantity_list(self) -> list[QuantityElement]:
         """output_quantity_list"""
         return self._output_quantity_list
 
     @output_quantity_list.setter
-    def output_quantity_list(self, value: list[dict]):
+    def output_quantity_list(self, value: list[QuantityElement]):
+        if isinstance(value, list):
+            new_vals = []
+            for val in value:
+                if isinstance(val, dict) and 'epcClass' in val.keys():
+                    qe = QuantityElement()
+                    for a_k in [('epc_class','epcClass'), ('quantity','quantity'), ('uom','uom')]:
+                        if a_k[1] in val.keys():
+                            setattr(qe,a_k[0],val[a_k[1]])
+                    new_vals.append(qe)
+            if len(new_vals) == len(value):
+                value = new_vals
         self._output_quantity_list = value
 
     @property
@@ -437,13 +481,17 @@ class EPCISEvent():
     def destination_list(self, value: list[dict]):
         self._destination_list = value
 
-qe = QuantityElement('asdfasdfsadfsfd', 5, 'lbs')
-
-qe.epc_class = URI("urn:epc:class:lgtin:4012345.012345.998877")
-qe.quantity = 200.5
-qe.uom = "KGM"
-
-print(type(qe.epc_class))
-print(type(qe.quantity))
-print(type(qe.uom))
-print(qe)
+event = EPCISEvent()
+event.output_quantity_list = [
+            {
+              "epcClass": "urn:epc:idpat:sgtin:4012345.098765.*",
+              "quantity": 10
+            },
+            {
+              "epcClass": "urn:epc:class:lgtin:4012345.012345.998877",
+              "quantity": 200.5,
+              "uom": "KGM"
+            }
+          ]
+for qe in event.output_quantity_list:
+    print(qe)
