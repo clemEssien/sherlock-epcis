@@ -2,8 +2,6 @@ import xml
 import xml.etree.ElementTree as ET
 
 def main() :
-    events = []
-    events_objects = []
     tree = ET.parse("XMLDeserialization/GS1StandardExample1.xml")
     root = tree.getroot()
 
@@ -11,17 +9,31 @@ def main() :
         print("Not EPCISDocument")
         return
 
-    for child in root.iter('EventList') :
+    for event in root.iter('EventList') :
         keyList = []
         myDict = {}
-        for event in child :
-            for ob in event :
-                keyList.append(ob.tag)
-        myDict = dict.fromkeys(keyList, [])
-        for event in child :
-            for ob in event :
-                myDict[ob.tag].append(ob.text)
-        print(myDict)
+        for ob in event :
+            for child in ob :
+                print(child.tag)
+                if len(child) :
+                    for subchild in child :
+                        if(ob.text != '\n        ') :
+                            keyList.append(ob.text)
+                    myDict[child.tag] = keyList
+                else :
+                    myDict[child.tag] = child.text
+            break
+    print(myDict)
+                # myDict[ob.tag].append(ob.text)
+        #for event in child :
+        #    if len(event) :
+         #       for ob in event :
+         #           keyList.append(ob.tag)
+        #myDict = dict.fromkeys(keyList, [])
+        #for event in child :
+          #  for ob in event :
+         #       myDict[ob.tag].append(ob.text)
+   #print(myDict)
 
 if __name__ == '__main__' :
     main()
