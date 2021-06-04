@@ -26,8 +26,10 @@ class URI():
             self.scheme = uri[3]
             self.value = uri[4]
     def __repr__(self) -> str:
-        rep = 'URI(' + self.uri + ' = ' + self.prefix + ':' + self.value + ')'
+        rep = 'URI(uri: ' + self.uri + '; prefix: ' + self.prefix + '; scheme: ' + self.scheme + '; value: ' + self.value + ')'
         return rep
+    def __str__(self) -> str:
+        return self.uri
 
 
 class EPCISEvent():
@@ -111,6 +113,16 @@ class EPCISEvent():
         self._business_transaction_list: list[dict] = []
         self._source_list: list[dict] = []
         self._destination_list: list[dict] = []
+
+    def __repr__(self) -> str:
+        """EPCISEvent representation"""
+        rep = "EPCISEvent(\n"
+        for attr in self.__dict__.keys():
+            rep = rep + attr + ' : ' + str(getattr(self, attr)) + '\n'
+        return rep + ')'
+
+
+
 
     @property
     def event_type(self) -> str:
@@ -370,3 +382,19 @@ class EPCISEvent():
     @destination_list.setter
     def destination_list(self, value: list[dict]):
         self._destination_list = value
+
+event = EPCISEvent()
+event.event_type = "ObservationEvent"
+event.event_time = "2013-10-31T14:58:56.591+00:00"
+event.event_timezone_offset = "+02:00"
+event.input_epc_list = [
+    "urn:epc:id:sgtin:4012345.011122.25",
+    "urn:epc:id:sgtin:4000001.065432.99886655"
+          ]
+event.output_epc_list = [
+    "urn:epc:id:sgtin:4012345.077889.25",
+    "urn:epc:id:sgtin:4012345.077889.26",
+    "urn:epc:id:sgtin:4012345.077889.27",
+    "urn:epc:id:sgtin:4012345.077889.28"
+    ]
+print(repr(event))
