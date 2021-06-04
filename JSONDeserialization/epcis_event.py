@@ -1,16 +1,15 @@
 import datetime
 import re
 
-
 class URI():
-    """ Provides a class for URI objects as defined in GS1's [TDS1.9, Section 6]
+    """ Provides a class for URI objects as defined in GS1's [TDS1.9, Section 7]
 
     Attributes:
         uri : str
             Entire uri. Will be present when other attributes cannot be parsed.
         prefix : str
             The first four parts of the URI, denoted by GS1 as the uri prefix.
-        epc_scheme : str
+        scheme : str
             The type of data represented by the URI (SGTIN, SSCC, biztype, etc.).
         value : str
             The data stored by the URI (the actual SGTIN, SSCC, or biztype, etc.).
@@ -19,24 +18,74 @@ class URI():
         """Creates a new URI instance from the given string"""
         self.uri = input_str
         self.prefix = ''
-        self.epc_scheme = ''
+        self.scheme = ''
         self.value = ''
-        if re.search("[a-z]+:[a-z]+:[a-z]+:[a-z]+:[a-z0-9.*]+",input_str) is not None:
+        if re.search("[a-z]+:[a-z]+:[a-z]+:[a-z]+:[a-z0-9.*]+", input_str) is not None:
             uri = input_str.split(':')
             self.prefix = "{}:{}:{}:{}".format(uri[0],uri[1],uri[2],uri[3])
-            self.epc_scheme = uri[3]
+            self.scheme = uri[3]
             self.value = uri[4]
     def __repr__(self) -> str:
         rep = 'URI(' + self.uri + ' = ' + self.prefix + ':' + self.value + ')'
         return rep
 
 
-#TODO: flesh out event object
 class EPCISEvent():
     """ Provides a class for EPCIS Event objects
 
-    Attributes:
+    Descriptions from [EPCIS1.2, Section 7.4]
 
+    Attributes:
+        event_type : str
+            The type of event represented by this EPCISEvent (e.g. ObjectEvent, TransformationEvent).
+        event_time : datetime.datetime
+            The date and time that the event occurred.
+        event_timezone_offset : datetime.timezone
+            The timezone offset in effect at the time and place the event occurred.
+        epc_list : list[URI]
+            The list of EPC's naming specific objects to which the event pertained.
+        parent_id : URI
+            The identifier of the parent of the objects given in epcList and quantityList,
+            or the parent of the association of the event.
+        child_epc_list : list[URI]
+            The identifiers of the objects contained in an aggregation event.
+        input_epc_list : list[URI]
+            The identifiers of objects that were inputs to a transformation event.
+        output_epc_list : list[URI]
+            The identifiers of objects that were outputs from a transformation event.
+        transformation_id : URI
+            An identifier that links the inputs and outputs of this event
+            to those of any other transformation event with the same id.
+        action : str
+            How this event relates to the lifecycle of the EPCs named in the event.
+            One of ADD, OBSERVE, DELETE.
+        business_step : URI
+            The business step of which this event was a part.
+        disposition : URI
+            The business condition of the objects associated with this event.
+        business_location : URI
+            The business location where objects associated with this event can be found.
+        read_point : URI
+            The read point at which the vent took place.
+        instance_lot_master_data : dict
+            Instance/Lot master data that describes objects created during this event. 
+            Only used when action is ADD.
+        quantity_list : list[dict]
+            A list of QuantityElements identify objects to which the event pertained.
+        child_quantity_list : list[dict]
+            The QuantityElements identifying the objects contained in an aggregation event.
+        input_quantity_list : list[dict]
+            The QuantityElements identifying the objects that were inputs in a transformation event.
+        output_quantity_list : list[dict]
+            The QuantityElements identifying the objects that were outputs from a transformation event.
+        business_transaction_list : list[dict]
+            The business transaction(s) in a TransactionEvent.
+        source_list : list[dict]
+            A list of Source elements that provide context about the originating endpoint of a business transfer
+            of which this event is a part.
+        destination_list : list[dict]
+            A list of Destination elements that provide context about the terminating endpoint of a business transfer
+            of which this event is a part.
     """
     def __init__(self):
         """Creates a new EPCISEvent instance with empty, but type-hinted, attributes"""
@@ -48,7 +97,7 @@ class EPCISEvent():
         self._child_epc_list: list[URI] = []
         self._input_epc_list: list[URI] = []
         self._output_epc_list: list[URI] = []
-        self._xform_id: URI = URI('')
+        self._transformation_id: URI = URI('')
         self._action: str = ''
         self._business_step: URI = URI('')
         self._disposition: URI = URI('')
@@ -177,15 +226,15 @@ class EPCISEvent():
         self._input_epc_list = value
 
     @property
-    def xform_id(self) -> URI:
+    def transformation_id(self) -> URI:
         """transaction_form_id"""
-        return self._xform_id
+        return self._transformation_id
 
-    @xform_id.setter
-    def xform_id(self, value: URI):
+    @transformation_id.setter
+    def transformation_id(self, value: URI):
         if isinstance(value, str):
             value = URI(value)
-        self._xform_id = value
+        self._transformation_id = value
 
     @property
     def action(self) -> str:
@@ -321,8 +370,3 @@ class EPCISEvent():
     @destination_list.setter
     def destination_list(self, value: list[dict]):
         self._destination_list = value
-
-event = EPCISEvent()
-event.business_location = "urn:epc:id:sgln:0614141.00888.0"
-print(event.business_location)
-
