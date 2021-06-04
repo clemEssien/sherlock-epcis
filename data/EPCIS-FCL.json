@@ -1,0 +1,1114 @@
+{
+  "version" : "1.0.0",
+  "data" : {
+    "version" : "1.0.0",
+    "stations" : {
+      "columnProperties" : [ {
+        "id" : "ID",
+        "type" : "string"
+      }, {
+        "id" : "stationName",
+        "type" : "string"
+      }, {
+        "id" : "Address",
+        "type" : "string"
+      }, {
+        "id" : "Country",
+        "type" : "string"
+      }, {
+        "id" : "type of business",
+        "type" : "string"
+      }, {
+        "id" : "Businessname",
+        "type" : "string"
+      }, {
+        "id" : "AK_Score",
+        "type" : "double"
+      }, {
+        "id" : "Name",
+        "type" : "string"
+      }, {
+        "id" : "GeocodingURL",
+        "type" : "string"
+      }, {
+        "id" : "GeocodingStreet",
+        "type" : "string"
+      }, {
+        "id" : "GeocodingCity",
+        "type" : "string"
+      }, {
+        "id" : "GeocodingDistrict",
+        "type" : "string"
+      }, {
+        "id" : "GeocodingState",
+        "type" : "string"
+      }, {
+        "id" : "GeocodingCountry",
+        "type" : "string"
+      }, {
+        "id" : "GeocodingPostalCode",
+        "type" : "string"
+      }, {
+        "id" : "Latitude",
+        "type" : "double"
+      }, {
+        "id" : "Longitude",
+        "type" : "double"
+      }, {
+        "id" : "Weight",
+        "type" : "double"
+      }, {
+        "id" : "CrossContamination",
+        "type" : "boolean"
+      }, {
+        "id" : "Kill Contamination",
+        "type" : "boolean"
+      }, {
+        "id" : "Observed",
+        "type" : "boolean"
+      }, {
+        "id" : "Score",
+        "type" : "double"
+      }, {
+        "id" : "Max Lot Score",
+        "type" : "double"
+      }, {
+        "id" : "Normalized Score",
+        "type" : "double"
+      }, {
+        "id" : "Positive Score",
+        "type" : "double"
+      }, {
+        "id" : "Negative Score",
+        "type" : "double"
+      }, {
+        "id" : "Backward",
+        "type" : "boolean"
+      }, {
+        "id" : "Forward",
+        "type" : "boolean"
+      }, {
+        "id" : "Is selected",
+        "type" : "boolean"
+      } ],
+      "data" : [ [ {
+        "id" : "ID",
+        "value" : "urn:epc:id:sgln:0071279.00002.0"
+      }, {
+        "id" : "stationName",
+        "value" : "Fresh Express-Streamwood"
+      }, {
+        "id" : "Address",
+        "value" : "Streamwood, USA"
+      }, {
+        "id" : "Country",
+        "value" : "USA"
+      }, {
+        "id" : "Businessname",
+        "value" : "Fresh Express-Streamwood"
+      }, {
+        "id" : "Name",
+        "value" : "Fresh Express-Streamwood"
+      }, {
+        "id" : "GeocodingURL",
+        "value" : "https://open.mapquestapi.com/geocoding/v1/address?key=XXXXXX&location=Streamwood%2C+USA"
+      }, {
+        "id" : "GeocodingCity",
+        "value" : "Streamwood"
+      }, {
+        "id" : "GeocodingDistrict",
+        "value" : "Cook County"
+      }, {
+        "id" : "GeocodingState",
+        "value" : "IL"
+      }, {
+        "id" : "GeocodingCountry",
+        "value" : "US"
+      }, {
+        "id" : "GeocodingPostalCode",
+        "value" : "60107"
+      }, {
+        "id" : "Latitude",
+        "value" : 42.025583
+      }, {
+        "id" : "Longitude",
+        "value" : -88.178408
+      }, {
+        "id" : "Weight",
+        "value" : 0.0
+      }, {
+        "id" : "CrossContamination",
+        "value" : false
+      }, {
+        "id" : "Kill Contamination",
+        "value" : false
+      }, {
+        "id" : "Observed",
+        "value" : false
+      }, {
+        "id" : "Score",
+        "value" : 0.0
+      }, {
+        "id" : "Max Lot Score",
+        "value" : 0.0
+      }, {
+        "id" : "Normalized Score",
+        "value" : 0.0
+      }, {
+        "id" : "Positive Score",
+        "value" : 0.0
+      }, {
+        "id" : "Negative Score",
+        "value" : 0.0
+      }, {
+        "id" : "Backward",
+        "value" : false
+      }, {
+        "id" : "Forward",
+        "value" : false
+      }, {
+        "id" : "Is selected",
+        "value" : false
+      } ], [ {
+        "id" : "ID",
+        "value" : "urn:epc:id:sgln:0078742.06085.0"
+      }, {
+        "id" : "stationName",
+        "value" : "Walmart DC 6085"
+      }, {
+        "id" : "Address",
+        "value" : "Mankato, USA"
+      }, {
+        "id" : "Country",
+        "value" : "USA"
+      }, {
+        "id" : "Businessname",
+        "value" : "Walmart DC 6085"
+      }, {
+        "id" : "Name",
+        "value" : "Walmart DC 6085"
+      }, {
+        "id" : "GeocodingURL",
+        "value" : "https://open.mapquestapi.com/geocoding/v1/address?key=XXXXXX&location=Mankato%2C+USA"
+      }, {
+        "id" : "GeocodingCity",
+        "value" : "Mankato"
+      }, {
+        "id" : "GeocodingDistrict",
+        "value" : "Blue Earth County"
+      }, {
+        "id" : "GeocodingState",
+        "value" : "MN"
+      }, {
+        "id" : "GeocodingCountry",
+        "value" : "US"
+      }, {
+        "id" : "Latitude",
+        "value" : 44.163466
+      }, {
+        "id" : "Longitude",
+        "value" : -93.99935
+      }, {
+        "id" : "Weight",
+        "value" : 0.0
+      }, {
+        "id" : "CrossContamination",
+        "value" : false
+      }, {
+        "id" : "Kill Contamination",
+        "value" : false
+      }, {
+        "id" : "Observed",
+        "value" : false
+      }, {
+        "id" : "Score",
+        "value" : 0.0
+      }, {
+        "id" : "Normalized Score",
+        "value" : 0.0
+      }, {
+        "id" : "Positive Score",
+        "value" : 0.0
+      }, {
+        "id" : "Negative Score",
+        "value" : 0.0
+      }, {
+        "id" : "Backward",
+        "value" : false
+      }, {
+        "id" : "Forward",
+        "value" : false
+      }, {
+        "id" : "Is selected",
+        "value" : false
+      } ], [ {
+        "id" : "ID",
+        "value" : "urn:epc:id:sgln:0071279.00003.0"
+      }, {
+        "id" : "stationName",
+        "value" : "Alvaro Nieto-Santa Amalia"
+      }, {
+        "id" : "Address",
+        "value" : "Col Alameda, Mexico"
+      }, {
+        "id" : "Country",
+        "value" : "Mexico"
+      }, {
+        "id" : "Businessname",
+        "value" : "Alvaro Nieto-Santa Amalia"
+      }, {
+        "id" : "Name",
+        "value" : "Alvaro Nieto-Santa Amalia"
+      }, {
+        "id" : "GeocodingURL",
+        "value" : "https://open.mapquestapi.com/geocoding/v1/address?key=XXXXXX&location=Col+Alameda%2C+Mexico"
+      }, {
+        "id" : "GeocodingStreet",
+        "value" : "Alameda"
+      }, {
+        "id" : "GeocodingCity",
+        "value" : "Manzanillo"
+      }, {
+        "id" : "GeocodingDistrict",
+        "value" : "Manzanillo"
+      }, {
+        "id" : "GeocodingState",
+        "value" : "Colima"
+      }, {
+        "id" : "GeocodingCountry",
+        "value" : "MX"
+      }, {
+        "id" : "GeocodingPostalCode",
+        "value" : "28200"
+      }, {
+        "id" : "Latitude",
+        "value" : 19.051311
+      }, {
+        "id" : "Longitude",
+        "value" : -104.313965
+      }, {
+        "id" : "Weight",
+        "value" : 0.0
+      }, {
+        "id" : "CrossContamination",
+        "value" : false
+      }, {
+        "id" : "Kill Contamination",
+        "value" : false
+      }, {
+        "id" : "Observed",
+        "value" : false
+      }, {
+        "id" : "Score",
+        "value" : 0.0
+      }, {
+        "id" : "Max Lot Score",
+        "value" : 0.0
+      }, {
+        "id" : "Normalized Score",
+        "value" : 0.0
+      }, {
+        "id" : "Positive Score",
+        "value" : 0.0
+      }, {
+        "id" : "Negative Score",
+        "value" : 0.0
+      }, {
+        "id" : "Backward",
+        "value" : false
+      }, {
+        "id" : "Forward",
+        "value" : false
+      }, {
+        "id" : "Is selected",
+        "value" : false
+      } ], [ {
+        "id" : "ID",
+        "value" : "urn:epc:id:sgln:0071279.00007.0"
+      }, {
+        "id" : "stationName",
+        "value" : "Lakeside Produce-Cow Island"
+      }, {
+        "id" : "Address",
+        "value" : "Port St. Lucie, USA"
+      }, {
+        "id" : "Country",
+        "value" : "USA"
+      }, {
+        "id" : "Businessname",
+        "value" : "Lakeside Produce-Cow Island"
+      }, {
+        "id" : "Name",
+        "value" : "Lakeside Produce-Cow Island"
+      }, {
+        "id" : "GeocodingURL",
+        "value" : "https://open.mapquestapi.com/geocoding/v1/address?key=XXXXXX&location=Port+St.+Lucie%2C+USA"
+      }, {
+        "id" : "GeocodingCity",
+        "value" : "Port St. Lucie"
+      }, {
+        "id" : "GeocodingDistrict",
+        "value" : "St. Lucie County"
+      }, {
+        "id" : "GeocodingState",
+        "value" : "FL"
+      }, {
+        "id" : "GeocodingCountry",
+        "value" : "US"
+      }, {
+        "id" : "Latitude",
+        "value" : 27.293933
+      }, {
+        "id" : "Longitude",
+        "value" : -80.350328
+      }, {
+        "id" : "Weight",
+        "value" : 0.0
+      }, {
+        "id" : "CrossContamination",
+        "value" : false
+      }, {
+        "id" : "Kill Contamination",
+        "value" : false
+      }, {
+        "id" : "Observed",
+        "value" : false
+      }, {
+        "id" : "Score",
+        "value" : 0.0
+      }, {
+        "id" : "Max Lot Score",
+        "value" : 0.0
+      }, {
+        "id" : "Normalized Score",
+        "value" : 0.0
+      }, {
+        "id" : "Positive Score",
+        "value" : 0.0
+      }, {
+        "id" : "Negative Score",
+        "value" : 0.0
+      }, {
+        "id" : "Backward",
+        "value" : false
+      }, {
+        "id" : "Forward",
+        "value" : false
+      }, {
+        "id" : "Is selected",
+        "value" : false
+      } ], [ {
+        "id" : "ID",
+        "value" : "urn:epc:id:sgln:0071279.00008.0"
+      }, {
+        "id" : "stationName",
+        "value" : "Persevere Produce-El Carey-Agricola Gova"
+      }, {
+        "id" : "Address",
+        "value" : "Lagos De Moreno, Mexico"
+      }, {
+        "id" : "Country",
+        "value" : "Mexico"
+      }, {
+        "id" : "Businessname",
+        "value" : "Persevere Produce-El Carey-Agricola Gova"
+      }, {
+        "id" : "Name",
+        "value" : "Persevere Produce-El Carey-Agricola Gova"
+      }, {
+        "id" : "GeocodingURL",
+        "value" : "https://open.mapquestapi.com/geocoding/v1/address?key=XXXXXX&location=Lagos+De+Moreno%2C+Mexico"
+      }, {
+        "id" : "GeocodingCity",
+        "value" : "Lagos de Moreno"
+      }, {
+        "id" : "GeocodingDistrict",
+        "value" : "Lagos de Moreno"
+      }, {
+        "id" : "GeocodingState",
+        "value" : "Jalisco"
+      }, {
+        "id" : "GeocodingCountry",
+        "value" : "MX"
+      }, {
+        "id" : "GeocodingPostalCode",
+        "value" : "47400"
+      }, {
+        "id" : "Latitude",
+        "value" : 21.355017
+      }, {
+        "id" : "Longitude",
+        "value" : -101.930464
+      }, {
+        "id" : "Weight",
+        "value" : 0.0
+      }, {
+        "id" : "CrossContamination",
+        "value" : false
+      }, {
+        "id" : "Kill Contamination",
+        "value" : false
+      }, {
+        "id" : "Observed",
+        "value" : false
+      }, {
+        "id" : "Score",
+        "value" : 0.0
+      }, {
+        "id" : "Max Lot Score",
+        "value" : 0.0
+      }, {
+        "id" : "Normalized Score",
+        "value" : 0.0
+      }, {
+        "id" : "Positive Score",
+        "value" : 0.0
+      }, {
+        "id" : "Negative Score",
+        "value" : 0.0
+      }, {
+        "id" : "Backward",
+        "value" : false
+      }, {
+        "id" : "Forward",
+        "value" : false
+      }, {
+        "id" : "Is selected",
+        "value" : false
+      } ] ]
+    },
+    "deliveries" : {
+      "columnProperties" : [ {
+        "id" : "ID",
+        "type" : "string"
+      }, {
+        "id" : "from",
+        "type" : "string"
+      }, {
+        "id" : "to",
+        "type" : "string"
+      }, {
+        "id" : "DeliveryName",
+        "type" : "string"
+      }, {
+        "id" : "Lot ID",
+        "type" : "string"
+      }, {
+        "id" : "Date Delivery Arrival",
+        "type" : "string"
+      }, {
+        "id" : "Amount",
+        "type" : "string"
+      }, {
+        "id" : "Name",
+        "type" : "string"
+      }, {
+        "id" : "TraceLot",
+        "type" : "string"
+      }, {
+        "id" : "Weight",
+        "type" : "double"
+      }, {
+        "id" : "CrossContamination",
+        "type" : "boolean"
+      }, {
+        "id" : "Kill Contamination",
+        "type" : "boolean"
+      }, {
+        "id" : "Observed",
+        "type" : "boolean"
+      }, {
+        "id" : "Score",
+        "type" : "double"
+      }, {
+        "id" : "Lot Score",
+        "type" : "double"
+      }, {
+        "id" : "Normalized Score",
+        "type" : "double"
+      }, {
+        "id" : "Positive Score",
+        "type" : "double"
+      }, {
+        "id" : "Negative Score",
+        "type" : "double"
+      }, {
+        "id" : "Backward",
+        "type" : "boolean"
+      }, {
+        "id" : "Forward",
+        "type" : "boolean"
+      }, {
+        "id" : "Is selected",
+        "type" : "boolean"
+      } ],
+      "data" : [ [ {
+        "id" : "ID",
+        "value" : "D-724"
+      }, {
+        "id" : "from",
+        "value" : "urn:epc:id:sgln:0071279.00003.0"
+      }, {
+        "id" : "to",
+        "value" : "urn:epc:id:sgln:0071279.00002.0"
+      }, {
+        "id" : "DeliveryName",
+        "value" : "Iceberg Lettuce-Packed"
+      }, {
+        "id" : "Lot ID",
+        "value" : "urn:epc:class:lgtin:0071279.289001.068479C"
+      }, {
+        "id" : "Date Delivery Arrival",
+        "value" : "2020-05-15T00:00:00.000+04:00"
+      }, {
+        "id" : "Amount",
+        "value" : "7498 LBR"
+      }, {
+        "id" : "Name",
+        "value" : "Iceberg Lettuce-Packed"
+      }, {
+        "id" : "TraceLot",
+        "value" : "068479C"
+      }, {
+        "id" : "Weight",
+        "value" : 0.0
+      }, {
+        "id" : "CrossContamination",
+        "value" : false
+      }, {
+        "id" : "Kill Contamination",
+        "value" : false
+      }, {
+        "id" : "Observed",
+        "value" : false
+      }, {
+        "id" : "Score",
+        "value" : 0.0
+      }, {
+        "id" : "Lot Score",
+        "value" : 0.0
+      }, {
+        "id" : "Normalized Score",
+        "value" : 0.0
+      }, {
+        "id" : "Positive Score",
+        "value" : 0.0
+      }, {
+        "id" : "Negative Score",
+        "value" : 0.0
+      }, {
+        "id" : "Backward",
+        "value" : false
+      }, {
+        "id" : "Forward",
+        "value" : false
+      }, {
+        "id" : "Is selected",
+        "value" : false
+      } ], [ {
+        "id" : "ID",
+        "value" : "D-725"
+      }, {
+        "id" : "from",
+        "value" : "urn:epc:id:sgln:0071279.00003.0"
+      }, {
+        "id" : "to",
+        "value" : "urn:epc:id:sgln:0071279.00002.0"
+      }, {
+        "id" : "DeliveryName",
+        "value" : "Iceberg Lettuce-Packed"
+      }, {
+        "id" : "Lot ID",
+        "value" : "urn:epc:class:lgtin:0071279.289001.068478C"
+      }, {
+        "id" : "Date Delivery Arrival",
+        "value" : "2020-05-15T00:00:00.000+04:00"
+      }, {
+        "id" : "Amount",
+        "value" : "23409 LBR"
+      }, {
+        "id" : "Name",
+        "value" : "Iceberg Lettuce-Packed"
+      }, {
+        "id" : "TraceLot",
+        "value" : "068478C"
+      }, {
+        "id" : "Weight",
+        "value" : 0.0
+      }, {
+        "id" : "CrossContamination",
+        "value" : false
+      }, {
+        "id" : "Kill Contamination",
+        "value" : false
+      }, {
+        "id" : "Observed",
+        "value" : false
+      }, {
+        "id" : "Score",
+        "value" : 0.0
+      }, {
+        "id" : "Lot Score",
+        "value" : 0.0
+      }, {
+        "id" : "Normalized Score",
+        "value" : 0.0
+      }, {
+        "id" : "Positive Score",
+        "value" : 0.0
+      }, {
+        "id" : "Negative Score",
+        "value" : 0.0
+      }, {
+        "id" : "Backward",
+        "value" : false
+      }, {
+        "id" : "Forward",
+        "value" : false
+      }, {
+        "id" : "Is selected",
+        "value" : false
+      } ], [ {
+        "id" : "ID",
+        "value" : "D-726"
+      }, {
+        "id" : "from",
+        "value" : "urn:epc:id:sgln:0071279.00003.0"
+      }, {
+        "id" : "to",
+        "value" : "urn:epc:id:sgln:0071279.00002.0"
+      }, {
+        "id" : "DeliveryName",
+        "value" : "Iceberg Lettuce-Packed"
+      }, {
+        "id" : "Lot ID",
+        "value" : "urn:epc:class:lgtin:0071279.289001.068477C"
+      }, {
+        "id" : "Date Delivery Arrival",
+        "value" : "2020-05-15T00:00:00.000+04:00"
+      }, {
+        "id" : "Amount",
+        "value" : "6513 LBR"
+      }, {
+        "id" : "Name",
+        "value" : "Iceberg Lettuce-Packed"
+      }, {
+        "id" : "TraceLot",
+        "value" : "068477C"
+      }, {
+        "id" : "Weight",
+        "value" : 0.0
+      }, {
+        "id" : "CrossContamination",
+        "value" : false
+      }, {
+        "id" : "Kill Contamination",
+        "value" : false
+      }, {
+        "id" : "Observed",
+        "value" : false
+      }, {
+        "id" : "Score",
+        "value" : 0.0
+      }, {
+        "id" : "Lot Score",
+        "value" : 0.0
+      }, {
+        "id" : "Normalized Score",
+        "value" : 0.0
+      }, {
+        "id" : "Positive Score",
+        "value" : 0.0
+      }, {
+        "id" : "Negative Score",
+        "value" : 0.0
+      }, {
+        "id" : "Backward",
+        "value" : false
+      }, {
+        "id" : "Forward",
+        "value" : false
+      }, {
+        "id" : "Is selected",
+        "value" : false
+      } ], [ {
+        "id" : "ID",
+        "value" : "D-727"
+      }, {
+        "id" : "from",
+        "value" : "urn:epc:id:sgln:0071279.00007.0"
+      }, {
+        "id" : "to",
+        "value" : "urn:epc:id:sgln:0071279.00002.0"
+      }, {
+        "id" : "DeliveryName",
+        "value" : "Red Cabbage-Packed"
+      }, {
+        "id" : "Lot ID",
+        "value" : "urn:epc:class:lgtin:0071279.289006.443617"
+      }, {
+        "id" : "Date Delivery Arrival",
+        "value" : "2020-05-15T00:00:00.000+04:00"
+      }, {
+        "id" : "Amount",
+        "value" : "34683 LBR"
+      }, {
+        "id" : "Name",
+        "value" : "Red Cabbage-Packed"
+      }, {
+        "id" : "TraceLot",
+        "value" : "443617"
+      }, {
+        "id" : "Weight",
+        "value" : 0.0
+      }, {
+        "id" : "CrossContamination",
+        "value" : false
+      }, {
+        "id" : "Kill Contamination",
+        "value" : false
+      }, {
+        "id" : "Observed",
+        "value" : false
+      }, {
+        "id" : "Score",
+        "value" : 0.0
+      }, {
+        "id" : "Lot Score",
+        "value" : 0.0
+      }, {
+        "id" : "Normalized Score",
+        "value" : 0.0
+      }, {
+        "id" : "Positive Score",
+        "value" : 0.0
+      }, {
+        "id" : "Negative Score",
+        "value" : 0.0
+      }, {
+        "id" : "Backward",
+        "value" : false
+      }, {
+        "id" : "Forward",
+        "value" : false
+      }, {
+        "id" : "Is selected",
+        "value" : false
+      } ], [ {
+        "id" : "ID",
+        "value" : "D-728"
+      }, {
+        "id" : "from",
+        "value" : "urn:epc:id:sgln:0071279.00007.0"
+      }, {
+        "id" : "to",
+        "value" : "urn:epc:id:sgln:0071279.00002.0"
+      }, {
+        "id" : "DeliveryName",
+        "value" : "Red Cabbage-Packed"
+      }, {
+        "id" : "Lot ID",
+        "value" : "urn:epc:class:lgtin:0071279.289006.443611"
+      }, {
+        "id" : "Date Delivery Arrival",
+        "value" : "2020-05-15T00:00:00.000+04:00"
+      }, {
+        "id" : "Amount",
+        "value" : "35077 LBR"
+      }, {
+        "id" : "Name",
+        "value" : "Red Cabbage-Packed"
+      }, {
+        "id" : "TraceLot",
+        "value" : "443611"
+      }, {
+        "id" : "Weight",
+        "value" : 0.0
+      }, {
+        "id" : "CrossContamination",
+        "value" : false
+      }, {
+        "id" : "Kill Contamination",
+        "value" : false
+      }, {
+        "id" : "Observed",
+        "value" : false
+      }, {
+        "id" : "Score",
+        "value" : 0.0
+      }, {
+        "id" : "Lot Score",
+        "value" : 0.0
+      }, {
+        "id" : "Normalized Score",
+        "value" : 0.0
+      }, {
+        "id" : "Positive Score",
+        "value" : 0.0
+      }, {
+        "id" : "Negative Score",
+        "value" : 0.0
+      }, {
+        "id" : "Backward",
+        "value" : false
+      }, {
+        "id" : "Forward",
+        "value" : false
+      }, {
+        "id" : "Is selected",
+        "value" : false
+      } ], [ {
+        "id" : "ID",
+        "value" : "D-729"
+      }, {
+        "id" : "from",
+        "value" : "urn:epc:id:sgln:0071279.00008.0"
+      }, {
+        "id" : "to",
+        "value" : "urn:epc:id:sgln:0071279.00002.0"
+      }, {
+        "id" : "DeliveryName",
+        "value" : "Carrots-Packed"
+      }, {
+        "id" : "Lot ID",
+        "value" : "urn:epc:class:lgtin:0071279.289673.443667"
+      }, {
+        "id" : "Date Delivery Arrival",
+        "value" : "2020-05-15T00:00:00.000+04:00"
+      }, {
+        "id" : "Amount",
+        "value" : "41600 KGM"
+      }, {
+        "id" : "Name",
+        "value" : "Carrots-Packed"
+      }, {
+        "id" : "TraceLot",
+        "value" : "443667"
+      }, {
+        "id" : "Weight",
+        "value" : 0.0
+      }, {
+        "id" : "CrossContamination",
+        "value" : false
+      }, {
+        "id" : "Kill Contamination",
+        "value" : false
+      }, {
+        "id" : "Observed",
+        "value" : false
+      }, {
+        "id" : "Score",
+        "value" : 0.0
+      }, {
+        "id" : "Lot Score",
+        "value" : 0.0
+      }, {
+        "id" : "Normalized Score",
+        "value" : 0.0
+      }, {
+        "id" : "Positive Score",
+        "value" : 0.0
+      }, {
+        "id" : "Negative Score",
+        "value" : 0.0
+      }, {
+        "id" : "Backward",
+        "value" : false
+      }, {
+        "id" : "Forward",
+        "value" : false
+      }, {
+        "id" : "Is selected",
+        "value" : false
+      } ], [ {
+        "id" : "ID",
+        "value" : "D-730"
+      }, {
+        "id" : "from",
+        "value" : "urn:epc:id:sgln:0071279.00002.0"
+      }, {
+        "id" : "to",
+        "value" : "urn:epc:id:sgln:0078742.06085.0"
+      }, {
+        "id" : "DeliveryName",
+        "value" : "WM Garden Salad 12-12oz"
+      }, {
+        "id" : "Lot ID",
+        "value" : "urn:epc:class:lgtin:0071279.156485.Z140"
+      }, {
+        "id" : "Date Delivery Arrival",
+        "value" : "2020-05-20T00:00:00.000+04:00"
+      }, {
+        "id" : "Amount",
+        "value" : "167"
+      }, {
+        "id" : "Name",
+        "value" : "WM Garden Salad 12-12oz"
+      }, {
+        "id" : "TraceLot",
+        "value" : "Z140"
+      }, {
+        "id" : "Weight",
+        "value" : 0.0
+      }, {
+        "id" : "CrossContamination",
+        "value" : false
+      }, {
+        "id" : "Kill Contamination",
+        "value" : false
+      }, {
+        "id" : "Observed",
+        "value" : false
+      }, {
+        "id" : "Score",
+        "value" : 0.0
+      }, {
+        "id" : "Lot Score",
+        "value" : 0.0
+      }, {
+        "id" : "Normalized Score",
+        "value" : 0.0
+      }, {
+        "id" : "Positive Score",
+        "value" : 0.0
+      }, {
+        "id" : "Negative Score",
+        "value" : 0.0
+      }, {
+        "id" : "Backward",
+        "value" : false
+      }, {
+        "id" : "Forward",
+        "value" : false
+      }, {
+        "id" : "Is selected",
+        "value" : false
+      } ] ]
+    },
+    "deliveryRelations" : {
+      "columnProperties" : [ {
+        "id" : "from",
+        "type" : "string"
+      }, {
+        "id" : "to",
+        "type" : "string"
+      } ],
+      "data" : [ [ {
+        "id" : "from",
+        "value" : "D-726"
+      }, {
+        "id" : "to",
+        "value" : "D-730"
+      } ], [ {
+        "id" : "from",
+        "value" : "D-725"
+      }, {
+        "id" : "to",
+        "value" : "D-730"
+      } ], [ {
+        "id" : "from",
+        "value" : "D-724"
+      }, {
+        "id" : "to",
+        "value" : "D-730"
+      } ], [ {
+        "id" : "from",
+        "value" : "D-728"
+      }, {
+        "id" : "to",
+        "value" : "D-730"
+      } ], [ {
+        "id" : "from",
+        "value" : "D-727"
+      }, {
+        "id" : "to",
+        "value" : "D-730"
+      } ], [ {
+        "id" : "from",
+        "value" : "D-729"
+      }, {
+        "id" : "to",
+        "value" : "D-730"
+      } ] ]
+    }
+  },
+  "tracing" : {
+    "version" : null,
+    "enforceTemporalOrder" : null,
+    "nodes" : [ {
+      "id" : "urn:epc:id:sgln:0071279.00002.0",
+      "weight" : 0.0,
+      "crossContamination" : false,
+      "killContamination" : false,
+      "observed" : false
+    }, {
+      "id" : "urn:epc:id:sgln:0078742.06085.0",
+      "weight" : 0.0,
+      "crossContamination" : false,
+      "killContamination" : false,
+      "observed" : false
+    }, {
+      "id" : "urn:epc:id:sgln:0071279.00003.0",
+      "weight" : 0.0,
+      "crossContamination" : false,
+      "killContamination" : false,
+      "observed" : false
+    }, {
+      "id" : "urn:epc:id:sgln:0071279.00007.0",
+      "weight" : 0.0,
+      "crossContamination" : false,
+      "killContamination" : false,
+      "observed" : false
+    }, {
+      "id" : "urn:epc:id:sgln:0071279.00008.0",
+      "weight" : 0.0,
+      "crossContamination" : false,
+      "killContamination" : false,
+      "observed" : false
+    } ],
+    "deliveries" : [ {
+      "id" : "D-724",
+      "weight" : 0.0,
+      "crossContamination" : false,
+      "killContamination" : false,
+      "observed" : false
+    }, {
+      "id" : "D-725",
+      "weight" : 0.0,
+      "crossContamination" : false,
+      "killContamination" : false,
+      "observed" : false
+    }, {
+      "id" : "D-726",
+      "weight" : 0.0,
+      "crossContamination" : false,
+      "killContamination" : false,
+      "observed" : false
+    }, {
+      "id" : "D-727",
+      "weight" : 0.0,
+      "crossContamination" : false,
+      "killContamination" : false,
+      "observed" : false
+    }, {
+      "id" : "D-728",
+      "weight" : 0.0,
+      "crossContamination" : false,
+      "killContamination" : false,
+      "observed" : false
+    }, {
+      "id" : "D-729",
+      "weight" : 0.0,
+      "crossContamination" : false,
+      "killContamination" : false,
+      "observed" : false
+    }, {
+      "id" : "D-730",
+      "weight" : 0.0,
+      "crossContamination" : false,
+      "killContamination" : false,
+      "observed" : false
+    } ]
+  },
+  "settings" : null
+}
