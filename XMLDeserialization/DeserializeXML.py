@@ -16,10 +16,12 @@ def main() :
             for child in ob :
                 print(child.tag)
                 if len(child) :
+                    childDicts = []
                     for subchild in child :
-                        if(ob.text != '\n        ') :
-                            keyList.append(ob.text)
-                    myDict[child.tag] = keyList
+                        childDict = {}
+                        childDict[subchild.tag] = subchild.text
+                        childDicts.append(childDict)
+                    myDict[child.tag] = childDicts
                 else :
                     myDict[child.tag] = child.text
             break
