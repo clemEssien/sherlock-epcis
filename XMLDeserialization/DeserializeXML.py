@@ -8,24 +8,28 @@ def main() :
     if root.tag != "{urn:epcglobal:epcis:xsd:1}EPCISDocument" :       
         print("Not EPCISDocument")
         return
-
+    eventDicts = []
     for event in root.iter('EventList') :
-        keyList = []
         myDict = {}
         for ob in event :
             for child in ob :
                 print(child.tag)
                 if len(child) :
-                    childDicts = []
-                    for subchild in child :
-                        childDict = {}
-                        childDict[subchild.tag] = subchild.text
-                        childDicts.append(childDict)
-                    myDict[child.tag] = childDicts
+                    if(child.tag == "readPoint" or child.tag == "bizLocation") :
+                        myDict[child.tag] = child[0].text
+                    else :
+                        childDicts = []
+                        for subchild in child :
+                            childDict = {}
+                            childDict[subchild.tag] = subchild.text
+                            childDicts.append(childDict)
+                        myDict[child.tag] = childDicts
                 else :
                     myDict[child.tag] = child.text
-            break
-    print(myDict)
+        print(myDict)
+        break
+        eventDicts.append(myDict)
+    print(eventDicts)
                 # myDict[ob.tag].append(ob.text)
         #for event in child :
         #    if len(event) :
