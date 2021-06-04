@@ -15,9 +15,13 @@ def main() :
         for event in child :
             for ob in event :
                 if len(ob) :                    # check if child of root has subchildren
+                    print(ob.tag)
+                    print(ob.text)
                     for subChild in ob :
+                        print(subChild.tag)
                         print(subChild.text)
                 else :                          # no subchildren
+                    print(ob.tag)
                     print(ob.text)
 
 if __name__ == '__main__' :
