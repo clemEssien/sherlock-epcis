@@ -4,7 +4,7 @@ import xml.etree.ElementTree as ET
 def main() :
     events = []
     events_objects = []
-    tree = ET.parse("GS1StandardExample1.xml")
+    tree = ET.parse("XMLDeserialization/GS1StandardExample1.xml")
     root = tree.getroot()
 
     if root.tag == "EPCISDocument" :        # doesnt work but concept
