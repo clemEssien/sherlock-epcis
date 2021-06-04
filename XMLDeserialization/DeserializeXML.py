@@ -16,7 +16,7 @@ def main() :
         myDict = {}
         for event in list :
             for child in event :
-                print(child.tag)
+                #print(child.tag)
                 if len(child) :                                                     #Check for lists (e.g. epcList, businessTransactionList)
                     if(child.tag == "readPoint" or child.tag == "bizLocation") :    #Check for specific outliers
                         myDict[child.tag] = child[0].text                           #Extract the id uris
@@ -30,7 +30,7 @@ def main() :
                 else :
                     myDict[child.tag] = child.text                                  #Append the URI
             eventDicts.append(myDict)
-    print(eventDicts)
+    print(eventDicts)                                                               #Printing output for now
                 # myDict[ob.tag].append(ob.text)
         #for event in child :
         #    if len(event) :
