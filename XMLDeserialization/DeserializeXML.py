@@ -10,13 +10,14 @@ def main() :
     if root.tag == "EPCISDocument" :        # doesnt work but concept
         print("worked")
 
-    for event in root.iter('ObjectEvent') :
-        for ob in event :
-            if len(ob) :                    # check if child of root has subchildren
-                for subChild in ob :
-                    print(subChild.text)
-            else :                          # no subchildren
-                print(ob.text)
+    for child in root.iter('EventList') :
+        for event in child :
+            for ob in event :
+                if len(ob) :                    # check if child of root has subchildren
+                    for subChild in ob :
+                        print(subChild.text)
+                else :                          # no subchildren
+                    print(ob.text)
 
 if __name__ == '__main__' :
     main()
