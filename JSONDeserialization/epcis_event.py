@@ -190,9 +190,9 @@ class EPCISEvent:
         self._read_point: URI = URI("")
         self._instance_lot_master_data: dict = {}
         self._quantity_list: list[QuantityElement] = []
-        self._child_quantity_list: list[dict] = []
-        self._input_quantity_list: list[dict] = []
-        self._output_quantity_list: list[dict] = []
+        self._child_quantity_list: list[QuantityElement] = []
+        self._input_quantity_list: list[QuantityElement] = []
+        self._output_quantity_list: list[QuantityElement] = []
         self._business_transaction_list: list[dict] = []
         self._source_list: list[dict] = []
         self._destination_list: list[dict] = []
