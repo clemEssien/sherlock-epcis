@@ -495,3 +495,5 @@ event.output_quantity_list = [
           ]
 for qe in event.output_quantity_list:
     print(qe)
+
+print(event)

@@ -1,6 +1,7 @@
 import datetime
 import json
 from uuid import UUID
+import epcis_event
 
 
 def map_from_epcis(data, obj):
@@ -25,20 +26,20 @@ def map_from_epcis(data, obj):
 def main():
     events = []
     event_objects = []
-    with open('GS1StandardExample1.json') as f:
+    with open('JSONDeserialization/GS1StandardExample1.json') as f:
         epcis_doc = json.load(f)
         if epcis_doc['isA'] != 'EPCISDocument':
             print('{} is an unsupported type'.format(epcis_doc['isA']))
             return
         events = epcis_doc['epcisBody']['eventList']
 
-    for event in events:
-        temp_event = EPCISEvent(event)
-        event_objects.append(temp_event)
+    for event_data in events:
+        event_obj = epcis_event.EPCISEvent()
+        map_from_epcis(event_data, event_obj)
+        event_objects.append(event_obj)
 
-    pp = pprint.PrettyPrinter(indent=2)
     for event in event_objects:
-        pp.pprint(event.__dict__)
+        print(event)
         print("")
 
 if __name__ == '__main__':
