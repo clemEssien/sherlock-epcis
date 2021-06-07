@@ -170,6 +170,8 @@ class EPCISEvent:
         destination_list : list[dict]
             A list of Destination elements that provide context about the terminating endpoint of a business transfer
             of which this event is a part.
+        extensions : list[dict]
+            A list storing user-defined data not in the EPCIS 1.2 standard.
     """
 
     def __init__(self):
@@ -196,6 +198,7 @@ class EPCISEvent:
         self._business_transaction_list: list[dict] = []
         self._source_list: list[dict] = []
         self._destination_list: list[dict] = []
+        self._extensions: list[dict] = []
 
     def __repr__(self) -> str:
         """EPCISEvent representation"""
@@ -526,6 +529,18 @@ class EPCISEvent:
     @destination_list.setter
     def destination_list(self, value: list[dict]):
         self._destination_list = value
+
+    @property
+    def extensions(self) -> list[dict]:
+        """extensions"""
+        return self._extensions
+
+    @extensions.setter
+    def extensions(self, value: dict):
+        if isinstance(value, list):
+            self._extensions = self._extensions + value
+        else:
+            self._extensions.append(value)
 
 
 event = EPCISEvent()
