@@ -1,8 +1,9 @@
 import datetime
 import re
 
-class URI():
-    """ Provides a class for URI objects as defined in GS1's [TDS1.9, Section 7]
+
+class URI:
+    """Provides a class for URI objects as defined in GS1's [TDS1.9, Section 7]
 
     Attributes:
         uri : str
@@ -14,26 +15,40 @@ class URI():
         value : str
             The data stored by the URI (the actual SGTIN, SSCC, or biztype, etc.).
     """
+
     def __init__(self, input_str: str):
         """Creates a new URI instance from the given string"""
         self.uri = input_str
-        self.prefix = ''
-        self.scheme = ''
-        self.value = ''
+        self.prefix = ""
+        self.scheme = ""
+        self.value = ""
         if re.search("[a-z]+:[a-z]+:[a-z]+:[a-z]+:[a-z0-9.*]+", input_str) is not None:
-            uri = input_str.split(':')
-            self.prefix = "{}:{}:{}:{}".format(uri[0],uri[1],uri[2],uri[3])
+            uri = input_str.split(":")
+            self.prefix = "{}:{}:{}:{}".format(uri[0], uri[1], uri[2], uri[3])
             self.scheme = uri[3]
             self.value = uri[4]
+
     def __repr__(self) -> str:
-        rep = 'URI(uri: ' + self.uri + '; prefix: ' + self.prefix + '; scheme: ' + self.scheme + '; value: ' + self.value + ')'
+        rep = (
+            "URI(uri: "
+            + self.uri
+            + "; prefix: "
+            + self.prefix
+            + "; scheme: "
+            + self.scheme
+            + "; value: "
+            + self.value
+            + ")"
+        )
         return rep
+
     def __str__(self) -> str:
         return self.uri
 
-class QuantityElement():
-    """ Provides a class for the QuantityElement structure defined in [EPCIS1.2, Section 7.3.3.3]
-    
+
+class QuantityElement:
+    """Provides a class for the QuantityElement structure defined in [EPCIS1.2, Section 7.3.3.3]
+
     Attributes:
         epc_class : URI
             The identifier for the class to which the specified quantity of objects belongs.
@@ -42,14 +57,23 @@ class QuantityElement():
         uom : str
             The unit of measure the quantity is to be interpreted as.
     """
-    def __init__(self, epc: URI =URI(''), quant: float=-1, unit: str =''):
+
+    def __init__(self, epc: URI = URI(""), quant: float = -1, unit: str = ""):
         """Creates a new QuantityElement instance"""
         self._epc_class: URI = epc
         self._quantity: float = quant
         self._uom: str = unit
 
     def __repr__(self) -> str:
-        return 'QuantityElement('+str(self._epc_class)+', '+str(self._quantity)+', '+self._uom+')'
+        return (
+            "QuantityElement("
+            + str(self._epc_class)
+            + ", "
+            + str(self._quantity)
+            + ", "
+            + self._uom
+            + ")"
+        )
 
     @property
     def epc_class(self) -> URI:
@@ -89,8 +113,9 @@ class QuantityElement():
                 pass
         self._uom = value
 
-class EPCISEvent():
-    """ Provides a class for EPCIS Event objects
+
+class EPCISEvent:
+    """Provides a class for EPCIS Event objects
 
     Descriptions from [EPCIS1.2, Section 7.4]
 
@@ -127,7 +152,7 @@ class EPCISEvent():
         read_point : URI
             The read point at which the vent took place.
         instance_lot_master_data : dict
-            Instance/Lot master data that describes objects created during this event. 
+            Instance/Lot master data that describes objects created during this event.
             Only used when action is ADD.
         quantity_list : list[QuantityElement]
             The QuantityElements identifying the objects to which the event pertained.
@@ -146,22 +171,23 @@ class EPCISEvent():
             A list of Destination elements that provide context about the terminating endpoint of a business transfer
             of which this event is a part.
     """
+
     def __init__(self):
         """Creates a new EPCISEvent instance with empty, but type-hinted, attributes"""
-        self._event_type: str = ''
-        self._event_time = datetime.datetime(1,1,1)
+        self._event_type: str = ""
+        self._event_time = datetime.datetime(1, 1, 1)
         self._event_timezone_offset = datetime.timezone(datetime.timedelta(hours=0))
         self._epc_list: list[URI] = []
-        self._parent_id: URI = URI('')
+        self._parent_id: URI = URI("")
         self._child_epc_list: list[URI] = []
         self._input_epc_list: list[URI] = []
         self._output_epc_list: list[URI] = []
-        self._transformation_id: URI = URI('')
-        self._action: str = ''
-        self._business_step: URI = URI('')
-        self._disposition: URI = URI('')
-        self._business_location: URI = URI('')
-        self._read_point: URI = URI('')
+        self._transformation_id: URI = URI("")
+        self._action: str = ""
+        self._business_step: URI = URI("")
+        self._disposition: URI = URI("")
+        self._business_location: URI = URI("")
+        self._read_point: URI = URI("")
         self._instance_lot_master_data: dict = {}
         self._quantity_list: list[QuantityElement] = []
         self._child_quantity_list: list[dict] = []
@@ -175,8 +201,8 @@ class EPCISEvent():
         """EPCISEvent representation"""
         rep = "EPCISEvent(\n"
         for attr in self.__dict__.keys():
-            rep = rep + attr + ' : ' + str(getattr(self, attr)) + '\n'
-        return rep + ')'
+            rep = rep + attr + " : " + str(getattr(self, attr)) + "\n"
+        return rep + ")"
 
     @property
     def event_type(self) -> str:
@@ -210,10 +236,14 @@ class EPCISEvent():
     def event_timezone_offset(self, value: datetime.timezone):
         if isinstance(value, str):
             if re.search("[+-][0-1][0-9]:[0-5][0-9]", value) is not None:
-                offset = value.split(':')
+                offset = value.split(":")
                 # computes hours as a float by taking (|hour| + minutes/60) * -1 or +1 depending on the offset's sign
-                value = datetime.timezone(datetime.timedelta(hours=
-                    (abs(float(offset[0]))+(float(offset[1])/60))*(abs(float(offset[0]))/float(offset[0]))))
+                value = datetime.timezone(
+                    datetime.timedelta(
+                        hours=(abs(float(offset[0])) + (float(offset[1]) / 60))
+                        * (abs(float(offset[0])) / float(offset[0]))
+                    )
+                )
         self._event_timezone_offset = value
 
     @property
@@ -369,7 +399,7 @@ class EPCISEvent():
     def instance_lot_master_data(self) -> dict:
         """instance_lot_master_data"""
         return self._instance_lot_master_data
-    
+
     @instance_lot_master_data.setter
     def instance_lot_master_data(self, value: dict):
         self._instance_lot_master_data = value
@@ -384,11 +414,15 @@ class EPCISEvent():
         if isinstance(value, list):
             new_vals = []
             for val in value:
-                if isinstance(val, dict) and 'epcClass' in val.keys():
+                if isinstance(val, dict) and "epcClass" in val.keys():
                     qe = QuantityElement()
-                    for a_k in [('epc_class','epcClass'), ('quantity','quantity'), ('uom','uom')]:
+                    for a_k in [
+                        ("epc_class", "epcClass"),
+                        ("quantity", "quantity"),
+                        ("uom", "uom"),
+                    ]:
                         if a_k[1] in val.keys():
-                            setattr(qe,a_k[0],val[a_k[1]])
+                            setattr(qe, a_k[0], val[a_k[1]])
                     new_vals.append(qe)
             if len(new_vals) == len(value):
                 value = new_vals
@@ -404,11 +438,15 @@ class EPCISEvent():
         if isinstance(value, list):
             new_vals = []
             for val in value:
-                if isinstance(val, dict) and 'epcClass' in val.keys():
+                if isinstance(val, dict) and "epcClass" in val.keys():
                     qe = QuantityElement()
-                    for a_k in [('epc_class','epcClass'), ('quantity','quantity'), ('uom','uom')]:
+                    for a_k in [
+                        ("epc_class", "epcClass"),
+                        ("quantity", "quantity"),
+                        ("uom", "uom"),
+                    ]:
                         if a_k[1] in val.keys():
-                            setattr(qe,a_k[0],val[a_k[1]])
+                            setattr(qe, a_k[0], val[a_k[1]])
                     new_vals.append(qe)
             if len(new_vals) == len(value):
                 value = new_vals
@@ -424,11 +462,15 @@ class EPCISEvent():
         if isinstance(value, list):
             new_vals = []
             for val in value:
-                if isinstance(val, dict) and 'epcClass' in val.keys():
+                if isinstance(val, dict) and "epcClass" in val.keys():
                     qe = QuantityElement()
-                    for a_k in [('epc_class','epcClass'), ('quantity','quantity'), ('uom','uom')]:
+                    for a_k in [
+                        ("epc_class", "epcClass"),
+                        ("quantity", "quantity"),
+                        ("uom", "uom"),
+                    ]:
                         if a_k[1] in val.keys():
-                            setattr(qe,a_k[0],val[a_k[1]])
+                            setattr(qe, a_k[0], val[a_k[1]])
                     new_vals.append(qe)
             if len(new_vals) == len(value):
                 value = new_vals
@@ -444,11 +486,15 @@ class EPCISEvent():
         if isinstance(value, list):
             new_vals = []
             for val in value:
-                if isinstance(val, dict) and 'epcClass' in val.keys():
+                if isinstance(val, dict) and "epcClass" in val.keys():
                     qe = QuantityElement()
-                    for a_k in [('epc_class','epcClass'), ('quantity','quantity'), ('uom','uom')]:
+                    for a_k in [
+                        ("epc_class", "epcClass"),
+                        ("quantity", "quantity"),
+                        ("uom", "uom"),
+                    ]:
                         if a_k[1] in val.keys():
-                            setattr(qe,a_k[0],val[a_k[1]])
+                            setattr(qe, a_k[0], val[a_k[1]])
                     new_vals.append(qe)
             if len(new_vals) == len(value):
                 value = new_vals
@@ -481,18 +527,16 @@ class EPCISEvent():
     def destination_list(self, value: list[dict]):
         self._destination_list = value
 
+
 event = EPCISEvent()
 event.output_quantity_list = [
-            {
-              "epcClass": "urn:epc:idpat:sgtin:4012345.098765.*",
-              "quantity": 10
-            },
-            {
-              "epcClass": "urn:epc:class:lgtin:4012345.012345.998877",
-              "quantity": 200.5,
-              "uom": "KGM"
-            }
-          ]
+    {"epcClass": "urn:epc:idpat:sgtin:4012345.098765.*", "quantity": 10},
+    {
+        "epcClass": "urn:epc:class:lgtin:4012345.012345.998877",
+        "quantity": 200.5,
+        "uom": "KGM",
+    },
+]
 for qe in event.output_quantity_list:
     print(qe)
 
