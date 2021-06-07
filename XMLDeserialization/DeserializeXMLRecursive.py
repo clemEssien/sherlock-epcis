@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 
 def main():
     eventDicts = []
-    tree = ET.parse('XMLDeserialization/GS1StandardExample2.xml')
+    tree = ET.parse('XMLDeserialization/GS1StandardExample4.xml')
     root = tree.getroot()
 
     if root.tag != "{urn:epcglobal:epcis:xsd:1}EPCISDocument" :                     #Check for the EPCISDocument tag 
@@ -16,10 +16,17 @@ def main():
     for list in root.iter('EventList'):
         for event in list:
             myDict = {}
-            print(event.tag)
-            myDict.update(parseTag(event))
-            tempDict = myDict.copy()
-            eventDicts.append(tempDict)
+            if(event.tag == "extension") :
+                for subEvent in event :
+                    print(subEvent.tag)
+                    myDict.update(parseTag(subEvent))
+                    tempDict = myDict.copy()
+                    eventDicts.append(tempDict)
+            else :
+                print(event.tag)
+                myDict.update(parseTag(event))
+                tempDict = myDict.copy()
+                eventDicts.append(tempDict)
     print(eventDicts)
 
 def parseTag(node):
@@ -30,7 +37,7 @@ def parseTag(node):
     #else:
     if len(node):
         for child in node:
-            print('parsing ' +child.tag)
+            #print('parsing ' +child.tag)
             nodeDict.update(parseTag(child))
     else:
         nodeDict[node.tag] = node.text
