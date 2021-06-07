@@ -27,6 +27,9 @@ We use [pytest](https://github.com/pytest-dev/pytest) for unit tests.
 #### Code review and PRs ####
 * Always assign your hierarchal buddy as your reviewer in addition to the defaults. 
 * Please also include changes to the ReadMe in your PRs as needed.
+* Please name branches using the following schema `<prefix>/<JIRA-ticket-ID>-description` where:
+	* prefix is either `feature`, `hotfix`, `release` or `bugfix` depending on the type of task.
+	* Jira ticket ID is the ticket number for the given feature in JIRA example `TNT-1`.
 
 Please follow the following guides to PRs:
 
