@@ -1,30 +1,28 @@
-import datetime
 import json
-from uuid import UUID
+import epcis_event
 
 
-def map_from_epcis(data, obj):
+def map_from_epcis(epcis_json, epcis_event_obj):
     """Map data from a data dictionary  to a class object instance's data attributes.
 
     Args:
         data: Any
-            Json Map file
+            Event dictionary
         obj: Any
-            The class object to load the data in to
+            The event object
     """
-    if data is None:
+    if epcis_json is None:
         return None
 
-    epcis_json = data["attr_key_mapping"]
-
     for attr in epcis_json.keys():
-        setattr(obj, attr, epcis_json[attr])
-    return obj
+        setattr(epcis_event_obj, attr, epcis_json[attr])
 
-# driver example
+    return epcis_event_obj
+
+# driver code
 def main():
-    events = []
     event_objects = []
+    epcis_event_obj = epcis_event.EPCISEvent()
     with open('GS1StandardExample1.json') as f:
         epcis_doc = json.load(f)
         if epcis_doc['isA'] != 'EPCISDocument':
@@ -33,13 +31,8 @@ def main():
         events = epcis_doc['epcisBody']['eventList']
 
     for event in events:
-        temp_event = EPCISEvent(event)
-        event_objects.append(temp_event)
-
-    pp = pprint.PrettyPrinter(indent=2)
-    for event in event_objects:
-        pp.pprint(event.__dict__)
-        print("")
+        event_obj = map_from_epcis(event, epcis_event_obj)
+        event_objects.append(event_obj)
 
 if __name__ == '__main__':
     main()
