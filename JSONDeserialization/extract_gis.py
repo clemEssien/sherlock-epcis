@@ -1,5 +1,18 @@
 import json
 import epcis_event
+import datetime
+
+def type_check(value):
+    if isinstance(value, datetime.datetime):
+        return value.isoformat("T").replace("+00:00", "") + "Z"
+    elif isinstance(value, datetime.date):
+        return value.strftime("%Y-%m-%d")
+    elif isinstance(value, datetime.time):
+        return value.strftime("%H:%M:%S.%f")
+    elif isinstance(value, dict):
+        return value[id]
+    elif isinstance(value, int) or isinstance(value, float) or isinstance(value, str):
+        return value
 
 
 def map_from_epcis(epcis_event_obj,epcis_json):
@@ -11,6 +24,7 @@ def map_from_epcis(epcis_event_obj,epcis_json):
         obj: Any
             The event object
     """
+    epcis_event_list = []
     if epcis_json is None:
         return None
 
@@ -18,7 +32,11 @@ def map_from_epcis(epcis_event_obj,epcis_json):
         schema_doc = json.load(f)
 
     for attr in schema_doc['attr_key_mapping'].keys():
-        setattr(epcis_event_obj, attr, schema_doc['attr_key_mapping'][attr])
+        if attr in epcis_json.keys():
+            value = type_check(epcis_json[schema_doc['attr_key_mapping'][attr]])
+            setattr(epcis_event_obj, attr, value)
+            epcis_event_list.append(epcis_event_obj)
+    return epcis_event_list
 
 # driver code
 def main():
@@ -32,7 +50,7 @@ def main():
 
     for event in events:
         epcis_event_obj = epcis_event.EPCISEvent()
-        map_from_epcis(epcis_event_obj, event)
+        event_objects = map_from_epcis(epcis_event_obj, event)
 
 if __name__ == '__main__':
     main()
