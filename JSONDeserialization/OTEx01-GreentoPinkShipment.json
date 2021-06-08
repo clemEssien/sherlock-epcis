@@ -1,0 +1,162 @@
+{
+    "EPCISDocument": {
+      "EPCISHeader": {
+        "StandardBusinessDocumentHeader": {
+          "HeaderVersion": 1,
+          "Sender": {
+            "Identifier": "urn:ot:object:actor:id:Company_Green",
+            "ContactInformation": {
+              "Contact": "Abraham Smith",
+              "EmailAddress": "abraham_Smith@green.com"
+            }
+          },
+          "Receiver": {
+            "Identifier": "urn:ot:object:actor:id:Company_Pink",
+            "ContactInformation": {
+              "Contact": "Betty Johnson",
+              "EmailAddress": "betty@pink.com"
+            }
+          },
+          "DocumentIdentification": {
+            "Standard": "GS1",
+            "TypeVersion": "V1.3",
+            "InstanceIdentifier": 100001,
+            "Type": "Shipment",
+            "CreationDateAndTime": "2018-01-01T00:31:52Z"
+          },
+          "BusinessScope": {
+            "Scope": {
+              "Type": "BusinessProcess",
+              "InstanceIdentifier": "Shipment/version2-251",
+              "Identifier": "EDI-Shipment"
+            }
+          }
+        },
+        "extension": {
+          "EPCISMasterData": {
+            "VocabularyList": {
+              "Vocabulary": [
+                {
+                  "VocabularyElementList": {
+                    "VocabularyElement": [
+                      {
+                        "attribute": [
+                          "Green",
+                          "Company producer",
+                          1.071387513389833e+48
+                        ]
+                      },
+                      {
+                        "attribute": [
+                          "Pink",
+                          "Company",
+                          1.4607362238109792e+48
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "VocabularyElementList": {
+                    "VocabularyElement": [
+                      {
+                        "attribute": [
+                          "Building",
+                          "Producer Warehouses"
+                        ],
+                        "children": {
+                          "id": [
+                            "urn:epc:id:sgln:Building_Green_V1",
+                            "urn:epc:id:sgln:Building_Green_V2"
+                          ]
+                        },
+                        "extension": {
+                          "attribute": "urn:ot:object:actor:id:Company_Green"
+                        }
+                      },
+                      {
+                        "attribute": [
+                          "Building",
+                          "Pink distributor warehouse"
+                        ],
+                        "extension": {
+                          "attribute": "urn:ot:object:actor:id:Company_Pink"
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "VocabularyElementList": {
+                    "VocabularyElement": {
+                      "attribute": [
+                        "Beverage",
+                        "Wine Pallet"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "VocabularyElementList": {
+                    "VocabularyElement": {
+                      "attribute": [
+                        "urn:ot:object:product:id:Product_1",
+                        "2017-31-12T00:01:54Z",
+                        "2020-31-12T00:01:54Z"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "EPCISBody": {
+        "EventList": {
+          "ObjectEvent": {
+            "eventTime": "2018-01-01T01:00:00.000-04:00",
+            "eventTimeZoneOffset": "-04:00",
+            "epcList": {
+              "epc": "urn:epc:id:sgtin:Batch_1"
+            },
+            "action": "OBSERVE",
+            "bizStep": "urn:epcglobal:cbv:bizstep:shipping",
+            "disposition": "urn:epcglobal:cbv:disp:active",
+            "readPoint": {
+              "id": "urn:epc:id:sgln:Building_Green_V2"
+            },
+            "bizLocation": {
+              "id": "urn:epc:id:sgln:Building_Green"
+            },
+            "bizTransactionList": {
+              "bizTransaction": "connectionId:0x611d771aAfaa3D6Fb66c4a81D97768300a6882D5"
+            },
+            "extension": {
+              "quantityList": {
+                "quantityElement": {
+                  "epcClass": "urn:epc:id:sgtin:Batch_1",
+                  "quantity": 10,
+                  "uom": "KG"
+                }
+              },
+              "extension": {
+                "documentId": 1,
+                "OTEventClass": [
+                  "urn:ot:event:Transport",
+                  "urn:ot:event:Ownership"
+                ],
+                "OTEventType": "Sales",
+                "sourceList": {
+                  "source": "urn:epc:id:sgln:Building_Green"
+                },
+                "destinationList": {
+                  "destination": "urn:epc:id:sgln:Building_Pink"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
