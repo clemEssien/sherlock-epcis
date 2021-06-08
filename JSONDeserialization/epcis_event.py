@@ -1,8 +1,9 @@
 import datetime
 import re
 
-class URI():
-    """ Provides a class for URI objects as defined in GS1's [TDS1.9, Section 7]
+
+class URI:
+    """Provides a class for URI objects as defined in GS1's [TDS1.9, Section 7]
 
     Attributes:
         uri : str
@@ -14,26 +15,107 @@ class URI():
         value : str
             The data stored by the URI (the actual SGTIN, SSCC, or biztype, etc.).
     """
+
     def __init__(self, input_str: str):
         """Creates a new URI instance from the given string"""
         self.uri = input_str
-        self.prefix = ''
-        self.scheme = ''
-        self.value = ''
+        self.prefix = ""
+        self.scheme = ""
+        self.value = ""
         if re.search("[a-z]+:[a-z]+:[a-z]+:[a-z]+:[a-z0-9.*]+", input_str) is not None:
-            uri = input_str.split(':')
-            self.prefix = "{}:{}:{}:{}".format(uri[0],uri[1],uri[2],uri[3])
+            uri = input_str.split(":")
+            self.prefix = "{}:{}:{}:{}".format(uri[0], uri[1], uri[2], uri[3])
             self.scheme = uri[3]
             self.value = uri[4]
+
     def __repr__(self) -> str:
-        rep = 'URI(uri: ' + self.uri + '; prefix: ' + self.prefix + '; scheme: ' + self.scheme + '; value: ' + self.value + ')'
+        rep = (
+            "URI(uri: "
+            + self.uri
+            + "; prefix: "
+            + self.prefix
+            + "; scheme: "
+            + self.scheme
+            + "; value: "
+            + self.value
+            + ")"
+        )
         return rep
+
     def __str__(self) -> str:
         return self.uri
 
 
-class EPCISEvent():
-    """ Provides a class for EPCIS Event objects
+class QuantityElement:
+    """Provides a class for the QuantityElement structure defined in [EPCIS1.2, Section 7.3.3.3]
+
+    Attributes:
+        epc_class : URI
+            The identifier for the class to which the specified quantity of objects belongs.
+        quantity : float
+            How many or how much of the specified EPCClass is denoted by this QuantityElement.
+        uom : str
+            The unit of measure the quantity is to be interpreted as.
+    """
+
+    def __init__(self, epc: URI = URI(""), quant: float = -1, unit: str = ""):
+        """Creates a new QuantityElement instance"""
+        self._epc_class: URI = epc
+        self._quantity: float = quant
+        self._uom: str = unit
+
+    def __repr__(self) -> str:
+        return (
+            "QuantityElement("
+            + str(self._epc_class)
+            + ", "
+            + str(self._quantity)
+            + ", "
+            + self._uom
+            + ")"
+        )
+
+    @property
+    def epc_class(self) -> URI:
+        return self._epc_class
+
+    @epc_class.setter
+    def epc_class(self, value: URI):
+        if isinstance(value, str):
+            value = URI(value)
+        self._epc_class = value
+
+    @property
+    def quantity(self) -> float:
+        return self._quantity
+
+    @quantity.setter
+    def quantity(self, value: float):
+        if isinstance(value, int):
+            value = float(value)
+        elif isinstance(value, str):
+            try:
+                value = float(value)
+            except:
+                pass
+        self._quantity = value
+
+    @property
+    def uom(self) -> str:
+        return self._uom
+
+    @uom.setter
+    def uom(self, value: str):
+        if not isinstance(value, str):
+            try:
+                value = str(value)
+            except:
+                pass
+        self._uom = value
+
+
+class EPCISEvent:
+    """Provides a class for EPCIS Event objects
 
     Descriptions from [EPCIS1.2, Section 7.4]
 
@@ -70,15 +152,15 @@ class EPCISEvent():
         read_point : URI
             The read point at which the vent took place.
         instance_lot_master_data : dict
-            Instance/Lot master data that describes objects created during this event. 
+            Instance/Lot master data that describes objects created during this event.
             Only used when action is ADD.
-        quantity_list : list[dict]
-            A list of QuantityElements identify objects to which the event pertained.
-        child_quantity_list : list[dict]
+        quantity_list : list[QuantityElement]
+            The QuantityElements identifying the objects to which the event pertained.
+        child_quantity_list : list[QuantityElement]
             The QuantityElements identifying the objects contained in an aggregation event.
-        input_quantity_list : list[dict]
+        input_quantity_list : list[QuantityElement]
             The QuantityElements identifying the objects that were inputs in a transformation event.
-        output_quantity_list : list[dict]
+        output_quantity_list : list[QuantityElement]
             The QuantityElements identifying the objects that were outputs from a transformation event.
         business_transaction_list : list[dict]
             The business transaction(s) in a TransactionEvent.
@@ -88,41 +170,42 @@ class EPCISEvent():
         destination_list : list[dict]
             A list of Destination elements that provide context about the terminating endpoint of a business transfer
             of which this event is a part.
+        extensions : list[dict]
+            A list storing user-defined data not in the EPCIS 1.2 standard.
     """
+
     def __init__(self):
         """Creates a new EPCISEvent instance with empty, but type-hinted, attributes"""
-        self._event_type: str = ''
-        self._event_time = datetime.datetime(1,1,1)
+        self._event_type: str = ""
+        self._event_time = datetime.datetime(1, 1, 1)
         self._event_timezone_offset = datetime.timezone(datetime.timedelta(hours=0))
         self._epc_list: list[URI] = []
-        self._parent_id: URI = URI('')
+        self._parent_id: URI = URI("")
         self._child_epc_list: list[URI] = []
         self._input_epc_list: list[URI] = []
         self._output_epc_list: list[URI] = []
-        self._transformation_id: URI = URI('')
-        self._action: str = ''
-        self._business_step: URI = URI('')
-        self._disposition: URI = URI('')
-        self._business_location: URI = URI('')
-        self._read_point: URI = URI('')
+        self._transformation_id: URI = URI("")
+        self._action: str = ""
+        self._business_step: URI = URI("")
+        self._disposition: URI = URI("")
+        self._business_location: URI = URI("")
+        self._read_point: URI = URI("")
         self._instance_lot_master_data: dict = {}
-        self._quantity_list: list[dict] = []
-        self._child_quantity_list: list[dict] = []
-        self._input_quantity_list: list[dict] = []
-        self._output_quantity_list: list[dict] = []
+        self._quantity_list: list[QuantityElement] = []
+        self._child_quantity_list: list[QuantityElement] = []
+        self._input_quantity_list: list[QuantityElement] = []
+        self._output_quantity_list: list[QuantityElement] = []
         self._business_transaction_list: list[dict] = []
         self._source_list: list[dict] = []
         self._destination_list: list[dict] = []
+        self._extensions: list[dict] = []
 
     def __repr__(self) -> str:
         """EPCISEvent representation"""
         rep = "EPCISEvent(\n"
         for attr in self.__dict__.keys():
-            rep = rep + attr + ' : ' + str(getattr(self, attr)) + '\n'
-        return rep + ')'
-
-
-
+            rep = rep + attr + " : " + str(getattr(self, attr)) + "\n"
+        return rep + ")"
 
     @property
     def event_type(self) -> str:
@@ -156,10 +239,14 @@ class EPCISEvent():
     def event_timezone_offset(self, value: datetime.timezone):
         if isinstance(value, str):
             if re.search("[+-][0-1][0-9]:[0-5][0-9]", value) is not None:
-                offset = value.split(':')
+                offset = value.split(":")
                 # computes hours as a float by taking (|hour| + minutes/60) * -1 or +1 depending on the offset's sign
-                value = datetime.timezone(datetime.timedelta(hours=
-                    (abs(float(offset[0]))+(float(offset[1])/60))*(abs(float(offset[0]))/float(offset[0]))))
+                value = datetime.timezone(
+                    datetime.timedelta(
+                        hours=(abs(float(offset[0])) + (float(offset[1]) / 60))
+                        * (abs(float(offset[0])) / float(offset[0]))
+                    )
+                )
         self._event_timezone_offset = value
 
     @property
@@ -315,45 +402,105 @@ class EPCISEvent():
     def instance_lot_master_data(self) -> dict:
         """instance_lot_master_data"""
         return self._instance_lot_master_data
-    
+
     @instance_lot_master_data.setter
     def instance_lot_master_data(self, value: dict):
         self._instance_lot_master_data = value
 
     @property
-    def quantity_list(self) -> list[dict]:
+    def quantity_list(self) -> list[QuantityElement]:
         """quantity_list"""
         return self._quantity_list
 
     @quantity_list.setter
-    def quantity_list(self, value: list[dict]):
+    def quantity_list(self, value: list[QuantityElement]):
+        if isinstance(value, list):
+            new_vals = []
+            for val in value:
+                if isinstance(val, dict) and "epcClass" in val.keys():
+                    qe = QuantityElement()
+                    for a_k in [
+                        ("epc_class", "epcClass"),
+                        ("quantity", "quantity"),
+                        ("uom", "uom"),
+                    ]:
+                        if a_k[1] in val.keys():
+                            setattr(qe, a_k[0], val[a_k[1]])
+                    new_vals.append(qe)
+            if len(new_vals) == len(value):
+                value = new_vals
         self._quantity_list = value
 
     @property
-    def child_quantity_list(self) -> list[dict]:
+    def child_quantity_list(self) -> list[QuantityElement]:
         """child_quantity_list"""
         return self._child_quantity_list
 
     @child_quantity_list.setter
-    def child_quantity_list(self, value: list[dict]):
+    def child_quantity_list(self, value: list[QuantityElement]):
+        if isinstance(value, list):
+            new_vals = []
+            for val in value:
+                if isinstance(val, dict) and "epcClass" in val.keys():
+                    qe = QuantityElement()
+                    for a_k in [
+                        ("epc_class", "epcClass"),
+                        ("quantity", "quantity"),
+                        ("uom", "uom"),
+                    ]:
+                        if a_k[1] in val.keys():
+                            setattr(qe, a_k[0], val[a_k[1]])
+                    new_vals.append(qe)
+            if len(new_vals) == len(value):
+                value = new_vals
         self._child_quantity_list = value
 
     @property
-    def input_quantity_list(self) -> list[dict]:
+    def input_quantity_list(self) -> list[QuantityElement]:
         """input_quantity_list"""
         return self._input_quantity_list
 
     @input_quantity_list.setter
-    def input_quantity_list(self, value: list[dict]):
+    def input_quantity_list(self, value: list[QuantityElement]):
+        if isinstance(value, list):
+            new_vals = []
+            for val in value:
+                if isinstance(val, dict) and "epcClass" in val.keys():
+                    qe = QuantityElement()
+                    for a_k in [
+                        ("epc_class", "epcClass"),
+                        ("quantity", "quantity"),
+                        ("uom", "uom"),
+                    ]:
+                        if a_k[1] in val.keys():
+                            setattr(qe, a_k[0], val[a_k[1]])
+                    new_vals.append(qe)
+            if len(new_vals) == len(value):
+                value = new_vals
         self._input_quantity_list = value
 
     @property
-    def output_quantity_list(self) -> list[dict]:
+    def output_quantity_list(self) -> list[QuantityElement]:
         """output_quantity_list"""
         return self._output_quantity_list
 
     @output_quantity_list.setter
-    def output_quantity_list(self, value: list[dict]):
+    def output_quantity_list(self, value: list[QuantityElement]):
+        if isinstance(value, list):
+            new_vals = []
+            for val in value:
+                if isinstance(val, dict) and "epcClass" in val.keys():
+                    qe = QuantityElement()
+                    for a_k in [
+                        ("epc_class", "epcClass"),
+                        ("quantity", "quantity"),
+                        ("uom", "uom"),
+                    ]:
+                        if a_k[1] in val.keys():
+                            setattr(qe, a_k[0], val[a_k[1]])
+                    new_vals.append(qe)
+            if len(new_vals) == len(value):
+                value = new_vals
         self._output_quantity_list = value
 
     @property
@@ -383,18 +530,29 @@ class EPCISEvent():
     def destination_list(self, value: list[dict]):
         self._destination_list = value
 
+    @property
+    def extensions(self) -> list[dict]:
+        """extensions"""
+        return self._extensions
+
+    @extensions.setter
+    def extensions(self, value: dict):
+        if isinstance(value, list):
+            self._extensions = self._extensions + value
+        else:
+            self._extensions.append(value)
+
+
 event = EPCISEvent()
-event.event_type = "ObservationEvent"
-event.event_time = "2013-10-31T14:58:56.591+00:00"
-event.event_timezone_offset = "+02:00"
-event.input_epc_list = [
-    "urn:epc:id:sgtin:4012345.011122.25",
-    "urn:epc:id:sgtin:4000001.065432.99886655"
-          ]
-event.output_epc_list = [
-    "urn:epc:id:sgtin:4012345.077889.25",
-    "urn:epc:id:sgtin:4012345.077889.26",
-    "urn:epc:id:sgtin:4012345.077889.27",
-    "urn:epc:id:sgtin:4012345.077889.28"
-    ]
-print(repr(event))
+event.output_quantity_list = [
+    {"epcClass": "urn:epc:idpat:sgtin:4012345.098765.*", "quantity": 10},
+    {
+        "epcClass": "urn:epc:class:lgtin:4012345.012345.998877",
+        "quantity": 200.5,
+        "uom": "KGM",
+    },
+]
+for qe in event.output_quantity_list:
+    print(qe)
+
+print(event)
