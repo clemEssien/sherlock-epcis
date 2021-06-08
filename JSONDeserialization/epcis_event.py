@@ -541,18 +541,3 @@ class EPCISEvent:
             self._extensions = self._extensions + value
         else:
             self._extensions.append(value)
-
-
-event = EPCISEvent()
-event.output_quantity_list = [
-    {"epcClass": "urn:epc:idpat:sgtin:4012345.098765.*", "quantity": 10},
-    {
-        "epcClass": "urn:epc:class:lgtin:4012345.012345.998877",
-        "quantity": 200.5,
-        "uom": "KGM",
-    },
-]
-for qe in event.output_quantity_list:
-    print(qe)
-
-print(event)
