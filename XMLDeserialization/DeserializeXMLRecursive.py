@@ -31,16 +31,38 @@ def main():
 
 def parseTag(node):
     nodeDict = {}
-    #check for base tag cases (Unifinished)
-    #if (identyfy lists and deal with them specifically)
-    #if not present parse subchildren
-    #else:
-    if len(node):
-        for child in node:
-            #print('parsing ' +child.tag)
-            nodeDict.update(parseTag(child))
+    if(node.tag == 'epcList' or node.tag == 'childEPCs' or node.tag == 'inputEpcList' or node.tag == 'outputEpcList') : #epc lists
+        #print('parsing an epcList')
+        uriList = []
+        for epc in node :
+            uriList.append(epc.text)
+        if(len(uriList) > 0):    
+            nodeDict[node.tag] = uriList
+    elif(node.tag == 'readPoint' or node.tag == 'bizLocation') :
+        #print('parsing readPoint or bizLocation')
+        for id in node:
+            nodeDict[node.tag] = parseTag(id)
+    elif(node.tag == 'bizTransactionList' or node.tag == 'sourceList' or node.tag == 'destinationList') : #typed lists
+        dictList = []
+        for listElement in node:
+            transactionDict = {}
+            transactionDict['type'] = listElement.get('type')
+            transactionDict[listElement.tag] = listElement.text
+            tempDict = transactionDict.copy()
+            dictList.append(tempDict)
+        nodeDict[node.tag] = dictList
+    elif(node.tag == 'quantityList' or node.tag == 'childQuantityList' or node.tag == 'inputQuantityList' or node.tag == 'outputQuantityList') :
+        dictList = []
+        for listElement in node:
+            dictList.append(parseTag(listElement))
+        nodeDict[node.tag] = dictList
     else:
-        nodeDict[node.tag] = node.text
+        if len(node):
+            for child in node:
+                #print('parsing ' +child.tag)
+                nodeDict.update(parseTag(child))
+        else:
+            nodeDict[node.tag] = node.text
     return nodeDict
 
 if __name__ == '__main__' :
