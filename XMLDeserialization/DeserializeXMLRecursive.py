@@ -31,7 +31,7 @@ def main():
 
 def parseTag(node):
     nodeDict = {}
-    if(node.tag == 'epcList' or node.tag == 'childEPCs' or node.tag == 'inputEpcList' or node.tag == 'outputEpcList') : #epc lists
+    if(node.tag == 'epcList' or node.tag == 'childEPCs' or node.tag == 'inputEPCList' or node.tag == 'outputEPCList') : #epc lists
         #print('parsing an epcList')
         uriList = []
         for epc in node :
