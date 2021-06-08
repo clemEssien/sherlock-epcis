@@ -12,19 +12,21 @@ def main():
     if root.tag != "{urn:epcglobal:epcis:xsd:1}EPCISDocument" :                     #Check for the EPCISDocument tag 
         print("Not EPCISDocument")
         return
-    eventDicts = []
+    eventDicts = []                                                                 #List of Event dicts
     for list in root.iter('EventList'):
-        for event in list:
+        for event in list:                                                          #Iterate through each event 
             myDict = {}
-            if(event.tag == "extension") :
-                for subEvent in event :
-                    print(subEvent.tag)
-                    myDict.update(parseTag(subEvent))
+            if(event.tag == "extension") :                                          #Check for extension tag on Event
+                for subEvent in event :                                             #Iterate through each event in extension
+                    #print(subEvent.tag)
+                    myDict.update(parseTag(subEvent))                               
+                    myDict["event_type"] = subEvent.tag
                     tempDict = myDict.copy()
-                    eventDicts.append(tempDict)
+                    eventDicts.append(tempDict)                                     
             else :
-                print(event.tag)
+                #print(event.tag)            
                 myDict.update(parseTag(event))
+                myDict["event_type"] = event.tag
                 tempDict = myDict.copy()
                 eventDicts.append(tempDict)
     print(eventDicts)
