@@ -48,6 +48,9 @@ Thumbs.db
 *.mov
 *.wmv
 
+env
 env/
 .vscode/
+.vscode
 .vs/
+.vs
