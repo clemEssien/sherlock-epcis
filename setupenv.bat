@@ -6,4 +6,4 @@ python -m venv ./env
 call env/Scripts/activate.bat
 pip install -r requirements.txt
 
-echo Setup complete.
+echo Setup Complete.
