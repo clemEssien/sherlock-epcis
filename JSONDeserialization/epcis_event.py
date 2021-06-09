@@ -399,6 +399,30 @@ class AggregationEvent(CommonEvent):
                 value = new_values
         self._child_epc_list = value
 
+    @property
+    def child_quantity_list(self) -> list[QuantityElement]:
+        """quantity_list"""
+        return self._child_quantity_list
+
+    @child_quantity_list.setter
+    def child_quantity_list(self, value: list[QuantityElement]):
+        if isinstance(value, list):
+            new_vals = []
+            for val in value:
+                if isinstance(val, dict) and "epcClass" in val.keys():
+                    qe = QuantityElement()
+                    for a_k in [
+                        ("epc_class", "epcClass"),
+                        ("quantity", "quantity"),
+                        ("uom", "uom"),
+                    ]:
+                        if a_k[1] in val.keys():
+                            setattr(qe, a_k[0], val[a_k[1]])
+                    new_vals.append(qe)
+            if len(new_vals) == len(value):
+                value = new_vals
+        self._child_quantity_list = value
+
 
 class QuantityEvent(EPCISEvent):
     """Provides a class for EPCIS QuantityEvents (DEPRECATED) [EPCIS1.2, Section 7.4.4]
@@ -721,3 +745,11 @@ if __name__ == "__main__":
     for key in event_types.keys():
         event = event_types[key]
         print(event)
+
+    obj_event = AggregationEvent()
+
+    for attr in obj_event.__dict__.keys():
+        attr = attr[1:]
+        setattr(obj_event, attr, attr)
+
+    print(obj_event)
