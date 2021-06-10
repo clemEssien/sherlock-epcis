@@ -69,10 +69,10 @@ def parseTag(node):
     ):  # typed lists
         dictList = []
         for listElement in node:
-            transactionDict = {}
-            transactionDict["type"] = listElement.get("type")
-            transactionDict[listElement.tag] = listElement.text
-            tempDict = transactionDict.copy()
+            typedDict = {}
+            typedDict["type"] = listElement.get("type")
+            typedDict[listElement.tag] = listElement.text
+            tempDict = typedDict.copy()
             dictList.append(tempDict)
         nodeDict[node.tag] = dictList
     elif (
@@ -80,15 +80,14 @@ def parseTag(node):
         or node.tag == "childQuantityList"
         or node.tag == "inputQuantityList"
         or node.tag == "outputQuantityList"
-    ):
+    ): # quantity lists
         dictList = []
         for listElement in node:
             dictList.append(parseTag(listElement))
         nodeDict[node.tag] = dictList
     else:
-        if len(node):
+        if len(node): # recursively parse subchildren
             for child in node:
-                # print('parsing ' +child.tag)
                 nodeDict.update(parseTag(child))
         else:
             nodeDict[node.tag] = node.text
