@@ -2,6 +2,7 @@
 #Last Modified: June 10th, 2021
 #Script to deserialize standard EPCIS documents in XML form recursively in order to avoid the <extension> tags
 import xml
+import pprint
 import xml.etree.ElementTree as ET
 
 def main():
@@ -30,7 +31,10 @@ def main():
                 tempDict = myDict.copy()
                 eventDicts.append(tempDict)
     print(eventDicts)
-
+    pp = pprint.PrettyPrinter(indent=2)
+    for event in eventDicts:
+        pp.pprint(event)
+        print("")
 def parseTag(node):
     nodeDict = {}
     if(node.tag == 'epcList' or node.tag == 'childEPCs' or node.tag == 'inputEPCList' or node.tag == 'outputEPCList') : #epc lists
