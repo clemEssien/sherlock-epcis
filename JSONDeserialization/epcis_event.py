@@ -6,44 +6,40 @@ class URI:
     """Provides a class for URI objects as defined in GS1's [TDS1.9, Section 7]
 
     Attributes:
-        uri : str
-            Entire uri. Will be present when other attributes cannot be parsed.
-        prefix : str
-            The first four parts of the URI, denoted by GS1 as the uri prefix.
-        scheme : str
-            The type of data represented by the URI (SGTIN, SSCC, biztype, etc.).
-        value : str
-            The data stored by the URI (the actual SGTIN, SSCC, or biztype, etc.).
+        uri_str : str
+            URI string.
     """
 
-    def __init__(self, input_str: str):
+    def __init__(self, uri_str: str):
         """Creates a new URI instance from the given string"""
-        self.uri = input_str
-        self.prefix = ""
-        self.scheme = ""
-        self.value = ""
-        if re.search("[a-z]+:[a-z]+:[a-z]+:[a-z]+:[a-z0-9.*]+", input_str) is not None:
-            uri = input_str.split(":")
-            self.prefix = "{}:{}:{}:{}".format(uri[0], uri[1], uri[2], uri[3])
-            self.scheme = uri[3]
-            self.value = uri[4]
+        self.uri_str = uri_str
 
     def __repr__(self) -> str:
-        rep = (
-            "URI(uri: "
-            + self.uri
-            + "; prefix: "
-            + self.prefix
-            + "; scheme: "
-            + self.scheme
-            + "; value: "
-            + self.value
-            + ")"
-        )
+        rep = "URI(" + self.uri_str + ")"
         return rep
 
     def __str__(self) -> str:
-        return self.uri
+        return self.uri_str
+
+    def prefix(self) -> str:
+        if re.search("[a-z]+:[a-z]+:[a-z]+:[a-z]+:[a-z0-9.*]+", self.uri_str) is None:
+            return ""
+        split_uri = self.uri_str.split(":")
+        return "{}:{}:{}:{}".format(
+            split_uri[0], split_uri[1], split_uri[2], split_uri[3]
+        )
+
+    def scheme(self) -> str:
+        if re.search("[a-z]+:[a-z]+:[a-z]+:[a-z]+:[a-z0-9.*]+", self.uri_str) is None:
+            return ""
+        split_uri = self.uri_str.split(":")
+        return split_uri[3]
+
+    def value(self) -> str:
+        if re.search("[a-z]+:[a-z]+:[a-z]+:[a-z]+:[a-z0-9.*]+", self.uri_str) is None:
+            return ""
+        split_uri = self.uri_str.split(":")
+        return split_uri[4]
 
 
 class QuantityElement:
@@ -746,21 +742,8 @@ class TransformationEvent(CommonEvent):
 
 # script showing the different event types
 if __name__ == "__main__":
-    event_types = {
-        "ObjectEvent": ObjectEvent(),
-        "AggregationEvent": AggregationEvent(),
-        "QuantityEvent": QuantityEvent(),
-        "TransactionEvent": TransactionEvent(),
-        "TransformationEvent": TransformationEvent(),
-    }
-    for key in event_types.keys():
-        event = event_types[key]
-        print(event)
-
-    obj_event = AggregationEvent()
-
-    for attr in obj_event.__dict__.keys():
-        attr = attr[1:]
-        setattr(obj_event, attr, attr)
-
-    print(obj_event)
+    uri = URI("urn:epc:id:sgtin:0614141.107346.2017")
+    print(uri.uri_str)
+    print(uri.prefix())
+    print(uri.scheme())
+    print(uri.value())
