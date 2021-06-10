@@ -6,8 +6,11 @@ import pprint
 import xml.etree.ElementTree as ET
 
 def main():
+    parseXML('XMLDeserialization/GS1StandardExample4.xml')
+
+def parseXML(filename) :
     eventDicts = []
-    tree = ET.parse('XMLDeserialization/GS1StandardExample4.xml')
+    tree = ET.parse(filename)
     root = tree.getroot()
 
     if root.tag != "{urn:epcglobal:epcis:xsd:1}EPCISDocument" :                     #Check for the EPCISDocument tag 
