@@ -122,12 +122,15 @@ class EPCISEvent:
             The date and time that the event occurred.
         event_timezone_offset : datetime.timezone
             The timezone offset in effect at the time and place the event occurred.
+        extensions : list[dict]
+            A place to add fields not in the EPCIS1.2 standard
     """
 
     def __init__(self):
         """Creates a new EPCISEvent instance with empty, but type-hinted, attributes"""
         self._event_time = datetime.datetime(1, 1, 1)
         self._event_timezone_offset = datetime.timezone(datetime.timedelta(hours=0))
+        self._extensions: list[dict] = []
 
     def __repr__(self) -> str:
         """EPCISEvent representation"""
@@ -168,6 +171,14 @@ class EPCISEvent:
                     )
                 )
         self._event_timezone_offset = value
+
+    @property
+    def extensions(self) -> list[dict]:
+        return self._extensions
+
+    @extensions.setter
+    def extensions(self, ext: dict):
+        self._extensions.append(ext)
 
 
 class CommonEvent(EPCISEvent):
