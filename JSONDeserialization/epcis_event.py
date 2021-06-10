@@ -3,11 +3,17 @@ import re
 
 
 class URI:
-    """Provides a class for URI objects as defined in GS1's [TDS1.9, Section 7]
+    """Provides a class for URI objects as defined in [EPCIS1.2, Section 6.4]
 
     Attributes:
         uri_str : str
-            URI string.
+            string representation of the URI.
+
+    GS1 URI Syntax:
+        "urn" : <Namespace Identifier> : <Namespace Specfic String> : <Scheme> : <Value>
+        examples:
+            "urn:epc:id:sgtin:0614141.107346.2018"
+            "urn:epcglobal:cbv:bizstep:receiving"
     """
 
     def __init__(self, uri_str: str):
@@ -21,25 +27,29 @@ class URI:
     def __str__(self) -> str:
         return self.uri_str
 
+    def split_uri(self) -> list[str]:
+        """returns a parsed URI"""
+        if re.search("[a-z]+:[a-z]+:[a-z]+:[a-z]+:[a-z0-9.*]+", self.uri_str):
+            return self.uri_str.split(":")
+        return None
+
     def prefix(self) -> str:
-        if re.search("[a-z]+:[a-z]+:[a-z]+:[a-z]+:[a-z0-9.*]+", self.uri_str) is None:
-            return ""
-        split_uri = self.uri_str.split(":")
-        return "{}:{}:{}:{}".format(
-            split_uri[0], split_uri[1], split_uri[2], split_uri[3]
-        )
+        """returns the URI's prefix"""
+        if split_uri := self.split_uri():
+            return "{}:{}:{}".format(split_uri[0], split_uri[1], split_uri[2])
+        return None
 
     def scheme(self) -> str:
-        if re.search("[a-z]+:[a-z]+:[a-z]+:[a-z]+:[a-z0-9.*]+", self.uri_str) is None:
-            return ""
-        split_uri = self.uri_str.split(":")
-        return split_uri[3]
+        """returns the URI's scheme"""
+        if split_uri := self.split_uri():
+            return split_uri[3]
+        return None
 
     def value(self) -> str:
-        if re.search("[a-z]+:[a-z]+:[a-z]+:[a-z]+:[a-z0-9.*]+", self.uri_str) is None:
-            return ""
-        split_uri = self.uri_str.split(":")
-        return split_uri[4]
+        """returns the value stored in the URI"""
+        if split_uri := self.split_uri():
+            return split_uri[4]
+        return None
 
 
 class QuantityElement:
@@ -54,20 +64,20 @@ class QuantityElement:
             The unit of measure the quantity is to be interpreted as.
     """
 
-    def __init__(self, epc: URI = URI(""), quant: float = -1, unit: str = ""):
+    def __init__(self, epc: URI = URI(""), quant: float = 0, unit: str = ""):
         """Creates a new QuantityElement instance"""
-        self._epc_class: URI = epc
-        self._quantity: float = quant
-        self._uom: str = unit
+        self.epc_class: URI = epc
+        self.quantity: float = quant
+        self.uom: str = unit
 
     def __repr__(self) -> str:
         return (
             "QuantityElement("
-            + str(self._epc_class)
+            + str(self.epc_class)
             + ", "
-            + str(self._quantity)
+            + str(self.quantity)
             + ", "
-            + self._uom
+            + self.uom
             + ")"
         )
 
