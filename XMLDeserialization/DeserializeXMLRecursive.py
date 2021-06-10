@@ -1,5 +1,5 @@
 #Author: Kevin Zong and Helina Solomon
-#Last Modified: June 8th, 2021
+#Last Modified: June 10th, 2021
 #Script to deserialize standard EPCIS documents in XML form recursively in order to avoid the <extension> tags
 import xml
 import xml.etree.ElementTree as ET
@@ -19,14 +19,14 @@ def main():
             if(event.tag == "extension") :                                          #Check for extension tag on Event
                 for subEvent in event :                                             #Iterate through each event in extension
                     #print(subEvent.tag)
-                    myDict.update(parseTag(subEvent))                               
                     myDict["isA"] = subEvent.tag
+                    myDict.update(parseTag(subEvent))                               
                     tempDict = myDict.copy()
                     eventDicts.append(tempDict)                                     
             else :
-                #print(event.tag)            
+                #print(event.tag)
+                myDict["isA"] = event.tag            
                 myDict.update(parseTag(event))
-                myDict["isA"] = event.tag
                 tempDict = myDict.copy()
                 eventDicts.append(tempDict)
     print(eventDicts)
