@@ -168,6 +168,10 @@ class EPCISEvent:
         self._event_time = value
 
     @property
+    def event_time_local(self) -> datetime.datetime:
+        return self._event_time.astimezone(self.event_timezone_offset)
+
+    @property
     def event_timezone_offset(self) -> datetime.timezone:
         """event_timezone_offset"""
         return self._event_timezone_offset
@@ -763,4 +767,5 @@ if __name__ == "__main__":
     test_event = EPCISEvent()
     test_event.event_time = "2013-06-08T14:58:56.591+02:00"
     test_event.event_timezone_offset = "+02:00"
-    print(test_event.event_time)
+    print("UTC:  ", test_event.event_time)
+    print("Local:", test_event.event_time_local)
