@@ -22,16 +22,17 @@ def parseXML(filename):
     eventDicts = []  # List of Event dicts
     for list in root.iter("EventList"):
         for event in list:  # Iterate through each event
-            myDict = {}
             if event.tag == "extension":  # Check for extension tag on Event
                 for subEvent in event:  # Iterate through each event in extension
                     # print(subEvent.tag)
+                    myDict = {}
                     myDict["isA"] = subEvent.tag
                     myDict.update(parseTag(subEvent))
                     tempDict = myDict.copy()
                     eventDicts.append(tempDict)
             else:
                 # print(event.tag)
+                myDict = {}
                 myDict["isA"] = event.tag
                 myDict.update(parseTag(event))
                 tempDict = myDict.copy()
@@ -84,9 +85,7 @@ def parseTag(node):
         for listElement in node:
             dictList.append(parseTag(listElement))
         nodeDict[node.tag] = dictList
-    elif (
-        node.tag == "ilmd"
-    ): # instance lot master data
+    elif node.tag == "ilmd":  # instance lot master data
         dictDict = {}
         for element in node:
             dictDict.update(parseTag(element))
