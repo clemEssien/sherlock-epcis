@@ -84,6 +84,13 @@ def parseTag(node):
         for listElement in node:
             dictList.append(parseTag(listElement))
         nodeDict[node.tag] = dictList
+    elif (
+        node.tag == "ilmd"
+    ): # instance lot master data
+        dictDict = {}
+        for element in node:
+            dictDict.update(parseTag(element))
+        nodeDict[node.tag] = dictDict
     else:
         if len(node):  # recursively parse subchildren
             for child in node:
