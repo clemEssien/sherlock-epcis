@@ -11,7 +11,6 @@ def main():
 
 
 def parseXML(filename):
-    eventDicts = []
     tree = ET.parse(filename)
     root = tree.getroot()
 
@@ -41,7 +40,7 @@ def parseXML(filename):
     pp = pprint.PrettyPrinter(indent=2)
     for event in eventDicts:
         pp.pprint(event)
-        print("")
+        print()
 
 
 def parseTag(node):
@@ -80,13 +79,13 @@ def parseTag(node):
         or node.tag == "childQuantityList"
         or node.tag == "inputQuantityList"
         or node.tag == "outputQuantityList"
-    ): # quantity lists
+    ):  # quantity lists
         dictList = []
         for listElement in node:
             dictList.append(parseTag(listElement))
         nodeDict[node.tag] = dictList
     else:
-        if len(node): # recursively parse subchildren
+        if len(node):  # recursively parse subchildren
             for child in node:
                 nodeDict.update(parseTag(child))
         else:
