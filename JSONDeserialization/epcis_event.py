@@ -18,7 +18,12 @@ class URI:
 
     def __init__(self, uri_str: str):
         """Creates a new URI instance from the given string"""
-        self.uri_str = uri_str
+        self.uri_str: str = uri_str
+        self._split_uri: list[str] = []
+        self._is_split: bool = False
+        if re.search("[a-z]+:[a-z]+:[a-z]+:[a-z]+:[a-z0-9.*]+", self.uri_str):
+            self._split_uri = self.uri_str.split(":")
+            self._is_split = True
 
     def __repr__(self) -> str:
         rep = "URI(" + self.uri_str + ")"
@@ -27,28 +32,27 @@ class URI:
     def __str__(self) -> str:
         return self.uri_str
 
-    def split_uri(self) -> list[str]:
-        """returns a parsed URI"""
-        if re.search("[a-z]+:[a-z]+:[a-z]+:[a-z]+:[a-z0-9.*]+", self.uri_str):
-            return self.uri_str.split(":")
-        return None
-
+    @property
     def prefix(self) -> str:
         """returns the URI's prefix"""
-        if split_uri := self.split_uri():
-            return "{}:{}:{}".format(split_uri[0], split_uri[1], split_uri[2])
+        if self._is_split:
+            return "{}:{}:{}".format(
+                self._split_uri[0], self._split_uri[1], self._split_uri[2]
+            )
         return None
 
+    @property
     def scheme(self) -> str:
         """returns the URI's scheme"""
-        if split_uri := self.split_uri():
-            return split_uri[3]
+        if self._is_split:
+            return self._split_uri[3]
         return None
 
+    @property
     def value(self) -> str:
         """returns the value stored in the URI"""
-        if split_uri := self.split_uri():
-            return split_uri[4]
+        if self._is_split:
+            return self._split_uri[4]
         return None
 
 
@@ -754,6 +758,6 @@ class TransformationEvent(CommonEvent):
 if __name__ == "__main__":
     uri = URI("urn:epc:id:sgtin:0614141.107346.2017")
     print(uri.uri_str)
-    print(uri.prefix())
-    print(uri.scheme())
-    print(uri.value())
+    print(uri.prefix)
+    print(uri.scheme)
+    print(uri.value)
