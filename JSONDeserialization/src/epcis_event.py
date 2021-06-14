@@ -1,7 +1,6 @@
 import datetime
 import re
 from dateutil import tz, parser
-import dateutil
 
 
 class URI:
