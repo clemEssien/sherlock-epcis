@@ -1,6 +1,7 @@
 import datetime
 import re
-from dateutil import tz
+from dateutil import tz, parser
+import dateutil
 
 
 class URI:
@@ -161,7 +162,10 @@ class EPCISEvent:
             try:
                 value = datetime.datetime.fromisoformat(value)
             except:
-                pass
+                try:
+                    value = parser.parse(value)
+                except:
+                    pass
         if isinstance(value, datetime.datetime):
             utc = tz.tzutc()
             value = value.astimezone(utc)
@@ -765,7 +769,7 @@ class TransformationEvent(CommonEvent):
 # script showing the different event types
 if __name__ == "__main__":
     test_event = EPCISEvent()
-    test_event.event_time = "2013-06-08T14:58:56.591+02:00"
-    test_event.event_timezone_offset = "+02:00"
+    test_event.event_time = "6-14-2021 9:36AM EDT"
+    test_event.event_timezone_offset = "-04:00"
     print("UTC:  ", test_event.event_time)
     print("Local:", test_event.event_time_local)
