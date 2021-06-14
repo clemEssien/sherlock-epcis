@@ -1,5 +1,7 @@
 import datetime
 import re
+from dateutil import tz, parser
+import dateutil
 
 
 class URI:
@@ -18,7 +20,12 @@ class URI:
 
     def __init__(self, uri_str: str):
         """Creates a new URI instance from the given string"""
-        self.uri_str = uri_str
+        self.uri_str: str = uri_str
+        self._split_uri: list[str] = []
+        self._is_split: bool = False
+        if re.search("[a-z]+:[a-z]+:[a-z]+:[a-z]+:[a-z0-9.*]+", self.uri_str):
+            self._split_uri = self.uri_str.split(":")
+            self._is_split = True
 
     def __repr__(self) -> str:
         rep = "URI(" + self.uri_str + ")"
@@ -27,28 +34,27 @@ class URI:
     def __str__(self) -> str:
         return self.uri_str
 
-    def split_uri(self) -> list[str]:
-        """returns a parsed URI"""
-        if re.search("[a-z]+:[a-z]+:[a-z]+:[a-z]+:[a-z0-9.*]+", self.uri_str):
-            return self.uri_str.split(":")
-        return None
-
+    @property
     def prefix(self) -> str:
         """returns the URI's prefix"""
-        if split_uri := self.split_uri():
-            return "{}:{}:{}".format(split_uri[0], split_uri[1], split_uri[2])
+        if self._is_split:
+            return "{}:{}:{}".format(
+                self._split_uri[0], self._split_uri[1], self._split_uri[2]
+            )
         return None
 
+    @property
     def scheme(self) -> str:
         """returns the URI's scheme"""
-        if split_uri := self.split_uri():
-            return split_uri[3]
+        if self._is_split:
+            return self._split_uri[3]
         return None
 
+    @property
     def value(self) -> str:
         """returns the value stored in the URI"""
-        if split_uri := self.split_uri():
-            return split_uri[4]
+        if self._is_split:
+            return self._split_uri[4]
         return None
 
 
@@ -156,8 +162,18 @@ class EPCISEvent:
             try:
                 value = datetime.datetime.fromisoformat(value)
             except:
-                pass
+                try:
+                    value = parser.parse(value)
+                except:
+                    pass
+        if isinstance(value, datetime.datetime):
+            utc = tz.tzutc()
+            value = value.astimezone(utc)
         self._event_time = value
+
+    @property
+    def event_time_local(self) -> datetime.datetime:
+        return self._event_time.astimezone(self.event_timezone_offset)
 
     @property
     def event_timezone_offset(self) -> datetime.timezone:
@@ -240,6 +256,7 @@ class CommonEvent(EPCISEvent):
     def business_step(self, value: URI):
         if isinstance(value, str):
             value = URI(value)
+        self._business_step = value
 
     @property
     def disposition(self) -> URI:
@@ -655,7 +672,7 @@ class TransformationEvent(CommonEvent):
         return self._input_epc_list
 
     @input_epc_list.setter
-    def input_epc_list(self, value):
+    def input_epc_list(self, value: list[URI]):
         if isinstance(value, list):
             new_values = []
             for epc in value:
@@ -750,10 +767,14 @@ class TransformationEvent(CommonEvent):
         self._instance_lot_master_data = value
 
 
-# script showing the different event types
+# simple testing script
 if __name__ == "__main__":
-    uri = URI("urn:epc:id:sgtin:0614141.107346.2017")
-    print(uri.uri_str)
-    print(uri.prefix())
-    print(uri.scheme())
-    print(uri.value())
+    test_event = EPCISEvent()
+    test_event.event_time = "6-14-2021 9:36PM EDT"
+    test_event.event_timezone_offset = "-04:00"
+    print("UTC:  ", test_event.event_time)
+    print("Local:", test_event.event_time_local)
+
+    test_event.event_time = "2005-07-11T11:30:47+00:00"
+    print("UTC:  ", test_event.event_time)
+    print("Local:", test_event.event_time_local)
