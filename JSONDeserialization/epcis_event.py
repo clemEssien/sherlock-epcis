@@ -256,6 +256,7 @@ class CommonEvent(EPCISEvent):
     def business_step(self, value: URI):
         if isinstance(value, str):
             value = URI(value)
+        self._business_step = value
 
     @property
     def disposition(self) -> URI:
@@ -671,7 +672,7 @@ class TransformationEvent(CommonEvent):
         return self._input_epc_list
 
     @input_epc_list.setter
-    def input_epc_list(self, value):
+    def input_epc_list(self, value: list[URI]):
         if isinstance(value, list):
             new_values = []
             for epc in value:
@@ -766,10 +767,14 @@ class TransformationEvent(CommonEvent):
         self._instance_lot_master_data = value
 
 
-# script showing the different event types
+# simple testing script
 if __name__ == "__main__":
     test_event = EPCISEvent()
-    test_event.event_time = "6-14-2021 9:36AM EDT"
+    test_event.event_time = "6-14-2021 9:36PM EDT"
     test_event.event_timezone_offset = "-04:00"
+    print("UTC:  ", test_event.event_time)
+    print("Local:", test_event.event_time_local)
+
+    test_event.event_time = "2005-07-11T11:30:47+00:00"
     print("UTC:  ", test_event.event_time)
     print("Local:", test_event.event_time_local)
