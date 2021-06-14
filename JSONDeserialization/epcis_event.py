@@ -1,49 +1,61 @@
 import datetime
 import re
+from dateutil import tz, parser
+import dateutil
 
 
 class URI:
-    """Provides a class for URI objects as defined in GS1's [TDS1.9, Section 7]
+    """Provides a class for URI objects as defined in [EPCIS1.2, Section 6.4]
 
     Attributes:
-        uri : str
-            Entire uri. Will be present when other attributes cannot be parsed.
-        prefix : str
-            The first four parts of the URI, denoted by GS1 as the uri prefix.
-        scheme : str
-            The type of data represented by the URI (SGTIN, SSCC, biztype, etc.).
-        value : str
-            The data stored by the URI (the actual SGTIN, SSCC, or biztype, etc.).
+        uri_str : str
+            string representation of the URI.
+
+    GS1 URI Syntax:
+        "urn" : <Namespace Identifier> : <Namespace Specfic String> : <Scheme> : <Value>
+        examples:
+            "urn:epc:id:sgtin:0614141.107346.2018"
+            "urn:epcglobal:cbv:bizstep:receiving"
     """
 
-    def __init__(self, input_str: str):
+    def __init__(self, uri_str: str):
         """Creates a new URI instance from the given string"""
-        self.uri = input_str
-        self.prefix = ""
-        self.scheme = ""
-        self.value = ""
-        if re.search("[a-z]+:[a-z]+:[a-z]+:[a-z]+:[a-z0-9.*]+", input_str) is not None:
-            uri = input_str.split(":")
-            self.prefix = "{}:{}:{}:{}".format(uri[0], uri[1], uri[2], uri[3])
-            self.scheme = uri[3]
-            self.value = uri[4]
+        self.uri_str: str = uri_str
+        self._split_uri: list[str] = []
+        self._is_split: bool = False
+        if re.search("[a-z]+:[a-z]+:[a-z]+:[a-z]+:[a-z0-9.*]+", self.uri_str):
+            self._split_uri = self.uri_str.split(":")
+            self._is_split = True
 
     def __repr__(self) -> str:
-        rep = (
-            "URI(uri: "
-            + self.uri
-            + "; prefix: "
-            + self.prefix
-            + "; scheme: "
-            + self.scheme
-            + "; value: "
-            + self.value
-            + ")"
-        )
+        rep = "URI(" + self.uri_str + ")"
         return rep
 
     def __str__(self) -> str:
-        return self.uri
+        return self.uri_str
+
+    @property
+    def prefix(self) -> str:
+        """returns the URI's prefix"""
+        if self._is_split:
+            return "{}:{}:{}".format(
+                self._split_uri[0], self._split_uri[1], self._split_uri[2]
+            )
+        return None
+
+    @property
+    def scheme(self) -> str:
+        """returns the URI's scheme"""
+        if self._is_split:
+            return self._split_uri[3]
+        return None
+
+    @property
+    def value(self) -> str:
+        """returns the value stored in the URI"""
+        if self._is_split:
+            return self._split_uri[4]
+        return None
 
 
 class QuantityElement:
@@ -58,20 +70,20 @@ class QuantityElement:
             The unit of measure the quantity is to be interpreted as.
     """
 
-    def __init__(self, epc: URI = URI(""), quant: float = -1, unit: str = ""):
+    def __init__(self, epc: URI = URI(""), quant: float = 0, unit: str = ""):
         """Creates a new QuantityElement instance"""
-        self._epc_class: URI = epc
-        self._quantity: float = quant
-        self._uom: str = unit
+        self.epc_class: URI = epc
+        self.quantity: float = quant
+        self.uom: str = unit
 
     def __repr__(self) -> str:
         return (
             "QuantityElement("
-            + str(self._epc_class)
+            + str(self.epc_class)
             + ", "
-            + str(self._quantity)
+            + str(self.quantity)
             + ", "
-            + self._uom
+            + self.uom
             + ")"
         )
 
@@ -122,12 +134,15 @@ class EPCISEvent:
             The date and time that the event occurred.
         event_timezone_offset : datetime.timezone
             The timezone offset in effect at the time and place the event occurred.
+        extensions : list[dict]
+            A place to add fields not in the EPCIS1.2 standard
     """
 
     def __init__(self):
         """Creates a new EPCISEvent instance with empty, but type-hinted, attributes"""
         self._event_time = datetime.datetime(1, 1, 1)
         self._event_timezone_offset = datetime.timezone(datetime.timedelta(hours=0))
+        self._extensions: list[dict] = []
 
     def __repr__(self) -> str:
         """EPCISEvent representation"""
@@ -147,8 +162,18 @@ class EPCISEvent:
             try:
                 value = datetime.datetime.fromisoformat(value)
             except:
-                pass
+                try:
+                    value = parser.parse(value)
+                except:
+                    pass
+        if isinstance(value, datetime.datetime):
+            utc = tz.tzutc()
+            value = value.astimezone(utc)
         self._event_time = value
+
+    @property
+    def event_time_local(self) -> datetime.datetime:
+        return self._event_time.astimezone(self.event_timezone_offset)
 
     @property
     def event_timezone_offset(self) -> datetime.timezone:
@@ -168,6 +193,14 @@ class EPCISEvent:
                     )
                 )
         self._event_timezone_offset = value
+
+    @property
+    def extensions(self) -> list[dict]:
+        return self._extensions
+
+    @extensions.setter
+    def extensions(self, ext: dict):
+        self._extensions.append(ext)
 
 
 class CommonEvent(EPCISEvent):
@@ -223,6 +256,7 @@ class CommonEvent(EPCISEvent):
     def business_step(self, value: URI):
         if isinstance(value, str):
             value = URI(value)
+        self._business_step = value
 
     @property
     def disposition(self) -> URI:
@@ -638,7 +672,7 @@ class TransformationEvent(CommonEvent):
         return self._input_epc_list
 
     @input_epc_list.setter
-    def input_epc_list(self, value):
+    def input_epc_list(self, value: list[URI]):
         if isinstance(value, list):
             new_values = []
             for epc in value:
@@ -733,23 +767,14 @@ class TransformationEvent(CommonEvent):
         self._instance_lot_master_data = value
 
 
-# script showing the different event types
+# simple testing script
 if __name__ == "__main__":
-    event_types = {
-        "ObjectEvent": ObjectEvent(),
-        "AggregationEvent": AggregationEvent(),
-        "QuantityEvent": QuantityEvent(),
-        "TransactionEvent": TransactionEvent(),
-        "TransformationEvent": TransformationEvent(),
-    }
-    for key in event_types.keys():
-        event = event_types[key]
-        print(event)
+    test_event = EPCISEvent()
+    test_event.event_time = "6-14-2021 9:36PM EDT"
+    test_event.event_timezone_offset = "-04:00"
+    print("UTC:  ", test_event.event_time)
+    print("Local:", test_event.event_time_local)
 
-    obj_event = AggregationEvent()
-
-    for attr in obj_event.__dict__.keys():
-        attr = attr[1:]
-        setattr(obj_event, attr, attr)
-
-    print(obj_event)
+    test_event.event_time = "2005-07-11T11:30:47+00:00"
+    print("UTC:  ", test_event.event_time)
+    print("Local:", test_event.event_time_local)
