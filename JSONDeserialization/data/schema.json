@@ -14,7 +14,7 @@
     "disposition": "disposition",
     "read_point": "readPoint",
     "business_location": "bizLocation",
-    "instance_lot_master_data": "ilmd",
+    "instance_lot_master_data": "instance_lot_master_data",
     "quantity_list": "quantityList",
     "child_quantity_list": "childQuantityList",
     "input_quantity_list": "inputQuantityList",
