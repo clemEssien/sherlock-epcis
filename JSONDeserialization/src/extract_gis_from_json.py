@@ -84,17 +84,13 @@ def map_from_epcis(epcis_event_obj,epcis_json):
         attr = attr[1:]
 
         try:
-
             instvar = getattr(epcis_event_obj, attr)
             value = epcis_json[schema_doc['attr_key_mapping'][attr]]
             formated_value = attr_type_check(instvar, value)
-            #default_value = type_check(epcis_json[schema_doc['attr_key_mapping'][attr]])
             setattr(epcis_event_obj, attr, formated_value)
 
         except Exception as e:
-            a = 1
-            # print(attr, e)
-            #print("error: ",attr, e)
+            pass
 
     epcis_json_keys = epcis_json.keys()
     schema_values = schema_doc["attr_key_mapping"].values()
@@ -103,8 +99,6 @@ def map_from_epcis(epcis_event_obj,epcis_json):
     for k in ext_keys:
         ext_dict[k] = epcis_json[k]
     epcis_event_obj.extensions.append(ext_dict)
-
-    print(epcis_event_obj)
 
     return epcis_event_obj
 
