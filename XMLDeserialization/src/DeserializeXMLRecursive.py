@@ -5,9 +5,9 @@ import xml
 import pprint
 import xml.etree.ElementTree as ET
 
-
+XML_DIR = '../data/'
 def main():
-    parseXML("XMLDeserialization/GS1StandardExample4.xml")
+    parseXML(XML_DIR+"GS1StandardExample4.xml")
 
 
 def parseXML(filename):

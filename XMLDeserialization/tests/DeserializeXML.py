@@ -4,8 +4,9 @@
 import xml
 import xml.etree.ElementTree as ET
 
+XML_DIR = '../data/'
 def main() :
-    tree = ET.parse("XMLDeserialization/GS1StandardExample1.xml")
+    tree = ET.parse(XML_DIR+"GS1StandardExample1.xml")
     root = tree.getroot()
 
     if root.tag != "{urn:epcglobal:epcis:xsd:1}EPCISDocument" :                     #Check for the EPCISDocument tag 
