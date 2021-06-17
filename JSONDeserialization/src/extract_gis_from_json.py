@@ -1,6 +1,5 @@
 import json
 import datetime
-import inspect
 from JSONDeserialization.src import epcis_event
 
 DATA_DIR = '../data/'
@@ -99,7 +98,6 @@ def map_from_epcis(epcis_event_obj,epcis_json):
     for k in ext_keys:
         ext_dict[k] = epcis_json[k]
     epcis_event_obj.extensions.append(ext_dict)
-
     return epcis_event_obj
 
 

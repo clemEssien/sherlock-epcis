@@ -21,8 +21,6 @@
     "output_quantity_list": "outputQuantityList",
     "business_transaction_list": "bizTransactionList",
     "source_list": "sourceList",
-    "destination_list": "destinationList",
-    "extension": "extensions",
-    "instance_lot_master_data": "instance_lot_master_data"
+    "destination_list": "destinationList"
     }
 }

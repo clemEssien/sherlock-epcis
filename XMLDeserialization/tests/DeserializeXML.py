@@ -18,7 +18,7 @@ def main() :
         for event in list :
             for child in event :
                 #print(child.tag)
-                if len(child) :                                                     #Check for lists (e.g. epcList, businessTransactionList)
+                if len(child):                                                     #Check for lists (e.g. epcList, businessTransactionList)
                     if(child.tag == "readPoint" or child.tag == "bizLocation") :    #Check for specific outliers
                         myDict[child.tag] = child[0].text                           #Extract the id uris
                     else :
