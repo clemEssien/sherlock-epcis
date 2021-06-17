@@ -1,10 +1,12 @@
 import json
 import datetime
+from dateutil import tz, parser
 from JSONDeserialization.src import epcis_event
 
 DATA_DIR = '../data/'
 
 def read_uri(uri):
+    """ method returns URI string from a URI"""
     if type(uri) == dict:
         return uri['id']
     return epcis_event.URI(uri)
@@ -12,7 +14,6 @@ def read_uri(uri):
 def is_primitive(value) -> bool:
     """
     Returns True if the type is a primitive value
-
     Primitive values include str, int, float, datetime, date, and time.
     """
     if isinstance(value, datetime.datetime):
@@ -29,13 +30,20 @@ def is_primitive(value) -> bool:
         return False
 
 def attr_type_check(instvar, data):
+
     if isinstance(instvar, str):
         value = data
+
     if isinstance(instvar, list):
-        arr_out = []
-        for val in data:
-                arr_out.append(val)
-        return arr_out
+        dict_out = {}
+        arr = []
+        for item in data:
+            if is_primitive(item):
+                arr.append(item)
+            else:
+                arr.append(data)
+        dict_out = arr[0]
+        value = dict_out
 
     if isinstance(instvar, epcis_event.URI):
         value = read_uri(data)
@@ -45,8 +53,8 @@ def attr_type_check(instvar, data):
         keys = data.keys()
         if len(keys):
             for key in keys:
-                    dict_out[key] = data[key]
-        return dict_out
+                dict_out[key] = data[key]
+        value = dict_out
 
     elif isinstance(instvar, datetime.date):
         try:
@@ -55,10 +63,14 @@ def attr_type_check(instvar, data):
         except:
             value = data
     elif isinstance(instvar, datetime.datetime):
+        utc = tz.tzutc()
         try:
-            value = datetime.date.fromisoformat(data)
+            value = data.astimezone(utc)
         except:
-            value = data
+            try:
+                value = parser.parse(value)
+            except:
+                pass
     elif isinstance(instvar, datetime.timezone):
         value = data
     return value
@@ -97,7 +109,8 @@ def map_from_epcis(epcis_event_obj,epcis_json):
     ext_dict = {}
     for k in ext_keys:
         ext_dict[k] = epcis_json[k]
-    epcis_event_obj.extensions.append(ext_dict)
+    setattr(epcis_event_obj, 'extensions', ext_dict)
+
     return epcis_event_obj
 
 

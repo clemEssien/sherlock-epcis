@@ -137,6 +137,4 @@ def map_from_epcis(epcis_event_obj,epcis_json):
         ext_dict[k] = epcis_json[k]
     setattr(epcis_event_obj, 'extensions', ext_dict)
 
-    print(epcis_event_obj)
-
     return epcis_event_obj

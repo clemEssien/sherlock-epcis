@@ -3,6 +3,7 @@ from JSONDeserialization.src import epcis_event
 from JSONDeserialization.src.extract_gis_from_json import map_from_epcis
 
 DATA_DIR = '../data/'
+
 # driver code
 event_types = {
     "ObjectEvent": epcis_event.ObjectEvent(),
