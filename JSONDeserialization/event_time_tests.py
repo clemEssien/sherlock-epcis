@@ -1,10 +1,4 @@
-from pathlib import Path
-import sys
-
-# Pylance doesn't love this, but it works.
-path = str(Path(Path(__file__).parent.absolute()).parent.absolute())
-sys.path.insert(0, path)
-from src import epcis_event
+import epcis_event
 
 test_event = epcis_event.EPCISEvent()
 test_event.event_time = "6-14-2021 9:36PM EDT"
