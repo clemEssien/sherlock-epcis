@@ -60,7 +60,7 @@ def is_primitive(value) -> bool:
         return False
 
 def attr_type_check(instvar, data, attr):
-
+    """method checks for the data type and formats it appropriately"""
     if isinstance(instvar, str):
         value = data
 
