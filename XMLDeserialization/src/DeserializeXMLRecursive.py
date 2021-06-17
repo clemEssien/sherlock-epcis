@@ -7,7 +7,7 @@ import xml.etree.ElementTree as ET
 
 
 def main():
-    parse_xml("XMLDeserialization/GS1StandardExample4.xml")
+    parse_xml("../data/GS1StandardExample4.xml")
 
 def parse_tag(node):
     nodeDict = {}

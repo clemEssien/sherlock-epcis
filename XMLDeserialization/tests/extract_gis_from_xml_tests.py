@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-from JSONDeserialization.src import epcis_event as epc
+from JSONDeserialization import epcis_event as epc
 from XMLDeserialization.src.extract_gis_from_xml import map_xml_to_dict
 from XMLDeserialization.src.extract_gis_from_xml import map_from_epcis
 from XMLDeserialization.src.extract_gis_from_xml import  map_to_epcis_dict
@@ -34,7 +34,6 @@ def main():
                    if len(event_list):
                        for event in event_list:
                            if event:
-                               print(event.tag)
                                d = map_xml_to_dict(event)
                                try:
                                    xml_doc = d[event.tag]

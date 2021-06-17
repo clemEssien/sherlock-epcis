@@ -1,5 +1,5 @@
 import json
-from JSONDeserialization.src import epcis_event
+from JSONDeserialization import epcis_event
 from JSONDeserialization.src.extract_gis_from_json import map_from_epcis
 
 DATA_DIR = '../data/'
@@ -22,6 +22,6 @@ with open(DATA_DIR+'GS1StandardExample1.json') as f:
 for event in events:
     event_type = (event['isA'])
     epcis_event_obj = event_types[event_type]
-    map_from_epcis(epcis_event_obj, event)
+    print(map_from_epcis(epcis_event_obj, event))
 
 

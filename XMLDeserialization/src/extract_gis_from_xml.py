@@ -2,9 +2,9 @@ import json
 import datetime
 from dateutil import tz, parser
 
-from JSONDeserialization.src import epcis_event
+from JSONDeserialization import epcis_event
 
-DATA_DIR = '../data/'
+DATA_DIR = '../../JSONDeserialization/data/'
 
 def map_xml_to_dict(parent):
     """
@@ -136,5 +136,5 @@ def map_from_epcis(epcis_event_obj,epcis_json):
     for k in ext_keys:
         ext_dict[k] = epcis_json[k]
     setattr(epcis_event_obj, 'extensions', ext_dict)
-
+    print(epcis_event_obj)
     return epcis_event_obj

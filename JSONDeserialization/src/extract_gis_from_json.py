@@ -1,7 +1,7 @@
 import json
 import datetime
 from dateutil import tz, parser
-from JSONDeserialization.src import epcis_event
+from JSONDeserialization import epcis_event
 
 DATA_DIR = '../data/'
 
@@ -64,6 +64,7 @@ def attr_type_check(instvar, data):
             value = data
     elif isinstance(instvar, datetime.datetime):
         utc = tz.tzutc()
+        data = data.replace("Z","+00:00")
         try:
             value = data.astimezone(utc)
         except:
