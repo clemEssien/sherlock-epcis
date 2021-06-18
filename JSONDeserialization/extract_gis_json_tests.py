@@ -1,8 +1,13 @@
 import json
-from JSONDeserialization import epcis_event
-from JSONDeserialization.src.extract_gis_from_json import map_from_epcis
+import os , sys
+currentdir = os.path.dirname(os.path.realpath(__file__))
+parentdir = os.path.dirname(currentdir)
+sys.path.append(parentdir)
 
-DATA_DIR = '../data/'
+from JSONDeserialization import epcis_event
+from JSONDeserialization import extract_gis_from_json as ex
+
+DATA_DIR = "../data/"
 
 # driver code
 event_types = {
@@ -22,6 +27,6 @@ with open(DATA_DIR+'GS1StandardExample1.json') as f:
 for event in events:
     event_type = (event['isA'])
     epcis_event_obj = event_types[event_type]
-    print(map_from_epcis(epcis_event_obj, event))
+    print(ex.map_from_epcis(epcis_event_obj, event))
 
 

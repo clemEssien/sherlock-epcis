@@ -1,10 +1,24 @@
 import xml.etree.ElementTree as ET
-from JSONDeserialization import epcis_event as epc
-from XMLDeserialization.src.extract_gis_from_xml import map_xml_to_dict
-from XMLDeserialization.src.extract_gis_from_xml import map_from_epcis
-from XMLDeserialization.src.extract_gis_from_xml import  map_to_epcis_dict
+import os, sys
+currentdir = os.path.dirname(os.path.realpath(__file__))
+parentdir = os.path.dirname(currentdir)
+sys.path.append(parentdir)
 
-DATA_DIR = '../data/'
+
+from extract_gis_from_xml import map_xml_to_dict
+from extract_gis_from_xml import map_from_epcis
+from extract_gis_from_xml import  map_to_epcis_dict
+
+
+from XMLDeserialization.extract_gis_from_xml import map_xml_to_dict
+
+currentdir = os.path.dirname(os.path.realpath(__file__))
+parentdir = os.path.dirname(currentdir)
+sys.path.append(parentdir)
+
+from JSONDeserialization import epcis_event as js
+
+DATA_DIR = "../data/"
 
 def find_event_from_xml(xml_element_tree, event_types):
     for event in event_types:
@@ -12,16 +26,17 @@ def find_event_from_xml(xml_element_tree, event_types):
             return event
 
 def main():
+    a = 1
     event_types = {
-        "ObjectEvent": epc.ObjectEvent(),
-        "CommonEvent":epc.CommonEvent(),
-        "AggregationEvent": epc.AggregationEvent(),
-        "QuantityEvent": epc.QuantityEvent(),
-        "TransactionEvent": epc.TransactionEvent(),
-        "TransformationEvent": epc.TransformationEvent(),
+        "ObjectEvent": js.ObjectEvent(),
+        "CommonEvent":js.CommonEvent(),
+        "AggregationEvent": js.AggregationEvent(),
+        "QuantityEvent": js.QuantityEvent(),
+        "TransactionEvent": js.TransactionEvent(),
+        "TransformationEvent": js.TransformationEvent(),
     }
-
-    with open (DATA_DIR+'GS1StandardExample1.xml', 'r') as f:
+#
+    with open(DATA_DIR+'GS1StandardExample3.xml', 'r') as f:
            tree = ET.parse(f)
            root = tree.getroot()
 
@@ -45,7 +60,7 @@ def main():
                                     pass
 
                                xml_dict = map_to_epcis_dict(xml_doc)
-                               map_from_epcis(epcis_event_obj, xml_dict)
+                               print(map_from_epcis(epcis_event_obj, xml_dict))
                    else:
                        print("No Events detected in this document")
 
