@@ -1,13 +1,13 @@
 import json
 import os , sys
-# currentdir = os.path.dirname(os.path.realpath(__file__))
-# parentdir = os.path.dirname(currentdir)
-# sys.path.append(parentdir)
+currentdir = os.path.dirname(os.path.realpath(__file__))
+parentdir = os.path.dirname(currentdir)
+sys.path.append(parentdir)
 
 import epcis_event as epc 
 import extract_gis_from_json as ex
 
-DATA_DIR = "../data/"
+DATA_DIR = "./data/"
 
 # driver code
 event_types = {

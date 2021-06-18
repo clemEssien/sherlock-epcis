@@ -4,21 +4,13 @@ currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
-
 from extract_gis_from_xml import map_xml_to_dict
 from extract_gis_from_xml import map_from_epcis
 from extract_gis_from_xml import  map_to_epcis_dict
-
-
-from XMLDeserialization.extract_gis_from_xml import map_xml_to_dict
-
-currentdir = os.path.dirname(os.path.realpath(__file__))
-parentdir = os.path.dirname(currentdir)
-sys.path.append(parentdir)
-
+from extract_gis_from_xml import map_xml_to_dict
 from JSONDeserialization import epcis_event as js
 
-DATA_DIR = "../data/"
+DATA_DIR = "./data/"
 
 def find_event_from_xml(xml_element_tree, event_types):
     for event in event_types:

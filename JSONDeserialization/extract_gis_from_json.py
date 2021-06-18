@@ -3,7 +3,7 @@ import datetime
 from dateutil import tz, parser
 import epcis_event
 
-DATA_DIR = "../data/"
+DATA_DIR = "./data/"
 
 def read_uri(uri):
     """ method returns URI string from a URI"""
