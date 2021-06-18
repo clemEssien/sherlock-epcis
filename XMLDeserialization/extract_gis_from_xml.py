@@ -3,11 +3,11 @@ import datetime
 from dateutil import tz, parser
 import os, sys
 
-currentdir = os.path.dirname(os.path.realpath(__file__))
-parentdir = os.path.dirname(currentdir)
-sys.path.append(parentdir)
+# currentdir = os.path.dirname(os.path.realpath(__file__))
+# parentdir = os.path.dirname(currentdir)
+# sys.path.append(parentdir)
 
-from JSONDeserialization import epcis_event
+import epcis_event
 DATA_DIR = "../data/"
 
 def map_xml_to_dict(parent):

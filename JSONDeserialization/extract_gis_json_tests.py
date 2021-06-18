@@ -1,21 +1,21 @@
 import json
 import os , sys
-currentdir = os.path.dirname(os.path.realpath(__file__))
-parentdir = os.path.dirname(currentdir)
-sys.path.append(parentdir)
+# currentdir = os.path.dirname(os.path.realpath(__file__))
+# parentdir = os.path.dirname(currentdir)
+# sys.path.append(parentdir)
 
-from JSONDeserialization import epcis_event
-from JSONDeserialization import extract_gis_from_json as ex
+import epcis_event as epc 
+import extract_gis_from_json as ex
 
 DATA_DIR = "../data/"
 
 # driver code
 event_types = {
-    "ObjectEvent": epcis_event.ObjectEvent(),
-    "AggregationEvent": epcis_event.AggregationEvent(),
-    "QuantityEvent": epcis_event.QuantityEvent(),
-    "TransactionEvent": epcis_event.TransactionEvent(),
-    "TransformationEvent": epcis_event.TransformationEvent(),
+    "ObjectEvent": epc.ObjectEvent(),
+    "AggregationEvent": epc.AggregationEvent(),
+    "QuantityEvent": epc.QuantityEvent(),
+    "TransactionEvent": epc.TransactionEvent(),
+    "TransformationEvent": epc.TransformationEvent(),
 }
 
 with open(DATA_DIR+'GS1StandardExample1.json') as f:
