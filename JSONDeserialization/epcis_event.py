@@ -1,6 +1,7 @@
 import datetime
 import re
 from dateutil import tz, parser
+from typing import List
 
 
 class URI:
@@ -20,7 +21,7 @@ class URI:
     def __init__(self, uri_str: str):
         """Creates a new URI instance from the given string"""
         self.uri_str: str = uri_str
-        self._split_uri: list[str] = []
+        self._split_uri: List[str] = []
         self._is_split: bool = False
         if re.search("[a-z]+:[a-z]+:[a-z]+:[a-z]+:[a-z0-9.*]+", self.uri_str):
             self._split_uri = self.uri_str.split(":")
@@ -141,7 +142,7 @@ class EPCISEvent:
         """Creates a new EPCISEvent instance with empty, but type-hinted, attributes"""
         self._event_time = datetime.datetime(1, 1, 1)
         self._event_timezone_offset = datetime.timezone(datetime.timedelta(hours=0))
-        self._extensions: list[dict] = []
+        self._extensions: List[dict] = []
 
     def __repr__(self) -> str:
         """EPCISEvent representation"""
@@ -194,7 +195,7 @@ class EPCISEvent:
         self._event_timezone_offset = value
 
     @property
-    def extensions(self) -> list[dict]:
+    def extensions(self) -> List[dict]:
         return self._extensions
 
     @extensions.setter
@@ -233,9 +234,9 @@ class CommonEvent(EPCISEvent):
         self._disposition: URI = URI("")
         self._read_point: URI = URI("")
         self._business_location: URI = URI("")
-        self._business_transaction_list: list[dict] = []
-        self._source_list: list[dict] = []
-        self._destination_list: list[dict] = []
+        self._business_transaction_list: List[dict] = []
+        self._source_list: List[dict] = []
+        self._destination_list: List[dict] = []
 
     @property
     def action(self) -> str:
@@ -291,30 +292,30 @@ class CommonEvent(EPCISEvent):
         self._business_location = value
 
     @property
-    def business_transaction_list(self) -> list[dict]:
+    def business_transaction_list(self) -> List[dict]:
         """business_transaction_list"""
         return self._business_transaction_list
 
     @business_transaction_list.setter
-    def business_transaction_list(self, value: list[dict]):
+    def business_transaction_list(self, value: List[dict]):
         self._business_transaction_list = value
 
     @property
-    def source_list(self) -> list[dict]:
+    def source_list(self) -> List[dict]:
         """source_list"""
         return self._source_list
 
     @source_list.setter
-    def source_list(self, value: list[dict]):
+    def source_list(self, value: List[dict]):
         self._source_list = value
 
     @property
-    def destination_list(self) -> list[dict]:
+    def destination_list(self) -> List[dict]:
         """destination_list"""
         return self._destination_list
 
     @destination_list.setter
-    def destination_list(self, value: list[dict]):
+    def destination_list(self, value: List[dict]):
         self._destination_list = value
 
 
@@ -333,17 +334,17 @@ class ObjectEvent(CommonEvent):
 
     def __init__(self):
         super().__init__()
-        self._epc_list: list[URI] = []
-        self._quantity_list: list[QuantityElement] = []
+        self._epc_list: List[URI] = []
+        self._quantity_list: List[QuantityElement] = []
         self._instance_lot_master_data: dict = {}
 
     @property
-    def epc_list(self) -> list[URI]:
+    def epc_list(self) -> List[URI]:
         """epc_list"""
         return self._epc_list
 
     @epc_list.setter
-    def epc_list(self, value: list[URI]):
+    def epc_list(self, value: List[URI]):
         if isinstance(value, list):
             new_values = []
             for epc in value:
@@ -354,12 +355,12 @@ class ObjectEvent(CommonEvent):
         self._epc_list = value
 
     @property
-    def quantity_list(self) -> list[QuantityElement]:
+    def quantity_list(self) -> List[QuantityElement]:
         """quantity_list"""
         return self._quantity_list
 
     @quantity_list.setter
-    def quantity_list(self, value: list[QuantityElement]):
+    def quantity_list(self, value: List[QuantityElement]):
         if isinstance(value, list):
             new_vals = []
             for val in value:
@@ -402,8 +403,8 @@ class AggregationEvent(CommonEvent):
     def __init__(self):
         super().__init__()
         self._parent_id: URI = URI("")
-        self._child_epc_list: list[URI] = []
-        self._child_quantity_list: list[QuantityElement] = []
+        self._child_epc_list: List[URI] = []
+        self._child_quantity_list: List[QuantityElement] = []
 
     @property
     def parent_id(self) -> URI:
@@ -417,12 +418,12 @@ class AggregationEvent(CommonEvent):
         self._parent_id = value
 
     @property
-    def child_epc_list(self) -> list[URI]:
+    def child_epc_list(self) -> List[URI]:
         """child_epc_list"""
         return self._child_epc_list
 
     @child_epc_list.setter
-    def child_epc_list(self, value: list[URI]):
+    def child_epc_list(self, value: List[URI]):
         if isinstance(value, list):
             new_values = []
             for epc in value:
@@ -433,12 +434,12 @@ class AggregationEvent(CommonEvent):
         self._child_epc_list = value
 
     @property
-    def child_quantity_list(self) -> list[QuantityElement]:
+    def child_quantity_list(self) -> List[QuantityElement]:
         """quantity_list"""
         return self._child_quantity_list
 
     @child_quantity_list.setter
-    def child_quantity_list(self, value: list[QuantityElement]):
+    def child_quantity_list(self, value: List[QuantityElement]):
         if isinstance(value, list):
             new_vals = []
             for val in value:
@@ -485,7 +486,7 @@ class QuantityEvent(EPCISEvent):
         self._disposition: URI = URI("")
         self._read_point: URI = URI("")
         self._business_location: URI = URI("")
-        self._business_transaction_list: list[dict] = []
+        self._business_transaction_list: List[dict] = []
 
     @property
     def epc_class(self) -> URI:
@@ -557,12 +558,12 @@ class QuantityEvent(EPCISEvent):
         self._business_location = value
 
     @property
-    def business_transaction_list(self) -> list[dict]:
+    def business_transaction_list(self) -> List[dict]:
         """business_transaction_list"""
         return self._business_transaction_list
 
     @business_transaction_list.setter
-    def business_transaction_list(self, value: list[dict]):
+    def business_transaction_list(self, value: List[dict]):
         self._business_transaction_list = value
 
 
@@ -582,8 +583,8 @@ class TransactionEvent(CommonEvent):
     def __init__(self):
         super().__init__()
         self._parent_id: URI = URI("")
-        self._epc_list: list[URI] = []
-        self._quantity_list: list[QuantityElement] = []
+        self._epc_list: List[URI] = []
+        self._quantity_list: List[QuantityElement] = []
 
     @property
     def parent_id(self) -> URI:
@@ -597,12 +598,12 @@ class TransactionEvent(CommonEvent):
         self._parent_id = value
 
     @property
-    def epc_list(self) -> list[URI]:
+    def epc_list(self) -> List[URI]:
         """epc_list"""
         return self._epc_list
 
     @epc_list.setter
-    def epc_list(self, value: list[URI]):
+    def epc_list(self, value: List[URI]):
         if isinstance(value, list):
             new_values = []
             for epc in value:
@@ -613,12 +614,12 @@ class TransactionEvent(CommonEvent):
         self._epc_list = value
 
     @property
-    def quantity_list(self) -> list[QuantityElement]:
+    def quantity_list(self) -> List[QuantityElement]:
         """quantity_list"""
         return self._quantity_list
 
     @quantity_list.setter
-    def quantity_list(self, value: list[QuantityElement]):
+    def quantity_list(self, value: List[QuantityElement]):
         if isinstance(value, list):
             new_vals = []
             for val in value:
@@ -658,20 +659,20 @@ class TransformationEvent(CommonEvent):
 
     def __init__(self):
         super().__init__()
-        self._input_epc_list: list[URI] = []
-        self._input_quantity_list: list[QuantityElement] = []
-        self._output_epc_list: list[URI] = []
-        self._output_quantity_list: list[QuantityElement] = []
+        self._input_epc_list: List[URI] = []
+        self._input_quantity_list: List[QuantityElement] = []
+        self._output_epc_list: List[URI] = []
+        self._output_quantity_list: List[QuantityElement] = []
         self._transformation_id: URI = URI("")
         self._instance_lot_master_data: dict = {}
 
     @property
-    def input_epc_list(self) -> list[URI]:
+    def input_epc_list(self) -> List[URI]:
         """input_epc_list"""
         return self._input_epc_list
 
     @input_epc_list.setter
-    def input_epc_list(self, value: list[URI]):
+    def input_epc_list(self, value: List[URI]):
         if isinstance(value, list):
             new_values = []
             for epc in value:
@@ -682,12 +683,12 @@ class TransformationEvent(CommonEvent):
         self._input_epc_list = value
 
     @property
-    def input_quantity_list(self) -> list[QuantityElement]:
+    def input_quantity_list(self) -> List[QuantityElement]:
         """input_quantity_list"""
         return self._input_quantity_list
 
     @input_quantity_list.setter
-    def input_quantity_list(self, value: list[QuantityElement]):
+    def input_quantity_list(self, value: List[QuantityElement]):
         if isinstance(value, list):
             new_vals = []
             for val in value:
@@ -706,12 +707,12 @@ class TransformationEvent(CommonEvent):
         self._input_quantity_list = value
 
     @property
-    def output_epc_list(self) -> list[URI]:
+    def output_epc_list(self) -> List[URI]:
         """output_epc_list"""
         return self._output_epc_list
 
     @output_epc_list.setter
-    def output_epc_list(self, value: list[URI]):
+    def output_epc_list(self, value: List[URI]):
         if isinstance(value, list):
             new_values = []
             for epc in value:
@@ -722,12 +723,12 @@ class TransformationEvent(CommonEvent):
         self._output_epc_list = value
 
     @property
-    def output_quantity_list(self) -> list[QuantityElement]:
+    def output_quantity_list(self) -> List[QuantityElement]:
         """output_quantity_list"""
         return self._output_quantity_list
 
     @output_quantity_list.setter
-    def output_quantity_list(self, value: list[QuantityElement]):
+    def output_quantity_list(self, value: List[QuantityElement]):
         if isinstance(value, list):
             new_vals = []
             for val in value:
