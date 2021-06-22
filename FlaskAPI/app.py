@@ -62,7 +62,16 @@ class XMLView(FlaskView):
 
     @route("/", methods=["GET"])
     def index(self):
-        pass
+        """
+        IN PROGRESS
+        Gets EPCIS event data
+
+        Error Codes:
+
+        On Success (200):
+        
+        """
+        raise NotImplementedError()
 
     @route("/", methods=["POST"])
     def post(self):
