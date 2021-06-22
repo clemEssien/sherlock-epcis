@@ -59,5 +59,23 @@ class JSONView(FlaskView):
 class XMLView(FlaskView):
     route_base = "/xml"
 
+    @route("/", method=["GET"])
+    def index(self):
+        pass
+
+    @route("/", method=["POST"])
+    def post(self):
+        """
+        Posts XML EPCIS event to add to db
+
+        Request Body: {
+            xml: str *string of xml data
+        }
+        """
+        epcis_xml = request.get_json();
 
 JSONView.register(app)
+XMLView.register(app)
+
+if __name__ == "__main__":
+    app.run()
