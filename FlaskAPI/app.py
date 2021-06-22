@@ -69,7 +69,7 @@ class XMLView(FlaskView):
         Error Codes:
 
         On Success (200):
-        
+
         """
         raise NotImplementedError()
 
@@ -78,6 +78,8 @@ class XMLView(FlaskView):
         """
         IN PROGRESS
         Posts XML EPCIS event to add to db
+
+        Content Type: application/xml
 
         Request Body: 
             xml data of epcis
@@ -88,7 +90,7 @@ class XMLView(FlaskView):
         On Success (200):
             {
                 success: true
-                events: any
+                events: EPCISEvent[]
             }
         """
         epcis_xml = str(request.get_data(), "utf-8") 
@@ -113,14 +115,13 @@ class XMLView(FlaskView):
 
                     xml_dict = ex_xml.map_to_epcis_dict(xml_doc)
                     ex_xml.map_from_epcis(epcis_event_obj, xml_dict)
-                    events.append({
+                    events.append({     #Event object not json serializable
                         "_event_time": str(epcis_event_obj._event_time),
                         "_event_timezone_offset": str(epcis_event_obj._event_timezone_offset),
                         "_extensions": str(epcis_event_obj._extensions),
                         "_action": str(epcis_event_obj._action),
                         "_business_step": str(epcis_event_obj._business_step),
                     })
-
 
         return {"success": True, "events": events}, 200
         
