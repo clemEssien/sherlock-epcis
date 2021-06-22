@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from flask_classful import FlaskView
+from flask_classful import FlaskView, route
 from neo4j import GraphDatabase
 
 import os, sys
@@ -9,6 +9,7 @@ parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 import JSONDeserialization.epcis_event as epc
 import JSONDeserialization.extract_gis_from_json as ex_json
+import XMLDeserialization.extract_gis_from_xml as ex_xml
 
 # Temporary sandbox database, expires June 21 at 3:20pm
 USER = "neo4j"
@@ -27,13 +28,17 @@ event_types = {
 }
 
 
-class EventsView(FlaskView):
+class JSONView(FlaskView):
+    route_base = "/json"
+
+    @route("/", methods=["GET"])
     def index(self):
         with driver.session() as session:
             q = "match (n:Event) return n"
             results = session.run(q).data()
         return jsonify(results)
 
+    @route("/", methds=["POST"])
     def post(self):
         """POST an JSON EPCIS event to add to db"""
         epcis_json = request.get_json()
@@ -51,5 +56,8 @@ class EventsView(FlaskView):
         except Exception as e:
             return str(e)
 
+class XMLView(FlaskView):
+    route_base = "/xml"
 
-EventsView.register(app)
+
+JSONView.register(app)

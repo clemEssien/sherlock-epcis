@@ -22,5 +22,5 @@ mydata = {
     ],
 }
 
-response = requests.post(BASE + "events/", json=mydata)
+response = requests.post(BASE + "json/", json=mydata)
 print(response)
