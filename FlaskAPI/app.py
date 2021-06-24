@@ -2,9 +2,11 @@ from flask import Flask, jsonify, request
 from flask_classful import FlaskView, route
 from neo4j import GraphDatabase
 
+from dotenv import load_dotenv
 import os, sys
 import xml.etree.ElementTree as ET
 
+load_dotenv()
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
@@ -13,9 +15,9 @@ import JSONDeserialization.extract_gis_from_json as ex_json
 import XMLDeserialization.extract_gis_from_xml as ex_xml
 
 # Temporary sandbox database, expires June 21 at 3:20pm
-USER = "neo4j"
-PASS = "emitter-juries-tunes"
-URI = "bolt://35.172.233.63:7687"
+USER = os.getenv('DB_USER')
+PASS = os.getenv('DB_PASS')
+URI = os.getenv('DB_URI')
 driver = GraphDatabase.driver(uri=URI, auth=(USER, PASS))
 
 app = Flask(__name__)
