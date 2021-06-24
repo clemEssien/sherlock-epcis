@@ -28,16 +28,27 @@ event_types = {
     "TransformationEvent": epc.TransformationEvent,
 }
 
-
-class JSONView(FlaskView):
-    route_base = "/json"
+class EventView(FlaskView):
+    route_base = "/event"
 
     @route("/", methods=["GET"])
     def index(self):
+        """
+        IN PROGRESS
+        Gets EPCIS event data
+
+        Error Codes:
+
+        On Success (200):
+
+        """
         with driver.session() as session:
             q = "match (n:Event) return n"
             results = session.run(q).data()
-        return jsonify(results)
+        return jsonify(results), 200
+
+class JSONView(FlaskView):
+    route_base = "/json"
 
     @route("/", methods=["POST"])
     def post(self):
@@ -59,19 +70,6 @@ class JSONView(FlaskView):
 
 class XMLView(FlaskView):
     route_base = "/xml"
-
-    @route("/", methods=["GET"])
-    def index(self):
-        """
-        IN PROGRESS
-        Gets EPCIS event data
-
-        Error Codes:
-
-        On Success (200):
-
-        """
-        raise NotImplementedError()
 
     @route("/", methods=["POST"])
     def post(self):
@@ -126,7 +124,7 @@ class XMLView(FlaskView):
         return {"success": True, "events": events}, 200
         
 
-
+EventView.register(app)
 JSONView.register(app)
 XMLView.register(app)
 
