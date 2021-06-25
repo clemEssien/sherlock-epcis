@@ -14,7 +14,7 @@ import JSONDeserialization.epcis_event as epc
 import JSONDeserialization.extract_gis_from_json as ex_json
 import XMLDeserialization.extract_gis_from_xml as ex_xml
 
-# Temporary sandbox database, expires June 21 at 3:20pm
+# Temporary sandbox database, probably expired
 USER = os.getenv('DB_USER')
 PASS = os.getenv('DB_PASS')
 URI = os.getenv('DB_URI')
@@ -31,13 +31,13 @@ event_types = {
 }
 
 class EventView(FlaskView):
-    route_base = "/event"
+    route_base = "/api/event"
 
     @route("/", methods=["GET"])
-    def index(self):
+    def get_all(self):
         """
         IN PROGRESS
-        Gets EPCIS event data
+        Gets all EPCIS event data
 
         Error Codes:
 
@@ -49,16 +49,48 @@ class EventView(FlaskView):
             results = session.run(q).data()
         return jsonify(results), 200
 
+    
+
 class JSONView(FlaskView):
-    route_base = "/json"
+    route_base = "/api/json"
 
     @route("/", methods=["POST"])
     def post(self):
-        """POST an JSON EPCIS event to add to db"""
+        """
+        IN PROGRESS
+        POST an JSON EPCIS event to add to db
+
+        Request Body:
+            {
+                isA: str, *event type
+                eventTime: str,
+                eventTimeZoneOffset: str,
+                epcList: str[],
+                action: str,
+                bizStep: str,
+                disposition: str,
+                readPoint: {id: str},
+                bizTransactionList: [
+                    {
+                        type: str,
+                        bizTransaction: str,
+                    }
+                ],
+            }
+
+        Error Codes:
+            400: Bad request
+
+        On Success (200):
+            {
+                success: true
+            }
+
+        """
         epcis_json = request.get_json()
         event = event_types[epcis_json["isA"]]()
         ex_json.map_from_epcis(event, epcis_json)
-        q = "create (:Event{eventTime: datetime($eventTime), eventTimeZoneOffset: $eventTimeZoneOffset})"
+        q = "create (:Event{eventTime: $eventTime, eventTimeZoneOffset: $eventTimeZoneOffset})"
         qmap = {
             "eventTime": str(event.event_time),
             "eventTimeZoneOffset": str(event.event_timezone_offset),
@@ -66,18 +98,18 @@ class JSONView(FlaskView):
         try:
             with driver.session() as session:
                 session.run(q, qmap)
-            return "Event added"
+            return {"success": True}
         except Exception as e:
-            return str(e)
+            return {"error": "Error adding events"}, 400
 
 class XMLView(FlaskView):
-    route_base = "/xml"
+    route_base = "/api/xml"
 
     @route("/", methods=["POST"])
     def post(self):
         """
         IN PROGRESS
-        Posts XML EPCIS event to add to db
+        Posts XML EPCIS events to add to db
 
         Content Type: application/xml
 
@@ -107,20 +139,25 @@ class XMLView(FlaskView):
                     d = ex_xml.map_xml_to_dict(event)
                     try:
                         xml_doc = d[event.tag]
-                        epcis_event_obj = event_types[event.tag]()
+                        event = event_types[event.tag]()
                     except Exception:
                         event_from_xml = ex_xml.find_event_from_xml(event, event_types)
-                        epcis_event_obj = event_types[event_from_xml]
-                        pass
-
+                        event = event_types[event_from_xml]
                     xml_dict = ex_xml.map_to_epcis_dict(xml_doc)
-                    ex_xml.map_from_epcis(epcis_event_obj, xml_dict)
+                    ex_xml.map_from_epcis(event, xml_dict)
+                    q = "create (:Event{eventTime: $eventTime, eventTimeZoneOffset: $eventTimeZoneOffset})"
+                    qmap = {
+                        "eventTime": str(event.event_time),
+                        "eventTimeZoneOffset": str(event.event_timezone_offset),
+                    }
+                    try:
+                        with driver.session() as session:
+                            session.run(q, qmap)
+                    except Exception as e:
+                        return {"error": "Error adding events"}, 400
                     events.append({     #Event object not json serializable
-                        "_event_time": str(epcis_event_obj._event_time),
-                        "_event_timezone_offset": str(epcis_event_obj._event_timezone_offset),
-                        "_extensions": str(epcis_event_obj._extensions),
-                        "_action": str(epcis_event_obj._action),
-                        "_business_step": str(epcis_event_obj._business_step),
+                        "eventTime": str(event._event_time),
+                        "eventTimeZoneOffset": str(event._event_timezone_offset),
                     })
 
         return {"success": True, "events": events}, 200
@@ -131,4 +168,4 @@ JSONView.register(app)
 XMLView.register(app)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
