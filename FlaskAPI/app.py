@@ -31,7 +31,7 @@ event_types = {
 }
 
 class EventView(FlaskView):
-    route_base = "/api/event"
+    route_base = "/api/events"
 
     @route("/", methods=["GET"])
     def get_all(self):
@@ -48,8 +48,26 @@ class EventView(FlaskView):
             q = "match (n:Event) return n"
             results = session.run(q).data()
         return jsonify(results), 200
-
     
+    @route("/type", methods=["GET"])
+    def get_by_type(self):
+        """
+        IN PROGRESS
+        Gets EPCIS event data by event type
+
+        Error Codes:
+            400: Bad request
+
+        On Success (200):
+
+        """
+        try:
+            with driver.session() as session:
+                q = "match (n:Event) where type = {event_type} return n".format(event_type=request.args.get("event_type"))
+                results = session.run(q).data()
+            return jsonify(results), 200
+        except Exception as e:
+            return {"error": "Error adding events"}, 400
 
 class JSONView(FlaskView):
     route_base = "/api/json"
@@ -59,6 +77,8 @@ class JSONView(FlaskView):
         """
         IN PROGRESS
         POST an JSON EPCIS event to add to db
+
+        Content Type: application/json
 
         Request Body:
             {
@@ -168,4 +188,4 @@ JSONView.register(app)
 XMLView.register(app)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
