@@ -182,10 +182,11 @@ class XMLView(FlaskView):
 
         return {"success": True, "events": events}, 200
         
-
+'''
 EventView.register(app)
 JSONView.register(app)
 XMLView.register(app)
 
 if __name__ == "__main__":
     app.run()
+'''
