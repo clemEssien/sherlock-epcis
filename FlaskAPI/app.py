@@ -5,6 +5,7 @@ from neo4j import GraphDatabase
 from dotenv import load_dotenv
 import os, sys
 import xml.etree.ElementTree as ET
+import json
 
 load_dotenv()
 currentdir = os.path.dirname(os.path.realpath(__file__))
@@ -49,7 +50,7 @@ class EventView(FlaskView):
             results = session.run(q).data()
         return jsonify(results), 200
     
-    @route("/type", methods=["GET"])
+    @route("/type", methods=["GET"]) # TEMPORARY 
     def get_by_type(self):
         """
         IN PROGRESS
@@ -107,7 +108,7 @@ class JSONView(FlaskView):
             }
 
         """
-        epcis_json = request.get_json()
+        epcis_json = json.loads(request.get_data())
         event = event_types[epcis_json["isA"]]()
         ex_json.map_from_epcis(event, epcis_json)
         q = "create (:Event{eventTime: $eventTime, eventTimeZoneOffset: $eventTimeZoneOffset})"
@@ -182,11 +183,9 @@ class XMLView(FlaskView):
 
         return {"success": True, "events": events}, 200
         
-'''
 EventView.register(app)
 JSONView.register(app)
 XMLView.register(app)
 
 if __name__ == "__main__":
     app.run()
-'''
