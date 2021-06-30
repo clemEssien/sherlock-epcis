@@ -28,7 +28,15 @@ def client():
 BASE = "http://127.0.0.1:5000"
 
 # TESTS
+def test_delete(client):
+    response = client.delete(BASE + "/api/events/delete")
+
+    assert response.status_code == 200
+    assert response.json["success"] == True
+
 def test_json_post(client):
+    client.delete(BASE + "/api/events/delete")
+
     body = {
         "isA": "ObjectEvent",
         "eventTime": "2005-04-02T20:33:31.116-06:00",
@@ -51,8 +59,22 @@ def test_json_post(client):
 
     response = client.post(BASE + "/api/json/", data=json.dumps(body))
 
+    events = client.get(BASE + "/api/events/").json
+
     assert response.status_code == 200
     assert response.json["success"] == True
+    assert len(events["events"]) == 1 and events["events"][0]["n"]['eventTime'] == '2005-04-03 02:33:31.116000+00:00'
+
+def test_xml_post(client):
+    client.delete(BASE + "/api/events/delete")
+
+    response = client.post(BASE + "/api/xml/", data=str.encode(open("./data/GS1StandardExample3.xml").read()))
+
+    events = client.get(BASE + "/api/events/").json
+
+    assert response.status_code == 200
+    assert response.json["success"] == True
+    assert len(events["events"]) == 1 and events["events"][0]["n"]['eventTime'] == "2013-06-08 14:58:56.591000+00:00"
 
 
 

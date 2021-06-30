@@ -37,38 +37,44 @@ class EventView(FlaskView):
     @route("/", methods=["GET"])
     def get_all(self):
         """
-        IN PROGRESS
         Gets all EPCIS event data
-
-        Error Codes:
-
-        On Success (200):
-
-        """
-        with driver.session() as session:
-            q = "match (n:Event) return n"
-            results = session.run(q).data()
-        return jsonify(results), 200
-    
-    @route("/type", methods=["GET"]) # TEMPORARY 
-    def get_by_type(self):
-        """
-        IN PROGRESS
-        Gets EPCIS event data by event type
 
         Error Codes:
             400: Bad request
 
         On Success (200):
-
+            {
+                events: EPCISEvent[]
+            }
         """
         try:
             with driver.session() as session:
-                q = "match (n:Event) where type = {event_type} return n".format(event_type=request.args.get("event_type"))
+                q = "match (n:Event) return n"
                 results = session.run(q).data()
-            return jsonify(results), 200
+            return {"events": results}, 200
         except Exception as e:
-            return {"error": "Error adding events"}, 400
+            return {"error": "Error getting events"}, 400 
+
+    @route("/delete", methods=["DELETE"]) # TEMPORARY 
+    def delete(self):
+        """
+        Deletes all EPCIS event data
+
+        Error Codes:
+            400: Bad request
+
+        On Success (200):
+            {
+                success: true
+            }
+        """
+        try:
+            with driver.session() as session:
+                q = "match (n:Event) delete n"
+                session.run(q).data()
+            return {"success": True}
+        except Exception as e:
+            return {"error": "Error deleting events"}, 400 
 
 class JSONView(FlaskView):
     route_base = "/api/json"
@@ -76,7 +82,6 @@ class JSONView(FlaskView):
     @route("/", methods=["POST"])
     def post(self):
         """
-        IN PROGRESS
         POST an JSON EPCIS event to add to db
 
         Content Type: application/json
@@ -129,7 +134,6 @@ class XMLView(FlaskView):
     @route("/", methods=["POST"])
     def post(self):
         """
-        IN PROGRESS
         Posts XML EPCIS events to add to db
 
         Content Type: application/xml
