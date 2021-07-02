@@ -1,15 +1,17 @@
 import json
 import datetime
 from dateutil import tz, parser
-import epcis_event
+from . import epcis_event
 
 DATA_DIR = "./data/"
 
+
 def read_uri(uri):
-    """ method returns URI string from a URI"""
+    """method returns URI string from a URI"""
     if type(uri) == dict:
-        return uri['id']
+        return uri["id"]
     return epcis_event.URI(uri)
+
 
 def is_primitive(value) -> bool:
     """
@@ -28,6 +30,7 @@ def is_primitive(value) -> bool:
         return True
     else:
         return False
+
 
 def attr_type_check(instvar, data):
 
@@ -64,7 +67,7 @@ def attr_type_check(instvar, data):
             value = data
     elif isinstance(instvar, datetime.datetime):
         utc = tz.tzutc()
-        data = data.replace("Z","+00:00")
+        data = data.replace("Z", "+00:00")
         try:
             value = data.astimezone(utc)
         except:
@@ -77,7 +80,7 @@ def attr_type_check(instvar, data):
     return value
 
 
-def map_from_epcis(epcis_event_obj,epcis_json):
+def map_from_epcis(epcis_event_obj, epcis_json):
     """Map data from a data dictionary  to a class object instance's data attributes.
 
     Args:
@@ -89,7 +92,7 @@ def map_from_epcis(epcis_event_obj,epcis_json):
     if epcis_json is None:
         return None
 
-    with open(DATA_DIR+'schema.json') as f:
+    with open(DATA_DIR + "schema.json") as f:
         schema_doc = json.load(f)
 
     for attr in list(epcis_event_obj.__dict__.keys()):
@@ -97,7 +100,7 @@ def map_from_epcis(epcis_event_obj,epcis_json):
 
         try:
             instvar = getattr(epcis_event_obj, attr)
-            value = epcis_json[schema_doc['attr_key_mapping'][attr]]
+            value = epcis_json[schema_doc["attr_key_mapping"][attr]]
             formated_value = attr_type_check(instvar, value)
             setattr(epcis_event_obj, attr, formated_value)
 
@@ -106,13 +109,10 @@ def map_from_epcis(epcis_event_obj,epcis_json):
 
     epcis_json_keys = epcis_json.keys()
     schema_values = schema_doc["attr_key_mapping"].values()
-    ext_keys = (set(epcis_json_keys) - set(schema_values))
+    ext_keys = set(epcis_json_keys) - set(schema_values)
     ext_dict = {}
     for k in ext_keys:
         ext_dict[k] = epcis_json[k]
-    setattr(epcis_event_obj, 'extensions', ext_dict)
+    setattr(epcis_event_obj, "extensions", ext_dict)
 
     return epcis_event_obj
-
-
-
