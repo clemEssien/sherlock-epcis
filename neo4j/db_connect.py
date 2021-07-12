@@ -17,7 +17,7 @@ class Neo4jConnection:
         if self.__driver is not None:
             self.__driver.close()
 
-    def query(self, query, parameters=None, db=None):
+    def query(self, query, parameters=None, db='Neo4j'):
         assert self.__driver is not None, "Driver not initialized!"
         session = None
         response = None
@@ -31,7 +31,3 @@ class Neo4jConnection:
             if session is not None:
                 session.close()
         return response
-
-# conn = db_con.Neo4jConnection(uri="bolt://localhost:7687", 
-                        # user="neo4j",              
-                        # password=os.environ['neo4jPassword'])
