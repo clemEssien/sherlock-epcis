@@ -1,6 +1,7 @@
 import datetime
 import re
 from dateutil import tz, parser
+from uuid import UUID
 
 
 class URI:
@@ -129,6 +130,8 @@ class EPCISEvent:
     """Provides a common base type for all EPCIS events [EPCIS1.2, Section 7.4.1]
 
     Attributes:
+        event_id : UUID
+            The unique identifier of the event.
         event_time : datetime.datetime
             The date and time that the event occurred.
         event_timezone_offset : datetime.timezone
@@ -139,6 +142,7 @@ class EPCISEvent:
 
     def __init__(self):
         """Creates a new EPCISEvent instance with empty, but type-hinted, attributes"""
+        self._event_id: UUID = None
         self._event_time = datetime.datetime(1, 1, 1)
         self._event_timezone_offset = datetime.timezone(datetime.timedelta(hours=0))
         self._extensions: "list[dict]" = []
@@ -149,6 +153,15 @@ class EPCISEvent:
         for attr in self.__dict__.keys():
             rep = rep + attr + " : " + str(getattr(self, attr)) + "\n"
         return rep + ")"
+
+    @property
+    def event_id(self) -> UUID:
+        """event_id"""
+        return self._event_id
+
+    @event_id.setter
+    def event_id(self, value: UUID):
+        self._event_id = value
 
     @property
     def event_time(self) -> datetime.datetime:
