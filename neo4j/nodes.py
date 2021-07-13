@@ -175,7 +175,7 @@ def create_upload_relationship(User, Event):
     event = Event.__class__.__name__ 
     query = """
             MATCH (a:User), (b:"""+event+ """) 
-            WHERE a.name = '"""+User.name +"""' AND b.read_point = '"""+str(Event.read_point) +"""'  
+            WHERE a.name = '"""+User.name +"""' AND b.event_id = '"""+str(Event.event_id) +"""'  
             CREATE (a)-[: UploadEvent]->(b) 
             RETURN a,b 
     """
@@ -233,7 +233,7 @@ def create_epc_list_item_relationship(item_class, event):
     event_name = event.__class__.__name__ 
     query = """
             MATCH (a:ItemClass), (b:"""+event_name+ """) 
-            WHERE a.epc_class = '"""+item_class.epc_class +"""' AND b.read_point = '"""+str(event.read_point) +"""'  
+            WHERE a.epc_class = '"""+item_class.epc_class +"""' AND b.event_id = '"""+str(event.event_id) +"""'  
             CREATE (a)-[: epc_list_item]->(b) 
             RETURN a,b 
     """
@@ -248,7 +248,7 @@ def create_epc_list_item_instance_relationship(item_instance, event):
     event_name = event.__class__.__name__ 
     query = """
             MATCH (a:ItemInstance), (b:"""+event_name+ """) 
-            WHERE a.epc = '"""+item_instance.epc +"""' AND b.read_point = '"""+str(event.read_point) +"""'  
+            WHERE a.epc = '"""+item_instance.epc +"""' AND b.event_id = '"""+str(event.event_id) +"""'  
             CREATE (a)-[: epc_list_item]->(b) 
             RETURN a,b 
     """
@@ -263,7 +263,7 @@ def create_input_epc_list_relationship(item_instance, event):
     event_name = event.__class__.__name__ 
     query = """
             MATCH (a:ItemInstance), (b:"""+event_name+ """) 
-            WHERE a.epc = '"""+item_instance.epc +"""' AND b.read_point = '"""+str(event.read_point) +"""'  
+            WHERE a.epc = '"""+item_instance.epc +"""' AND b.event_id = '"""+str(event.event_id) +"""'  
             CREATE (a)-[: input_epc_list_item]->(b) 
             RETURN a,b 
     """
@@ -278,7 +278,7 @@ def create_parent_id_relationship(item_instance, event):
     event_name = event.__class__.__name__ 
     query = """
             MATCH (a:ItemInstance), (b:"""+event_name+ """) 
-            WHERE a.epc = '"""+item_instance.epc +"""' AND b.read_point = '"""+str(event.read_point) +"""'  
+            WHERE a.epc = '"""+item_instance.epc +"""' AND b.event_id = '"""+str(event.event_id) +"""'  
             CREATE (a)-[: parent_id]->(b) 
             RETURN a,b 
     """
@@ -293,7 +293,7 @@ def create_child_epc_relationship(item_instance, event):
     event_name = event.__class__.__name__ 
     query = """
             MATCH (a:ItemInstance), (b:"""+event_name+ """) 
-            WHERE a.epc = '"""+item_instance.epc +"""' AND b.read_point = '"""+str(event.read_point) +"""'  
+            WHERE a.epc = '"""+item_instance.epc +"""' AND b.event_id = '"""+str(event.event_id) +"""'  
             CREATE (a)-[:child_epc]->(b) 
             RETURN a,b 
     """
@@ -340,7 +340,7 @@ def create_quantity_list_item_relationship(item_class, event):
     event_name = event.__class__.__name__ 
     query = """
             MATCH (a:ItemClass), (b:"""+event_name+ """) 
-            WHERE a.epc_class = '"""+item_class.epc_class +"""' AND b.read_point = '"""+str(event.read_point) +"""'  
+            WHERE a.epc_class = '"""+item_class.epc_class +"""' AND b.event_id= '"""+str(event.event_id) +"""'  
             CREATE (a)-[: quantity_list_item {quantity , uom}]->(b) 
             RETURN a,b 
     """
@@ -355,7 +355,7 @@ def create_quantity_list_item_relationship(item_class, event):
     event_name = event.__class__.__name__ 
     query = """
             MATCH (a:ItemClass), (b:"""+event_name+ """) 
-            WHERE a.epc_class = '"""+item_class.epc_class +"""' AND b.read_point = '"""+str(event.read_point) +"""'  
+            WHERE a.epc_class = '"""+item_class.epc_class +"""' AND b.event_id = '"""+str(event.event_id) +"""'  
             CREATE (a)-[: quantity_list_item {quantity , uom}]->(b) 
             RETURN a,b 
     """
@@ -371,7 +371,7 @@ def create_quantity_list_item_relationship(item_class, event):
     event_name = event.__class__.__name__ 
     query = """
             MATCH (a:ItemClass), (b:"""+event_name+ """) 
-            WHERE a.epc_class = '"""+item_class.epc_class +"""' AND b.read_point = '"""+str(event.read_point) +"""'  
+            WHERE a.epc_class = '"""+item_class.epc_class +"""' AND b.event_id = '"""+str(event.event_id) +"""'  
             CREATE (a)-[: quantity_list_item {quantity , uom}]->(b) 
             RETURN a,b 
     """
@@ -386,7 +386,7 @@ def create_child_quantity_list_item_relationship(item_class, event):
     event_name = event.__class__.__name__ 
     query = """
             MATCH (a:ItemClass), (b:"""+event_name+ """) 
-            WHERE a.epc_class = '"""+item_class.epc_class +"""' AND b.read_point = '"""+str(event.read_point) +"""'  
+            WHERE a.epc_class = '"""+item_class.epc_class +"""' AND b.event_id = '"""+str(event.event_id) +"""'  
             CREATE (a)-[: child_quantity_list_item {quantity ,uom}]->(b) 
             RETURN a,b 
     """
@@ -416,7 +416,7 @@ def create_output_quantity_list_item_relationship(item_class, event):
     event_name = event.__class__.__name__ 
     query = """
             MATCH (a:ItemClass), (b:"""+event_name+ """) 
-            WHERE a.epc_class = '"""+item_class.epc_class +"""' AND b.read_point = '"""+str(event.read_point) +"""'  
+            WHERE a.epc_class = '"""+item_class.epc_class +"""' AND b.event_id = '"""+str(event.event_id) +"""'  
             CREATE (a)-[: output_quantity_list_item {quantity ,uom}]->(b) 
             RETURN a,b 
     """
@@ -432,7 +432,7 @@ def create_epc_class_relationship(item_class, event):
     event_name = event.__class__.__name__ 
     query = """
             MATCH (a:ItemClass), (b:"""+event_name+ """) 
-            WHERE a.epc_class = '"""+item_class.epc_class +"""' AND b.read_point = '"""+str(event.read_point) +"""'  
+            WHERE a.epc_class = '"""+item_class.epc_class +"""' AND b.event_id= '"""+str(event.event_id) +"""'  
             CREATE (a)-[: epc_class {quantity}]->(b) 
             RETURN a,b 
     """
