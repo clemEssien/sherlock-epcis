@@ -61,6 +61,6 @@
             "receiving"
         ]
     },
-    "receiving_first_not_fishing_vessel": {},
-    "receiving_first_from_fishing_vessel": {}
+    "receiving_first_non_fishing_vessel": {},
+    "receiving_first_fishing_vessel": {}
 }
