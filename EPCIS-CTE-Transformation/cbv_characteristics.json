@@ -1,0 +1,66 @@
+{
+    "growing": {
+        "event_type": [
+            "ObjectEvent"
+        ],
+        "action": [
+            "ADD"
+        ],
+        "business_step": [
+            "commissioning"
+        ]
+    },
+    "growing_sprouts": {},
+    "creation": {
+        "event_type": [
+            "TransformationEvent"
+        ],
+        "action": [
+            "ADD"
+        ],
+        "business_step": [
+            "commissioning"
+        ]
+    },
+    "transformation": {
+        "event_type": [
+            "TransformationEvent",
+            "AggregationEvent"
+        ],
+        "action": [
+            "ADD",
+            "DELETE"
+        ],
+        "business_step": [
+            "commissioning",
+            "packing",
+            "assembling",
+            "unpacking"
+        ]
+    },
+    "shipping": {
+        "event_type": [
+            "ObjectEvent"
+        ],
+        "action": [
+            "OBSERVE"
+        ],
+        "business_step": [
+            "shipping",
+            "departing"
+        ]
+    },
+    "receiving": {
+        "event_type": [
+            "ObjectEvent"
+        ],
+        "action": [
+            "OBSERVE"
+        ],
+        "business_step": [
+            "receiving"
+        ]
+    },
+    "receiving_first_not_fishing_vessel": {},
+    "receiving_first_from_fishing_vessel": {}
+}
