@@ -1,6 +1,8 @@
 import epcis_event
+from uuid import uuid4
 
 obj_event = epcis_event.ObjectEvent()
+obj_event.event_id = uuid4()
 obj_event.event_time = "2005-04-03T20:33:31.116-06:00"
 obj_event.event_timezone_offset = "-06:00"
 obj_event.epc_list = (
