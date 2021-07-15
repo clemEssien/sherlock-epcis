@@ -63,7 +63,7 @@ class Ocr(FlaskView):
     @route("/upload_file", methods=["GET", "POST"])
     def upload_file(self):
 
-        DOWNLOAD_URL = request.host_url + "/api/ocr/download_file/"
+        DOWNLOAD_URL = request.host_url + "api/ocr/download_file/"
 
         if request.method == 'POST':
             # check if the post request has the file part
