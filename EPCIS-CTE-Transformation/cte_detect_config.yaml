@@ -1,0 +1,37 @@
+---
+growing:
+- event_type:
+  - "ObjectEvent"
+- action:
+  - "ADD"
+- business_step:
+  - "commissioning"
+transformation:
+- event_type:
+  - "TransformationEvent"
+  - "AggregationEvent"
+- action:
+  - "ADD"
+  - "DELETE"
+- business_step:
+  - "commissioning"
+  - "packing"
+  - "assembling"
+  - "unpacking"
+shipping:
+- event_type:
+  - "ObjectEvent"
+- action:
+  - "OBSERVE"
+- business_step:
+  - "shipping"
+  - "departing"
+  - "consigning"
+receiving:
+- event_type:
+  - "ObjectEvent"
+- action:
+  - "OBSERVE"
+- business_step:
+  - "receiving"
+  - "arriving"
