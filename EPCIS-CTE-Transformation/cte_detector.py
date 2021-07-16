@@ -1,5 +1,7 @@
 import os, sys
 
+import yaml
+
 dir_path = os.path.dirname(os.path.realpath(__file__))
 parent_dir_path = os.path.abspath(os.path.join(dir_path, os.pardir))
 sys.path.insert(0, parent_dir_path)
@@ -28,34 +30,47 @@ class CTEDetector:
     def event_chars(self, value: dict) -> None:
         self._event_chars = value
 
+    def init_from_file(self, filename: str) -> None:
+        """Set event_chars to content of a given file"""
+        with open(filename) as f:
+            detection_config = yaml.safe_load(f)
+            self._event_chars = detection_config
+
     def detect_cte(self, epcis_event: EPCISEvent) -> str:
         """Return the most likely CTE for a given epcis_event"""
         # Calculate the number of characteristics the event shares with each CTE
         valid_ctes = [key for key in self._event_chars if self._event_chars[key]]
         cte_bins = dict.fromkeys(valid_ctes, 0)
         for cte in valid_ctes:
-            for element in self._event_chars[cte].keys():
-                if element == "event_type":
-                    for event_name in self._event_chars[cte][element]:
-                        if epcis_event.__class__.__name__ == event_name:
-                            cte_bins[cte] += 1
-                else:
-                    for possible_val in self._event_chars[cte][element]:
-                        attr_val = getattr(epcis_event, element)
-                        if isinstance(attr_val, URI):
-                            if attr_val.value:
-                                if attr_val.value == possible_val:
+            for char_type in self._event_chars[cte].keys():
+                if char_type == "non_attributes":
+                    for element in self._event_chars[cte][char_type].keys():
+                        if element == "event_type":
+                            for event_name in self._event_chars[cte][char_type][
+                                element
+                            ]:
+                                if epcis_event.__class__.__name__ == event_name:
+                                    cte_bins[cte] += 1
+                elif char_type == "event_attributes":
+                    for element in self._event_chars[cte][char_type].keys():
+                        for possible_val in self._event_chars[cte][char_type][element]:
+                            try:
+                                attr_val = getattr(epcis_event, element)
+                            except:
+                                raise ("Attribute does not exist")
+                            if isinstance(attr_val, URI):
+                                if attr_val.value:
+                                    if attr_val.value == possible_val:
+                                        cte_bins[cte] += 1
+                                else:
+                                    if possible_val in attr_val.uri_str:
+                                        cte_bins[cte] += 1
+                            elif isinstance(attr_val, str):
+                                if possible_val in attr_val:
                                     cte_bins[cte] += 1
                             else:
-                                if possible_val in attr_val.uri_str:
+                                if possible_val == attr_val:
                                     cte_bins[cte] += 1
-                        elif isinstance(attr_val, str):
-                            if possible_val in attr_val:
-                                cte_bins[cte] += 1
-                        else:
-                            raise (
-                                "detectable EPCISEvent properties must be URIs or strings"
-                            )
         # Return the CTE with the highest percentage of shared characteristics
         for cte in cte_bins.keys():
             cte_bins[cte] /= len(self._event_chars[cte])
