@@ -1,4 +1,4 @@
-import json
+import json, yaml
 import os, sys
 from cte_detector import CTEDetector
 
@@ -12,8 +12,8 @@ from JSONDeserialization.epcis_event import (
 )
 
 if __name__ == "__main__":
-    with open("EPCIS-CTE-Transformation/cbv_characteristics.json") as f:
-        event_chars = json.load(f)
+    with open("EPCIS-CTE-Transformation/cte_detect_config.yaml") as f:
+        event_chars = yaml.safe_load(f)
     detector = CTEDetector(event_chars=event_chars)
 
     obj_event = ObjectEvent()
