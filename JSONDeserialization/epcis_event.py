@@ -161,6 +161,15 @@ class EPCISEvent:
 
     @event_id.setter
     def event_id(self, value: UUID):
+        if (isinstance(value, str)):
+            try:
+                value = UUID(value)
+            except:
+                raise TypeError("Invalid string format.  Must be a UUID.")
+            
+        elif not isinstance(value, UUID):
+            raise TypeError("Invalid data type.  Must be a UUID or a string representation of a UUID.")
+            
         self._event_id = value
 
     @property
