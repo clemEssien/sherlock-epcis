@@ -458,15 +458,3 @@ def create_date_relationship(Location, LocationDate, date):
 conn = db_con.Neo4jConnection(uri="bolt://localhost:7687", 
                        user="neo4j",              
                        password="hjz!MTkA9_E5")
-
-query = """
-    CALL apoc.load.json("one.json") 
-    YIELD value
-    RETURN value;
-"""
-
-response = conn.query(query, None, "trace")
-
-print(response)
-print("******************")
-print(type(response))
