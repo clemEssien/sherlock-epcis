@@ -7,36 +7,36 @@ conn = db_con.Neo4jConnection(uri="bolt://localhost:7687",
                        user="neo4j",              
                        password=os.environ['NEO4J_PASSWORD'])
 
-def create_relationships(dict_list):
+def create_relationships(dict_list, product):
     for key, value in dict_list.items():
         for id in value:
             print(id)
             query = """
-                MATCH (a:Pdt_Location), (b:Pdt_Location) 
-                WHERE a.id = '"""+key +"""' AND b.id = '"""+id +"""'  
-                CREATE (a)-[: next]->(b) 
+                MATCH (a:"""+product+"""), (b:"""+product+""") 
+                WHERE a._id = '"""+key +"""' AND b._id = '"""+id +"""'  
+                CREATE (b)-[: next_event]->(a) 
                 RETURN a,b 
             """
             
             response = conn.query(query, None)
             print(response)
-        print("**************")
 
 
 def format_attr_string(attr_str):
-    output = attr_str.replace("':", ":").replace(", '",", ").replace("'_id", "id")
+    output = attr_str.replace("':", ":").replace(", '",", ").replace("'_id", "_id")
     return output
 
-def create_node_from_json(file):
+def create_node_from_json(file, product):
+    lst = []
     exclude_list = ["flowid","connections", "objects", "association" ]
     relationships = defaultdict(list)
 
     with open(file) as f:
         json_file = json.load(f)
     key_values = {}
+    count = 1
     for record in json_file["data"]["events"]:
         id = ""
-        query = ""
         for key, value in record.items():
             if key == "_id":
                 id = record[key]
@@ -52,23 +52,22 @@ def create_node_from_json(file):
                 connections = record["connections"]
                 for event_id in connections:
                     relationships[id].append(event_id["event_id"])
-            key_values["name"] = record['location']
+            key_values["name"] = record['location'] + ' \n [' + record['type']+']'
             attr_str = format_attr_string(key_values.__str__())
-            query = """ 
-            CREATE (""" + \
-                "pdt_evt" + ":" + "Pdt_Location" + \
+        query = """ 
+        CREATE (""" + \
+            "loc_"+str(count) + " : " + product + \
                 attr_str + \
-                """
-            )
             """
-            response = conn.query(query,None)
-            print(response)
-    create_relationships(relationships)        
+        )
+        """
+        count += 1
+        # print(query)
+        response = conn.query(query,None)
+    create_relationships(relationships,product)        
     
-
-create_node_from_json("neo4j/json_files/9991002100014-OL001.json")
-create_node_from_json("neo4j/json_files/9991001100015-TO001.json")
-create_node_from_json("neo4j/json_files/9991000100016-CT001.json")
-create_node_from_json("neo4j/json_files/9991000100030-BP001.json")
-create_node_from_json("neo4j/json_files/9991002100014-OL001.json")
-
+create_node_from_json("neo4j/json_files/9991000100016-CT001.json", "cut_tomato")
+create_node_from_json("neo4j/json_files/9991000100023-PS001.json", "ps")
+create_node_from_json("neo4j/json_files/9991000100030-BP001.json", "bp")
+create_node_from_json("neo4j/json_files/9991001100015-TO001.json", "tomato")
+# create_node_from_json("neo4j/json_files/9991002100014-OL001.json", "olive")
