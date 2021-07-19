@@ -47,7 +47,8 @@
         ],
         "business_step": [
             "shipping",
-            "departing"
+            "departing",
+            "consigning"
         ]
     },
     "receiving": {
