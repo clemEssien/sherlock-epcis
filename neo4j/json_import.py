@@ -62,7 +62,6 @@ def create_node_from_json(file, product):
         )
         """
         count += 1
-        # print(query)
         response = conn.query(query,None)
     create_relationships(relationships,product)        
     
@@ -70,4 +69,4 @@ create_node_from_json("neo4j/json_files/9991000100016-CT001.json", "cut_tomato")
 create_node_from_json("neo4j/json_files/9991000100023-PS001.json", "ps")
 create_node_from_json("neo4j/json_files/9991000100030-BP001.json", "bp")
 create_node_from_json("neo4j/json_files/9991001100015-TO001.json", "tomato")
-# create_node_from_json("neo4j/json_files/9991002100014-OL001.json", "olive")
+create_node_from_json("neo4j/json_files/9991002100014-OL001.json", "olive")
