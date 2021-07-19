@@ -161,15 +161,17 @@ class EPCISEvent:
 
     @event_id.setter
     def event_id(self, value: UUID):
-        if (isinstance(value, str)):
+        if isinstance(value, str):
             try:
                 value = UUID(value)
             except:
                 raise TypeError("Invalid string format.  Must be a UUID.")
-            
+
         elif not isinstance(value, UUID):
-            raise TypeError("Invalid data type.  Must be a UUID or a string representation of a UUID.")
-            
+            raise TypeError(
+                "Invalid data type.  Must be a UUID or a string representation of a UUID."
+            )
+
         self._event_id = value
 
     @property
@@ -186,10 +188,14 @@ class EPCISEvent:
                 try:
                     value = parser.parse(value)
                 except:
-                    pass
+                    raise TypeError("Invalid string format. Must be a date.")
         if isinstance(value, datetime.datetime):
             utc = tz.tzutc()
             value = value.astimezone(utc)
+        elif not isinstance(value, datetime.datetime):
+            raise TypeError(
+                "Invalid data type. Must be a datetime or a string representation of a datetime."
+            )
         self._event_time = value
 
     @property
@@ -213,6 +219,19 @@ class EPCISEvent:
                         * (abs(float(offset[0])) / float(offset[0]))
                     )
                 )
+            else:
+                raise TypeError(
+                    "Invalid string. Must be a timezone offset in the form '[+-][0-1][0-9]:[0-5][0-9]'."
+                )
+        if isinstance(value, float) or isinstance(value, int):
+            try:
+                value = datetime.timezone(datetime.timedelta(hours=value))
+            except:
+                raise TypeError("Invalid number. Must be between -24 and 24.")
+        if not isinstance(value, datetime.timezone):
+            raise TypeError(
+                "Invalid data type. Must be a datetime.timezone or a float, int, or string representation of a datetime.timezone."
+            )
         self._event_timezone_offset = value
 
     @property
@@ -220,8 +239,16 @@ class EPCISEvent:
         return self._extensions
 
     @extensions.setter
-    def extensions(self, ext: dict):
-        self._extensions.append(ext)
+    def extensions(self, value: dict):
+        """Append dict to list of extensions."""
+        if isinstance(value, dict):
+            self._extensions.append(value)
+        else:
+            raise TypeError("Invalid data type. Must be a dict.")
+
+    def delete_extensions(self):
+        """Delete the list of extensions."""
+        self._extensions = []
 
 
 class CommonEvent(EPCISEvent):
