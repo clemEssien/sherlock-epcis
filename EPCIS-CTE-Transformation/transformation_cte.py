@@ -1,8 +1,11 @@
 from _typeshed import Self
-from JSONDeserialization import epcis_event
+from abc import ABC, abstractclassmethod, abstractmethod
+from typing import Type
+from JSONDeserialization.epcis_event import QuantityElement, QuantityEvent, URI, CommonEvent, AggregationEvent, EPCISEvent, ObjectEvent, TransactionEvent, TransformationEvent
+from cte import CTEBase
+import json
 
-
-class TransformationCTE:
+class TransformationCTE(CTEBase):
     def __init__(self):
         self._traceability_product = []
         self._quantity_of_input = []
@@ -10,6 +13,47 @@ class TransformationCTE:
         self._location_of_transformation = ""
         self._new_traceability_product = []
         self._unit_of_measure = []
+
+    def new_from_data(cls, data: dict):
+        pass
+
+    def new_from_epcis(cls, event: EPCISEvent):
+        output = cls()
+        output._location_of_transformation = event._read_point.value
+        
+        if not isinstance(event, TransformationEvent):
+            raise TypeError("Transformation CTE requires TransformationEvent")
+        
+        transEvent: TransformationEvent = event
+
+        for element in event._input_quantity_list:
+            output._quantity_of_input.append(element._quantity)
+            output._unit_of_measure.append(element._uom)
+
+        for element in event._output_quantity_list:
+            output._quantity_of_output.append(element._quantity)
+
+        for element in event._input_epc_list:
+            output._traceability_product.append(element.value)
+
+        for element in event._output_epc_list:
+            output._new_traceability_product.append(element.value)
+
+        return output
+        
+        
+    def new_from_json(cls, json_data: str): 
+        data = json.loads(json_data)
+        return cls.new_from_data(data)
+    
+    def new_from_excel(cls, excel_data: str):
+        pass
+
+    def save_to_excel(self):
+        pass
+    
+    def new_from_csv(cls, csv_lines: "list[str]"):
+        pass
 
     @property
     def traceability_product(self) -> str:
@@ -59,17 +103,16 @@ class TransformationCTE:
     def unit_of_measure(self, value: str):
         self._unit_of_measure = value
 
-    def map_epcis_to_kde(self, event: epcis_event.EPCISEvent):
-        self._location_of_transformation = event._read_point.value
-        for element in event._input_quantity_list:
-            self._quantity_of_input.append(element._quantity)
-            self._unit_of_measure.append(element._uom)
+    def output_xlsx(self) -> str:
+        '''
+        Create an excel spreadsheet and output the contents to an XML string
+        '''
 
-        for element in event._output_quantity_list:
-            self._quantity_of_output.append(element._quantity)
-
-        for element in event._input_epc_list:
-            self._traceability_product.append(element.value)
-
-        for element in event._output_epc_list:
-            self._new_traceability_product.append(element.value)
+        # code here
+        
+        v = "foobar"
+        return v
+    
+    def save_as_xlsx(self, filename: str): 
+        pass
+        # code here
