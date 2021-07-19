@@ -4,12 +4,12 @@ from JSONDeserialization import epcis_event
 
 class TransformationCTE:
     def __init__(self):
-        self._traceability_product = ""
-        self._quantity_of_input = 0.0
-        self._quantity_of_output = 0.0
+        self._traceability_product = []
+        self._quantity_of_input = []
+        self._quantity_of_output = []
         self._location_of_transformation = ""
-        self._new_traceability_product = ""
-        self._unit_of_measure = ""
+        self._new_traceability_product = []
+        self._unit_of_measure = []
 
     @property
     def traceability_product(self) -> str:
@@ -59,19 +59,17 @@ class TransformationCTE:
     def unit_of_measure(self, value: str):
         self._unit_of_measure = value
 
-    def map_epcis_to_kde(self, event: epcis_event.TransformationEvent):
+    def map_epcis_to_kde(self, event: epcis_event.EPCISEvent):
         self._location_of_transformation = event._read_point.value
         for element in event._input_quantity_list:
-            self._quantity_of_input += element._quantity
-            self._unit_of_measure = element._uom
+            self._quantity_of_input.append(element._quantity)
+            self._unit_of_measure.append(element._uom)
 
         for element in event._output_quantity_list:
-            self._quantity_of_output += element._quantity
+            self._quantity_of_output.append(element._quantity)
 
         for element in event._input_epc_list:
-            self._traceability_product = element.value
-            break
+            self._traceability_product.append(element.value)
 
         for element in event._output_epc_list:
-            self.traceability_product = element.value
-            break
+            self._new_traceability_product.append(element.value)
