@@ -60,7 +60,7 @@ class TransformationCTE:
         self._unit_of_measure = value
 
     def map_epcis_to_kde(self, event: epcis_event.TransformationEvent):
-        self._location_of_transformation = event._read_point
+        self._location_of_transformation = event._read_point.value
         for element in event._input_quantity_list:
             self._quantity_of_input += element._quantity
             self._unit_of_measure = element._uom
@@ -69,9 +69,9 @@ class TransformationCTE:
             self._quantity_of_output += element._quantity
 
         for element in event._input_epc_list:
-            self._traceability_product = element.uri_str
+            self._traceability_product = element.value
             break
 
         for element in event._output_epc_list:
-            self.traceability_product = element.uri_str
+            self.traceability_product = element.value
             break
