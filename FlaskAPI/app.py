@@ -37,7 +37,7 @@ from werkzeug.utils import secure_filename
 import json
 
 UPLOAD_FOLDER = '/var/src/uploads'
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'json', 'csv', 'xlsx', 'xml'}
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
