@@ -1,6 +1,5 @@
 import datetime
 import re
-from typing import Type
 from dateutil import tz, parser
 from uuid import UUID
 
@@ -21,22 +20,35 @@ class URI:
 
     def __init__(self, uri_str: str):
         """Creates a new URI instance from the given string"""
-        self.uri_str: str = uri_str
+        self._uri_str: str = uri_str
         self._split_uri: "list[str]" = []
         self._is_split: bool = False
-        if re.search("[a-z]+:[a-z]+:[a-z]+:[a-z]+:[a-z0-9.*]+", self.uri_str):
+        if re.search("[a-z]+:[a-z]+:[a-z]+:[a-z]+:[a-z0-9.*]+", self._uri_str):
             self._split_uri = self.uri_str.split(":")
             self._is_split = True
 
     def __repr__(self) -> str:
-        rep = "URI(" + self.uri_str + ")"
+        rep = "URI(" + self._uri_str + ")"
         return rep
 
     def __str__(self) -> str:
-        return self.uri_str
+        return self._uri_str
 
     def __eq__(self, other) -> bool:
-        return self.uri_str == other.uri_str
+        try:
+            return str(self) == str(other)
+        except:
+            return False
+
+    @property
+    def uri_str(self) -> str:
+        return self._uri_str
+
+    @uri_str.setter
+    def uri_str(self, value: str) -> None:
+        if not isinstance(value, str):
+            value = str(value)
+        self._uri_str = value
 
     @property
     def prefix(self) -> str:
@@ -92,7 +104,10 @@ class QuantityElement:
         )
 
     def __eq__(self, other) -> bool:
-        return self.__repr__() == other.__repr__()
+        try:
+            return str(self) == str(other)
+        except:
+            return False
 
     @property
     def epc_class(self) -> URI:
