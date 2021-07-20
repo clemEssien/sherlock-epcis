@@ -244,3 +244,45 @@ class TestAggregationEvent:
         with pytest.raises(TypeError):
             event.child_quantity_list = "foo"
             event.child_quantity_list = ["bar"]
+
+
+class TestQuantityEvent:
+    @pytest.mark.parametrize(
+        "prop, string, uri",
+        [
+            ("epc_class", "foo", URI("foo")),
+            ("business_step", "foo", URI("foo")),
+            ("disposition", "foo", URI("foo")),
+            ("read_point", "foo", URI("foo")),
+            ("business_location", "foo", URI("foo")),
+        ],
+    )
+    def test_URI_properties(self, prop, string, uri):
+        event = QuantityEvent()
+        setattr(event, prop, string)
+        assert getattr(event, prop).uri_str == uri.uri_str
+        setattr(event, prop, uri)
+        assert getattr(event, prop).uri_str == uri.uri_str
+        with pytest.raises(TypeError):
+            setattr(event, prop, 42)
+
+    def test_business_transaction_list(self):
+        event = QuantityEvent()
+        event.business_transaction_list = [{"foo": "bar"}]
+        assert event.business_transaction_list == [{"foo": "bar"}]
+        event.business_transaction_list = []
+        assert event.business_transaction_list == []
+        with pytest.raises(TypeError):
+            event.business_transaction_list = [42]
+            event.business_transaction_list = 42
+
+    def test_quantity(self):
+        event = QuantityEvent()
+        event.quantity = 42
+        assert event.quantity == 42.0
+        event.quantity = 42.0
+        assert event.quantity == 42.0
+        event.quantity = "42.0"
+        assert event.quantity == 42.0
+        with pytest.raises(TypeError):
+            event.quantity = "foo"
