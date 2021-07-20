@@ -1,5 +1,6 @@
 import datetime
 import re
+from typing import Type
 from dateutil import tz, parser
 from uuid import UUID
 
@@ -33,6 +34,9 @@ class URI:
 
     def __str__(self) -> str:
         return self.uri_str
+
+    def __eq__(self, other) -> bool:
+        return self.uri_str == other.uri_str
 
     @property
     def prefix(self) -> str:
@@ -86,6 +90,9 @@ class QuantityElement:
             + self.uom
             + ")"
         )
+
+    def __eq__(self, other) -> bool:
+        return self.__repr__() == other.__repr__()
 
     @property
     def epc_class(self) -> URI:
@@ -192,7 +199,7 @@ class EPCISEvent:
         if isinstance(value, datetime.datetime):
             utc = tz.tzutc()
             value = value.astimezone(utc)
-        elif not isinstance(value, datetime.datetime):
+        else:
             raise TypeError(
                 "Invalid data type. Must be a datetime or a string representation of a datetime."
             )
@@ -293,7 +300,10 @@ class CommonEvent(EPCISEvent):
 
     @action.setter
     def action(self, value: str):
-        self._action = value
+        if isinstance(value, str):
+            self._action = value
+        else:
+            raise TypeError("Incorrect data type. Must be a string")
 
     @property
     def business_step(self) -> URI:
@@ -304,6 +314,8 @@ class CommonEvent(EPCISEvent):
     def business_step(self, value: URI):
         if isinstance(value, str):
             value = URI(value)
+        if not isinstance(value, URI):
+            raise TypeError("Incorrect type. Must be a URI or a string.")
         self._business_step = value
 
     @property
@@ -315,6 +327,8 @@ class CommonEvent(EPCISEvent):
     def disposition(self, value: URI):
         if isinstance(value, str):
             value = URI(value)
+        if not isinstance(value, URI):
+            raise TypeError("Incorrect type. Must be a URI or a string.")
         self._disposition = value
 
     @property
@@ -326,6 +340,8 @@ class CommonEvent(EPCISEvent):
     def read_point(self, value: URI):
         if isinstance(value, str):
             value = URI(value)
+        if not isinstance(value, URI):
+            raise TypeError("Incorrect type. Must be a URI or a string.")
         self._read_point = value
 
     @property
@@ -337,6 +353,8 @@ class CommonEvent(EPCISEvent):
     def business_location(self, value: URI):
         if isinstance(value, str):
             value = URI(value)
+        if not isinstance(value, URI):
+            raise TypeError("Incorrect type. Must be a URI or a string.")
         self._business_location = value
 
     @property
@@ -346,6 +364,12 @@ class CommonEvent(EPCISEvent):
 
     @business_transaction_list.setter
     def business_transaction_list(self, value: "list[dict]"):
+        if isinstance(value, list):
+            if len(value) != 0:
+                if any(not isinstance(val, dict) for val in value):
+                    raise TypeError("Incorrect data type. List items must be dicts.")
+        else:
+            raise TypeError("Incorrect data type. Must be a list of dicts.")
         self._business_transaction_list = value
 
     @property
@@ -355,6 +379,12 @@ class CommonEvent(EPCISEvent):
 
     @source_list.setter
     def source_list(self, value: "list[dict]"):
+        if isinstance(value, list):
+            if len(value) != 0:
+                if any(not isinstance(val, dict) for val in value):
+                    raise TypeError("Incorrect data type. List items must be dicts.")
+        else:
+            raise TypeError("Incorrect data type. Must be a list of dicts.")
         self._source_list = value
 
     @property
@@ -364,6 +394,12 @@ class CommonEvent(EPCISEvent):
 
     @destination_list.setter
     def destination_list(self, value: "list[dict]"):
+        if isinstance(value, list):
+            if len(value) > 0:
+                if any(not isinstance(val, dict) for val in value):
+                    raise TypeError("Incorrect data type. List items must be dicts.")
+        else:
+            raise TypeError("Incorrect data type. Must be a list of dicts.")
         self._destination_list = value
 
 
@@ -394,12 +430,21 @@ class ObjectEvent(CommonEvent):
     @epc_list.setter
     def epc_list(self, value: "list[URI]"):
         if isinstance(value, list):
-            new_values = []
-            for epc in value:
-                if isinstance(epc, str):
-                    new_values.append(URI(epc))
-            if len(new_values) == len(value):
-                value = new_values
+            if len(value) > 0:
+                new_values = []
+                for epc in value:
+                    if isinstance(epc, str):
+                        new_values.append(URI(epc))
+                if len(value) == len(new_values):
+                    value = new_values
+                if any([not isinstance(val, URI) for val in value]):
+                    raise TypeError(
+                        "Invalid data type. List must contain URIs or string representations of URIs."
+                    )
+        else:
+            raise TypeError(
+                "Invalid data type. Must be list of URIs or string representations of URIs."
+            )
         self._epc_list = value
 
     @property
@@ -410,20 +455,29 @@ class ObjectEvent(CommonEvent):
     @quantity_list.setter
     def quantity_list(self, value: "list[QuantityElement]"):
         if isinstance(value, list):
-            new_vals = []
-            for val in value:
-                if isinstance(val, dict) and "epcClass" in val.keys():
-                    qe = QuantityElement()
-                    for a_k in [
-                        ("epc_class", "epcClass"),
-                        ("quantity", "quantity"),
-                        ("uom", "uom"),
-                    ]:
-                        if a_k[1] in val.keys():
-                            setattr(qe, a_k[0], val[a_k[1]])
-                    new_vals.append(qe)
-            if len(new_vals) == len(value):
-                value = new_vals
+            if len(value) > 0:
+                new_vals = []
+                for val in value:
+                    if isinstance(val, dict) and "epcClass" in val.keys():
+                        qe = QuantityElement()
+                        for a_k in [
+                            ("epc_class", "epcClass"),
+                            ("quantity", "quantity"),
+                            ("uom", "uom"),
+                        ]:
+                            if a_k[1] in val.keys():
+                                setattr(qe, a_k[0], val[a_k[1]])
+                        new_vals.append(qe)
+                if len(new_vals) == len(value):
+                    value = new_vals
+                if any(not isinstance(val, QuantityElement) for val in value):
+                    raise TypeError(
+                        "Incorrect data type. List items must be QuantityElements or dict representations of QuantityElements."
+                    )
+        else:
+            raise TypeError(
+                "Incorrect data type. Must be list of QuantityElements or dict representations of QuantityElements."
+            )
         self._quantity_list = value
 
     @property
@@ -433,6 +487,8 @@ class ObjectEvent(CommonEvent):
 
     @instance_lot_master_data.setter
     def instance_lot_master_data(self, value: dict):
+        if not isinstance(value, dict):
+            raise TypeError("Incorrect data type. Must be a dict.")
         self._instance_lot_master_data = value
 
 
