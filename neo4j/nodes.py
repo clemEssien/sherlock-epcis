@@ -446,7 +446,7 @@ Parameters: A Location and a LocationDate Object
 """
 def create_date_relationship(Location, LocationDate, date):
     query = """
-            MATCH (a:LocationDate), (b:"""+Locationt+ """) 
+            MATCH (a:LocationDate), (b:"""+Location+ """) 
             WHERE a.date = '"""+LocationDate.date +"""' AND b.id = '"""+str(Location.id) +"""'  
             CREATE (a)-[:"""+ date +"""]->(b) 
             RETURN a,b 
