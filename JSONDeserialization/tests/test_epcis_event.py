@@ -1,3 +1,5 @@
+from typing import Type
+import py
 import pytest
 from uuid import uuid4
 from datetime import datetime, timezone, timedelta
@@ -9,7 +11,16 @@ currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
-from epcis_event import EPCISEvent, ObjectEvent, URI
+from epcis_event import (
+    EPCISEvent,
+    CommonEvent,
+    URI,
+    TransactionEvent,
+    TransformationEvent,
+    AggregationEvent,
+    QuantityElement,
+    QuantityEvent,
+)
 
 
 class TestEPCISEvent:
@@ -115,3 +126,48 @@ class TestEPCISEvent:
         event.extensions = {"bucky": "beaver"}
         event.delete_extensions()
         assert event.extensions == []
+
+
+class TestCommonEvent:
+    def test_action(self):
+        event = CommonEvent()
+        event.action = "ACTION"
+        assert event.action == "ACTION"
+        with pytest.raises(TypeError):
+            event.action = 7
+
+    @pytest.mark.parametrize(
+        "prop, string, uri",
+        [
+            ("business_step", "foo", URI("foo")),
+            ("disposition", "foo", URI("foo")),
+            ("read_point", "foo", URI("foo")),
+            ("business_location", "foo", URI("foo")),
+        ],
+    )
+    def test_URI_properties(self, prop, string, uri):
+        event = CommonEvent()
+        setattr(event, prop, string)
+        assert getattr(event, prop).uri_str == uri.uri_str
+        setattr(event, prop, uri)
+        assert getattr(event, prop).uri_str == uri.uri_str
+        with pytest.raises(TypeError):
+            setattr(event, prop, 42)
+
+    @pytest.mark.parametrize(
+        "prop, input",
+        [
+            ("business_transaction_list", [{"foo": "bar"}]),
+            ("source_list", [{"foo": "bar"}]),
+            ("destination_list", [{"foo": "bar"}]),
+        ],
+    )
+    def test_dict_list_properties(self, prop, input):
+        event = CommonEvent()
+        setattr(event, prop, input)
+        assert getattr(event, prop) == input
+        setattr(event, prop, [])
+        assert getattr(event, prop) == []
+        with pytest.raises(TypeError):
+            setattr(event, prop, [42])
+            setattr(event, prop, 42)
