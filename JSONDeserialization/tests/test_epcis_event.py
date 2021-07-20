@@ -1,6 +1,4 @@
-from typing import Type
 from _pytest.python_api import raises
-import py
 import pytest
 from uuid import uuid4
 from datetime import datetime, timezone, timedelta
