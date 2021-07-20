@@ -14,6 +14,7 @@ sys.path.append(parentdir)
 from epcis_event import (
     EPCISEvent,
     CommonEvent,
+    ObjectEvent,
     URI,
     TransactionEvent,
     TransformationEvent,
@@ -171,3 +172,37 @@ class TestCommonEvent:
         with pytest.raises(TypeError):
             setattr(event, prop, [42])
             setattr(event, prop, 42)
+
+
+class TestObjectEvent:
+    def test_epc_list(self):
+        event = ObjectEvent()
+        event.epc_list = []
+        assert event.epc_list == []
+        uri = URI("foo")
+        event.epc_list = [uri]
+        assert event.epc_list == [uri]
+        event.epc_list = ["foo"]
+        assert event.epc_list == [uri]
+        with pytest.raises(TypeError):
+            event.epc_list = uri
+
+    def test_quantity_list(self):
+        event = ObjectEvent()
+        event.quantity_list = []
+        assert event.quantity_list == []
+        event.quantity_list = [{"epcClass": "foo"}]
+        qe = QuantityElement(URI("foo"))
+        assert event.quantity_list == [qe]
+        event.quantity_list = [qe]
+        assert event.quantity_list == [qe]
+        with pytest.raises(TypeError):
+            event.quantity_list = "foo"
+            event.quantity_list = "bar"
+
+    def test_ilmd(self):
+        event = ObjectEvent()
+        event.instance_lot_master_data = {"foo": "bar"}
+        assert event.instance_lot_master_data == {"foo": "bar"}
+        with pytest.raises(TypeError):
+            event.instance_lot_master_data = "foobar"
