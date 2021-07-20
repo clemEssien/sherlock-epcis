@@ -590,7 +590,7 @@ class QuantityEvent(EPCISEvent):
     Attributes:
         epc_class : URI
             Identifier specficying the object class to which the event pertains.
-        quantity : int
+        quantity : float
             Quantity of object within class described by this event.
         business_step : URI
             The business steps of which this event took place.
@@ -607,7 +607,7 @@ class QuantityEvent(EPCISEvent):
     def __init__(self):
         super().__init__()
         self._epc_class: URI = URI("")
-        self._quantity: int = 0
+        self._quantity: float = 0
         self._business_step: URI = URI("")
         self._disposition: URI = URI("")
         self._read_point: URI = URI("")
@@ -623,6 +623,10 @@ class QuantityEvent(EPCISEvent):
     def epc_class(self, value: URI):
         if isinstance(value, str):
             value = URI(value)
+        if not isinstance(value, URI):
+            raise TypeError(
+                "Invalid data type. Must be URI or string representation of URI."
+            )
         self._epc_class = value
 
     @property
@@ -631,13 +635,27 @@ class QuantityEvent(EPCISEvent):
         return self._quantity
 
     @quantity.setter
-    def quantity(self, value: int):
-        if isinstance(value, str):
+    def quantity(self, value: float):
+        if not isinstance(value, float):
             try:
-                value = int(value)
+                value = float(value)
             except:
-                pass
+                raise TypeError(
+                    "Invalid data type. Must be a float or convertible to a float."
+                )
         self._quantity = value
+
+    @property
+    def action(self) -> str:
+        """action"""
+        return self._action
+
+    @action.setter
+    def action(self, value: str):
+        if isinstance(value, str):
+            self._action = value
+        else:
+            raise TypeError("Incorrect data type. Must be a string")
 
     @property
     def business_step(self) -> URI:
@@ -648,6 +666,8 @@ class QuantityEvent(EPCISEvent):
     def business_step(self, value: URI):
         if isinstance(value, str):
             value = URI(value)
+        if not isinstance(value, URI):
+            raise TypeError("Incorrect type. Must be a URI or a string.")
         self._business_step = value
 
     @property
@@ -659,6 +679,8 @@ class QuantityEvent(EPCISEvent):
     def disposition(self, value: URI):
         if isinstance(value, str):
             value = URI(value)
+        if not isinstance(value, URI):
+            raise TypeError("Incorrect type. Must be a URI or a string.")
         self._disposition = value
 
     @property
@@ -670,6 +692,8 @@ class QuantityEvent(EPCISEvent):
     def read_point(self, value: URI):
         if isinstance(value, str):
             value = URI(value)
+        if not isinstance(value, URI):
+            raise TypeError("Incorrect type. Must be a URI or a string.")
         self._read_point = value
 
     @property
@@ -681,6 +705,8 @@ class QuantityEvent(EPCISEvent):
     def business_location(self, value: URI):
         if isinstance(value, str):
             value = URI(value)
+        if not isinstance(value, URI):
+            raise TypeError("Incorrect type. Must be a URI or a string.")
         self._business_location = value
 
     @property
@@ -690,6 +716,12 @@ class QuantityEvent(EPCISEvent):
 
     @business_transaction_list.setter
     def business_transaction_list(self, value: "list[dict]"):
+        if isinstance(value, list):
+            if len(value) != 0:
+                if any(not isinstance(val, dict) for val in value):
+                    raise TypeError("Incorrect data type. List items must be dicts.")
+        else:
+            raise TypeError("Incorrect data type. Must be a list of dicts.")
         self._business_transaction_list = value
 
 
