@@ -1,4 +1,5 @@
 from typing import Type
+from _pytest.python_api import raises
 import py
 import pytest
 from uuid import uuid4
@@ -198,7 +199,7 @@ class TestObjectEvent:
         assert event.quantity_list == [qe]
         with pytest.raises(TypeError):
             event.quantity_list = "foo"
-            event.quantity_list = "bar"
+            event.quantity_list = ["bar"]
 
     def test_ilmd(self):
         event = ObjectEvent()
@@ -206,3 +207,40 @@ class TestObjectEvent:
         assert event.instance_lot_master_data == {"foo": "bar"}
         with pytest.raises(TypeError):
             event.instance_lot_master_data = "foobar"
+
+
+class TestAggregationEvent:
+    def test_parent_id(self):
+        event = AggregationEvent()
+        event.parent_id = "foo"
+        uri = URI("foo")
+        assert event.parent_id == uri
+        event.parent_id = uri
+        assert event.parent_id == uri
+        with pytest.raises(TypeError):
+            event.parent_id = 42
+
+    def test_child_epc_list(self):
+        event = AggregationEvent()
+        event.child_epc_list = []
+        assert event.child_epc_list == []
+        uri = URI("foo")
+        event.child_epc_list = [uri]
+        assert event.child_epc_list == [uri]
+        event.child_epc_list = ["foo"]
+        assert event.child_epc_list == [uri]
+        with pytest.raises(TypeError):
+            event.child_epc_list = uri
+
+    def test_child_quantity_list(self):
+        event = AggregationEvent()
+        event.child_quantity_list = []
+        assert event.child_quantity_list == []
+        event.child_quantity_list = [{"epcClass": "foo"}]
+        qe = QuantityElement(URI("foo"))
+        assert event.child_quantity_list == [qe]
+        event.child_quantity_list = [qe]
+        assert event.child_quantity_list == [qe]
+        with pytest.raises(TypeError):
+            event.child_quantity_list = "foo"
+            event.child_quantity_list = ["bar"]
