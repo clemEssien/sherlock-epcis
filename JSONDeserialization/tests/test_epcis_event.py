@@ -286,3 +286,84 @@ class TestQuantityEvent:
         assert event.quantity == 42.0
         with pytest.raises(TypeError):
             event.quantity = "foo"
+
+
+class TestTransactionEvent:
+    def test_parent_id(self):
+        event = TransactionEvent()
+        event.parent_id = "foo"
+        uri = URI("foo")
+        assert event.parent_id == uri
+        event.parent_id = uri
+        assert event.parent_id == uri
+        with pytest.raises(TypeError):
+            event.parent_id = 42
+
+    def test_epc_list(self):
+        event = TransactionEvent()
+        event.epc_list = []
+        assert event.epc_list == []
+        uri = URI("foo")
+        event.epc_list = [uri]
+        assert event.epc_list == [uri]
+        event.epc_list = ["foo"]
+        assert event.epc_list == [uri]
+        with pytest.raises(TypeError):
+            event.epc_list = uri
+
+    def test_quantity_list(self):
+        event = TransactionEvent()
+        event.quantity_list = []
+        assert event.quantity_list == []
+        event.quantity_list = [{"epcClass": "foo"}]
+        qe = QuantityElement(URI("foo"))
+        assert event.quantity_list == [qe]
+        event.quantity_list = [qe]
+        assert event.quantity_list == [qe]
+        with pytest.raises(TypeError):
+            event.quantity_list = "foo"
+            event.quantity_list = ["bar"]
+
+
+class TestTransformationEvent:
+    @pytest.mark.parametrize("prop", ["input_epc_list", "output_epc_list"])
+    def test_list_URI_properties(self, prop):
+        event = TransformationEvent()
+        setattr(event, prop, ["foo"])
+        uri = URI("foo")
+        assert getattr(event, prop) == [uri]
+        setattr(event, prop, [uri])
+        assert getattr(event, prop) == [uri]
+        with pytest.raises(TypeError):
+            setattr(event, prop, "foo")
+            setattr(event, prop, [42])
+
+    @pytest.mark.parametrize("prop", ["input_quantity_list", "output_quantity_list"])
+    def test_list_quantity_element_properties(self, prop):
+        event = TransformationEvent()
+        setattr(event, prop, [{"epcClass": "foo"}])
+        qe = QuantityElement(epc="foo")
+        assert getattr(event, prop) == [qe]
+        setattr(event, prop, [qe])
+        assert getattr(event, prop) == [qe]
+        with pytest.raises(TypeError):
+            setattr(event, prop, "foo")
+            setattr(event, prop, [42])
+
+    def test_transformation_id(self):
+        event = TransformationEvent()
+        uri = URI("foo")
+        event.transformation_id = "foo"
+        assert event.transformation_id == uri
+        event.transformation_id = uri
+        assert event.transformation_id == uri
+        with pytest.raises(TypeError):
+            event.transformation_id = 42
+
+    def test_ilmd(self):
+        event = TransformationEvent()
+        ilmd = {"foo": "bar"}
+        event.instance_lot_master_data = ilmd
+        assert event.instance_lot_master_data == ilmd
+        with pytest.raises(TypeError):
+            event.instance_lot_master_data = "foobar"
