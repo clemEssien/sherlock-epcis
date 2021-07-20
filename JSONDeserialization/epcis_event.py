@@ -852,12 +852,21 @@ class TransformationEvent(CommonEvent):
     @input_epc_list.setter
     def input_epc_list(self, value: "list[URI]"):
         if isinstance(value, list):
-            new_values = []
-            for epc in value:
-                if isinstance(epc, str):
-                    new_values.append(URI(epc))
-            if len(new_values) == len(value):
-                value = new_values
+            if len(value) > 0:
+                new_values = []
+                for epc in value:
+                    if isinstance(epc, str):
+                        new_values.append(URI(epc))
+                if len(value) == len(new_values):
+                    value = new_values
+                if any([not isinstance(val, URI) for val in value]):
+                    raise TypeError(
+                        "Invalid data type. List must contain URIs or string representations of URIs."
+                    )
+        else:
+            raise TypeError(
+                "Invalid data type. Must be list of URIs or string representations of URIs."
+            )
         self._input_epc_list = value
 
     @property
@@ -868,20 +877,29 @@ class TransformationEvent(CommonEvent):
     @input_quantity_list.setter
     def input_quantity_list(self, value: "list[QuantityElement]"):
         if isinstance(value, list):
-            new_vals = []
-            for val in value:
-                if isinstance(val, dict) and "epcClass" in val.keys():
-                    qe = QuantityElement()
-                    for a_k in [
-                        ("epc_class", "epcClass"),
-                        ("quantity", "quantity"),
-                        ("uom", "uom"),
-                    ]:
-                        if a_k[1] in val.keys():
-                            setattr(qe, a_k[0], val[a_k[1]])
-                    new_vals.append(qe)
-            if len(new_vals) == len(value):
-                value = new_vals
+            if len(value) > 0:
+                new_vals = []
+                for val in value:
+                    if isinstance(val, dict) and "epcClass" in val.keys():
+                        qe = QuantityElement()
+                        for a_k in [
+                            ("epc_class", "epcClass"),
+                            ("quantity", "quantity"),
+                            ("uom", "uom"),
+                        ]:
+                            if a_k[1] in val.keys():
+                                setattr(qe, a_k[0], val[a_k[1]])
+                        new_vals.append(qe)
+                if len(new_vals) == len(value):
+                    value = new_vals
+                if any(not isinstance(val, QuantityElement) for val in value):
+                    raise TypeError(
+                        "Invalid data type. List items must be QuantityElements or dict representations of QuantityElements."
+                    )
+        else:
+            raise TypeError(
+                "Invalid data type. Must be list of QuantityElements or dict representations of QuantityElements."
+            )
         self._input_quantity_list = value
 
     @property
@@ -892,12 +910,21 @@ class TransformationEvent(CommonEvent):
     @output_epc_list.setter
     def output_epc_list(self, value: "list[URI]"):
         if isinstance(value, list):
-            new_values = []
-            for epc in value:
-                if isinstance(epc, str):
-                    new_values.append(URI(epc))
-            if len(new_values) == len(value):
-                value = new_values
+            if len(value) > 0:
+                new_values = []
+                for epc in value:
+                    if isinstance(epc, str):
+                        new_values.append(URI(epc))
+                if len(value) == len(new_values):
+                    value = new_values
+                if any([not isinstance(val, URI) for val in value]):
+                    raise TypeError(
+                        "Invalid data type. List must contain URIs or string representations of URIs."
+                    )
+        else:
+            raise TypeError(
+                "Invalid data type. Must be list of URIs or string representations of URIs."
+            )
         self._output_epc_list = value
 
     @property
@@ -908,20 +935,29 @@ class TransformationEvent(CommonEvent):
     @output_quantity_list.setter
     def output_quantity_list(self, value: "list[QuantityElement]"):
         if isinstance(value, list):
-            new_vals = []
-            for val in value:
-                if isinstance(val, dict) and "epcClass" in val.keys():
-                    qe = QuantityElement()
-                    for a_k in [
-                        ("epc_class", "epcClass"),
-                        ("quantity", "quantity"),
-                        ("uom", "uom"),
-                    ]:
-                        if a_k[1] in val.keys():
-                            setattr(qe, a_k[0], val[a_k[1]])
-                    new_vals.append(qe)
-            if len(new_vals) == len(value):
-                value = new_vals
+            if len(value) > 0:
+                new_vals = []
+                for val in value:
+                    if isinstance(val, dict) and "epcClass" in val.keys():
+                        qe = QuantityElement()
+                        for a_k in [
+                            ("epc_class", "epcClass"),
+                            ("quantity", "quantity"),
+                            ("uom", "uom"),
+                        ]:
+                            if a_k[1] in val.keys():
+                                setattr(qe, a_k[0], val[a_k[1]])
+                        new_vals.append(qe)
+                if len(new_vals) == len(value):
+                    value = new_vals
+                if any(not isinstance(val, QuantityElement) for val in value):
+                    raise TypeError(
+                        "Invalid data type. List items must be QuantityElements or dict representations of QuantityElements."
+                    )
+        else:
+            raise TypeError(
+                "Invalid data type. Must be list of QuantityElements or dict representations of QuantityElements."
+            )
         self._output_quantity_list = value
 
     @property
@@ -933,6 +969,8 @@ class TransformationEvent(CommonEvent):
     def transformation_id(self, value: URI):
         if isinstance(value, str):
             value = URI(value)
+        if not isinstance(value, URI):
+            raise TypeError("Invalid data type. Must be a URI or string.")
         self._transformation_id = value
 
     @property
@@ -942,4 +980,6 @@ class TransformationEvent(CommonEvent):
 
     @instance_lot_master_data.setter
     def instance_lot_master_data(self, value: dict):
+        if not isinstance(value, dict):
+            raise TypeError("Invalid data type. Must be a dict.")
         self._instance_lot_master_data = value
