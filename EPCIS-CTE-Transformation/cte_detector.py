@@ -1,5 +1,4 @@
 import os, sys
-
 import yaml
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -30,8 +29,8 @@ class CTEDetector:
     def event_chars(self, value: dict) -> None:
         self._event_chars = value
 
-    def init_from_file(self, filename: str) -> None:
-        """Set event_chars to content of a given file"""
+    def init_from_yaml(self, filename: str) -> None:
+        """Set event_chars to content of a given yaml file"""
         with open(filename) as f:
             detection_config = yaml.safe_load(f)
             self._event_chars = detection_config
@@ -45,32 +44,30 @@ class CTEDetector:
             for char_type in self._event_chars[cte].keys():
                 if char_type == "non_attributes":
                     for element in self._event_chars[cte][char_type].keys():
+                        # Handle non-attribute event characteristics here
                         if element == "event_type":
                             for event_name in self._event_chars[cte][char_type][
                                 element
                             ]:
-                                if epcis_event.__class__.__name__ == event_name:
-                                    cte_bins[cte] += 1
+                                cte_bins[cte] += (
+                                    epcis_event.__class__.__name__ == event_name
+                                )
                 elif char_type == "event_attributes":
                     for element in self._event_chars[cte][char_type].keys():
                         for possible_val in self._event_chars[cte][char_type][element]:
                             try:
                                 attr_val = getattr(epcis_event, element)
                             except:
-                                raise ("Attribute does not exist")
+                                raise Exception("Attribute does not exist")
                             if isinstance(attr_val, URI):
                                 if attr_val.value:
-                                    if attr_val.value == possible_val:
-                                        cte_bins[cte] += 1
+                                    cte_bins[cte] += attr_val.value == possible_val
                                 else:
-                                    if possible_val in attr_val.uri_str:
-                                        cte_bins[cte] += 1
+                                    cte_bins[cte] += possible_val in attr_val.uri_str
                             elif isinstance(attr_val, str):
-                                if possible_val in attr_val:
-                                    cte_bins[cte] += 1
+                                cte_bins[cte] += possible_val in attr_val
                             else:
-                                if possible_val == attr_val:
-                                    cte_bins[cte] += 1
+                                cte_bins[cte] += possible_val == attr_val
         # Return the CTE with the highest percentage of shared characteristics
         for cte in cte_bins.keys():
             cte_bins[cte] /= len(self._event_chars[cte])
