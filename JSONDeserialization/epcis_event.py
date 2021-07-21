@@ -1,5 +1,6 @@
 import datetime
 import re
+from typing import Type
 from dateutil import tz, parser
 from uuid import UUID
 
@@ -57,21 +58,24 @@ class URI:
             return "{}:{}:{}".format(
                 self._split_uri[0], self._split_uri[1], self._split_uri[2]
             )
-        return None
+        else:
+            raise ValueError("URI does not fit the format needed to find prefix.")
 
     @property
     def scheme(self) -> str:
         """returns the URI's scheme"""
         if self._is_split:
             return self._split_uri[3]
-        return None
+        else:
+            raise ValueError("URI does not fit the format needed to find scheme.")
 
     @property
     def value(self) -> str:
         """returns the value stored in the URI"""
         if self._is_split:
             return self._split_uri[4]
-        return None
+        else:
+            raise ValueError("URI does not fit the format needed to find value.")
 
 
 class QuantityElement:
@@ -117,6 +121,8 @@ class QuantityElement:
     def epc_class(self, value: URI):
         if isinstance(value, str):
             value = URI(value)
+        if not isinstance(value, URI):
+            raise TypeError("Invalid data type. Must be a URI or string.")
         self._epc_class = value
 
     @property
@@ -125,13 +131,13 @@ class QuantityElement:
 
     @quantity.setter
     def quantity(self, value: float):
-        if isinstance(value, int):
-            value = float(value)
-        elif isinstance(value, str):
+        if not isinstance(value, float):
             try:
                 value = float(value)
             except:
-                pass
+                raise TypeError(
+                    "Invalid data type. Must be a float or convertible to a float."
+                )
         self._quantity = value
 
     @property
@@ -141,10 +147,7 @@ class QuantityElement:
     @uom.setter
     def uom(self, value: str):
         if not isinstance(value, str):
-            try:
-                value = str(value)
-            except:
-                pass
+            value = str(value)
         self._uom = value
 
 
