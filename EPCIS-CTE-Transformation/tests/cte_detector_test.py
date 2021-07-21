@@ -1,10 +1,13 @@
-import json, yaml
+import yaml
+
 import os, sys
+
+currentdir = os.path.dirname(os.path.realpath(__file__))
+parentdir = os.path.dirname(currentdir)
+sys.path.append(parentdir)
+
 from cte_detector import CTEDetector
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
-parent_dir_path = os.path.abspath(os.path.join(dir_path, os.pardir))
-sys.path.insert(0, parent_dir_path)
 from JSONDeserialization.epcis_event import (
     ObjectEvent,
     TransformationEvent,
