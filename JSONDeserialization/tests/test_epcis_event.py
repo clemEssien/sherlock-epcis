@@ -1,3 +1,4 @@
+from _pytest.python import pytest_pycollect_makeitem
 from _pytest.python_api import raises
 import pytest
 from uuid import uuid4
@@ -131,8 +132,8 @@ class TestEPCISEvent:
 class TestCommonEvent:
     def test_action(self):
         event = CommonEvent()
-        event.action = "ACTION"
-        assert event.action == "ACTION"
+        event.action = "ADD"
+        assert event.action == "ADD"
         with pytest.raises(TypeError):
             event.action = 7
 
@@ -365,3 +366,50 @@ class TestTransformationEvent:
         assert event.instance_lot_master_data == ilmd
         with pytest.raises(TypeError):
             event.instance_lot_master_data = "foobar"
+
+
+class TestURI:
+    def test_uri_can_split(self):
+        uri = URI("urn:epc:id:sgtin:0614141.107346.2018")
+        assert uri.uri_str == "urn:epc:id:sgtin:0614141.107346.2018"
+        assert uri.prefix == "urn:epc:id"
+        assert uri.scheme == "sgtin"
+        assert uri.value == "0614141.107346.2018"
+
+    def test_uri_cannot_split(self):
+        uri = URI("foo")
+        assert uri.uri_str == "foo"
+        with pytest.raises(ValueError):
+            getattr(uri, "prefix")
+            getattr(uri, "scheme")
+            getattr(uri, "value")
+
+
+class TestQuantityElement:
+    def test_epc_class(self):
+        qe = QuantityElement()
+        qe.epc_class = "foo"
+        uri = URI("foo")
+        assert qe.epc_class == uri
+        qe.epc_class = uri
+        assert qe.epc_class == uri
+        with pytest.raises(TypeError):
+            qe.epc_class = 42
+
+    def test_quantity(self):
+        qe = QuantityElement()
+        qe.quantity = 7.0
+        assert qe.quantity == 7.0
+        qe.quantity = 7
+        assert qe.quantity == 7.0
+        qe.quantity = "7.0"
+        assert qe.quantity == 7.0
+        qe.quantity = "7"
+        assert qe.quantity == 7.0
+        with pytest.raises(TypeError):
+            qe.quantity = "foo"
+
+    def test_uom(self):
+        qe = QuantityElement()
+        qe.uom = "KG"
+        assert qe.uom == "KG"
