@@ -16,12 +16,13 @@
 # Note that event_attributes are attributes of the EPCISEvent and its
 # subclasses. No additional code is needed to add new event_attributes,
 # assuming they are already part of the class. non_attributes are not
-# attributes of EPCIS event classes, therefore CTEDetector.detect_cte()
+# attributes of EPCIS event classes, therefore CTEDetector
 # will have to be modified in order to accomodate them. For example,
 # EPCIS event objects have an action attribute, so the value of that
 # attribute will be compared with "ADD" when testing for the growing CTE.
-# EPCIS event objects do not have an event_type attribute, so code was
-# written to manually check the name object's class.
+# EPCIS event objects do not have an event_type attribute, so _event_type_handler()
+# was written to check event types and the name of the characteristic and 
+# handler function were added to the _non_attribute_handlers dict.
 ---
 growing:
   event_attributes:

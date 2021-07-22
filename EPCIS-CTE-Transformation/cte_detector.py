@@ -20,6 +20,7 @@ class CTEDetector:
 
     def __init__(self, event_chars: dict = None) -> None:
         self._event_chars: dict = event_chars
+        self._non_attribute_handlers = {"event_type": "_event_type_handler"}
 
     @property
     def event_chars(self) -> dict:
@@ -35,6 +36,11 @@ class CTEDetector:
             detection_config = yaml.safe_load(f)
             self._event_chars = detection_config
 
+    def _event_type_handler(self, epcis_event, cte, cte_bins):
+        """Handler to determine if event has the event_type characteristic"""
+        for event_name in self._event_chars[cte]["non_attributes"]["event_type"]:
+            cte_bins[cte] += epcis_event.__class__.__name__ == event_name
+
     def detect_cte(self, epcis_event: EPCISEvent) -> str:
         """Return the most likely CTE for a given epcis_event"""
         # Calculate the number of characteristics the event shares with each CTE
@@ -43,15 +49,11 @@ class CTEDetector:
         for cte in valid_ctes:
             for char_type in self._event_chars[cte].keys():
                 if char_type == "non_attributes":
-                    for element in self._event_chars[cte][char_type].keys():
-                        # Handle non-attribute event characteristics here
-                        if element == "event_type":
-                            for event_name in self._event_chars[cte][char_type][
-                                element
-                            ]:
-                                cte_bins[cte] += (
-                                    epcis_event.__class__.__name__ == event_name
-                                )
+                    for non_attr_char in self._event_chars[cte][char_type].keys():
+                        handler = getattr(
+                            self, self._non_attribute_handlers[non_attr_char]
+                        )
+                        handler(epcis_event, cte, cte_bins)
                 elif char_type == "event_attributes":
                     for element in self._event_chars[cte][char_type].keys():
                         for possible_val in self._event_chars[cte][char_type][element]:
