@@ -300,11 +300,11 @@ def create_child_epc_relationship(item_instance, event):
     print(query)
     return query
 
-"""
-method creates output_epc_list_item relationship
-Parameters: An ItemInstance and an Event Object 
-"""
 def create_output_epc_list_item_relationship(item_class, event):
+    """
+    method creates output_epc_list_item relationship
+    Parameters: An ItemInstance and an Event Object 
+    """
     event_name = event.__class__.__name__ 
     query = """
             MATCH (a:ItemClass), (b:"""+event_name+ """) 
@@ -315,11 +315,11 @@ def create_output_epc_list_item_relationship(item_class, event):
     print(query)
     return query
 
-"""
-method creates shared_transformation relationship
-Parameters: Two Transformation Event Objects 
-"""
 def create_shared_transformation_relationship(Event1, Event2):
+    """
+    method creates shared_transformation relationship
+    Parameters: Two Transformation Event Objects 
+    """
     event1 = Event1.__class__.__name__ 
     event2 = Event2.__class__.__name__ 
     query = """
@@ -454,7 +454,9 @@ def create_date_relationship(Location, LocationDate, date):
     print(query)
     return query
 
-
-conn = db_con.Neo4jConnection(uri="bolt://localhost:7687", 
+def connectdb() -> db_con.Neo4jConnection:
+    return db_con.Neo4jConnection(uri="bolt://localhost:7687", 
                        user="neo4j",              
                        password="hjz!MTkA9_E5")
+
+
