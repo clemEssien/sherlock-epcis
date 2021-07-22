@@ -3,12 +3,23 @@ import os
 import db_connect as db_con
 from collections import defaultdict
 
-def create_relationships(dict_list, product, conn):
+def connectdb() -> db_con.Neo4jConnection:
+    return db_con.Neo4jConnection(uri="bolt://localhost:7687", 
+                       user="neo4j",              
+                       password=os.environ['NEO4J_PASSWORD']) 
+
+def create_relationships(dict_list, node_label):
+    """method creates relationships between nodes in the json files
+       Args: 
+            obj: defaultdict(list) of node ids as keys 
+            obj: list containing connector ids (i.e. event_ids)
+    """
+    conn = connectdb()
     for key, value in dict_list.items():
         for id in value:
             print(id)
             query = """
-                MATCH (a:"""+product+"""), (b:"""+product+""") 
+                MATCH (a:"""+node_label+"""), (b:"""+node_label+""") 
                 WHERE a._id = '"""+key +"""' AND b._id = '"""+id +"""'  
                 CREATE (b)-[: next_event]->(a) 
                 RETURN a,b 
@@ -22,11 +33,13 @@ def format_attr_string(attr_str):
     output = attr_str.replace("':", ":").replace(", '",", ").replace("'_id", "_id")
     return output
 
-def create_node_from_json(file, product):
-    conn = db_con.Neo4jConnection(uri="bolt://localhost:7687", 
-                       user="neo4j",              
-                       password=os.environ['NEO4J_PASSWORD'])
-    lst = []
+def create_node_from_json(file, node_label):
+    """method takes in a json file and node label 
+    Args: 
+        file: json file
+        str: node label
+    """
+    conn = connectdb()
     exclude_list = ["flowid","connections", "objects", "association" ]
     relationships = defaultdict(list)
 
@@ -55,18 +68,11 @@ def create_node_from_json(file, product):
             attr_str = format_attr_string(key_values.__str__())
         query = """ 
         CREATE (""" + \
-            "loc_"+str(count) + " : " + product + \
+            "loc_"+str(count) + " : " + node_label + \
                 attr_str + \
             """
         )
         """
         count += 1
         response = conn.query(query,None)
-    create_relationships(relationships,product, conn)        
-    
-create_node_from_json("neo4j/json_files/9991000100016-CT001.json", "cut_tomato")
-create_node_from_json("neo4j/json_files/9991000100023-PS001.json", "ps")
-create_node_from_json("neo4j/json_files/9991000100030-BP001.json", "bp")
-create_node_from_json("neo4j/json_files/9991001100015-TO001.json", "tomato")
-create_node_from_json("neo4j/json_files/9991002100014-OL001.json", "olive")
-
+    create_relationships(relationships,node_label)        

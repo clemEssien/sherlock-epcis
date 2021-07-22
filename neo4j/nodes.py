@@ -43,11 +43,14 @@ def format_query(query):
             new_query += item
     return new_query
 
-"""
-method creates an event node
-Parameter: Any epcis Event
-"""
+
 def create_event_node(event):
+    """Method creates an event node from an event object
+        Args: 
+             Event node
+        Returns:
+             Query String
+    """
     event_type = event.__class__.__name__ 
     node_name = node_names[event_type ]
     attributes = {}
@@ -67,32 +70,31 @@ def create_event_node(event):
     print(query)
 
 
-"""
-method creates a Location node
-Parameter: Location object
-"""
 def create_location_node(Location):
-    
+    """method creates a Location node
+       Args: 
+            Location object
+    """    
     query = """ 
     CREATE (
         loc:Location
-        { 	
+        {   
             id : '""" + Location.id +\
     """'    }
     )
     """
     return query
 
-"""
-method creates a LocationDate node
-Parameter: Any LocationDate object
-"""
+
 def create_location_date_node(LocationDate):
-    
+    """method creates a LocationDate node
+        Args:
+            LocationDate object
+    """
     query = """ 
     CREATE (
         loc_date:LocationDate
-        { 	
+        {   
             id : '""" + LocationDate.id + "'"+\
             ", date : datetime('"+ LocationDate.date + \
     """')    }
@@ -101,16 +103,16 @@ def create_location_date_node(LocationDate):
     print(query)
     return query
     
-"""
-method creates a Company node
-Parameter: Company object
-"""
+
 def create_company_node(company):
-    
+    """method creates a Company node
+       Args: 
+            Company object
+    """
     query = """ 
     CREATE (
         comp:Company
-        { 	
+        {   
             name : '""" + company.name + "'"+\
             ", prefix : '"+ company.prefix + \
     """'   }
@@ -119,31 +121,30 @@ def create_company_node(company):
     print(query)
     return query
 
-"""
-method creates an User node
-Parameter: A User object
-"""
-def create_user_node(user):
-    
+def create_user_node(user): 
+    """method creates an User node
+    Args: 
+        A User object
+    """
     query = """ 
     CREATE (
         user:User
-        { 	
+        {   
             id : '""" + user.id +\
     """'    }
     )
     """
     return query
 
-"""
-method creates an ItemInstance node
-Parameter: A ItemInstance object
-"""
 def create_item_instance_node(item_class):
+    """method creates an ItemInstance node
+    Arg: 
+        A ItemInstance object
+    """
     query = """ 
     CREATE (
         item_inst:ItemInstance
-        { 	
+        {   
             epc : '""" + item_class.epc +\
     """'    }
     )
@@ -151,15 +152,16 @@ def create_item_instance_node(item_class):
     print(query)
     return query
 
-"""
-method creates an ItemClass node
-Parameter: ItemClass object
-"""
+
 def create_item_class_node(item_class):
+    """method creates an ItemClass node
+    Args: 
+        ItemClass object
+    """
     query = """ 
     CREATE (
         item_class:ItemClass
-        { 	
+        {   
             epc : '""" + item_class.epc_class +\
     """'    }
     )
@@ -167,11 +169,11 @@ def create_item_class_node(item_class):
     print(query)
     return query
 
-"""
-method creates Upload event relationship
-Parameters: A User object and Event Object 
-"""
 def create_upload_relationship(User, Event):
+    """method creates Upload event relationship
+    Args: 
+        A User object and Event Object 
+    """
     event = Event.__class__.__name__ 
     query = """
             MATCH (a:User), (b:"""+event+ """) 
@@ -182,11 +184,13 @@ def create_upload_relationship(User, Event):
     print(query)
     return query
 
-"""
-method creates a business_location relationship
-Parameters: A LocationDate and Event Object 
-"""
+
 def create_biz_location_relationship(Event, LocationDate):
+    """method creates a business_location relationship
+    Args: 
+         obj: LocationDate
+         obj: Event Object 
+    """
     event = Event.__class__.__name__ 
     query = """
             MATCH (a:LocationDate), (b:"""+event+ """) 
@@ -197,11 +201,13 @@ def create_biz_location_relationship(Event, LocationDate):
     print(query)
     return query
    
-"""
-method creates a works_for relationship
-Parameters: A User and Company Object 
-"""
+
 def create_works_for_relationship(User, Company):
+    """method creates a works_for relationship
+    Args: 
+        obj: User
+        obj: Company 
+    """
     query = """
             MATCH (a:User), (b:Company) 
             WHERE a.id = '"""+User.id +"""' AND b.prefix = '"""+Company.prefix +"""'  
@@ -211,11 +217,13 @@ def create_works_for_relationship(User, Company):
     print(query)
     return query
 
-"""
-method creates owns relationship
-Parameters: A Location and Company Object 
-"""
+
 def create_owns_relationship(Location, Company):
+    """method creates owns relationship
+    Args: 
+        obj: Location
+        obj: Company
+    """
     query = """
             MATCH (a:Location), (b:Company) 
             WHERE a.id = '"""+str(Location.id) +"""' AND b.prefix = '"""+Company.prefix +"""'  
@@ -225,11 +233,13 @@ def create_owns_relationship(Location, Company):
     print(query)
     return query
 
-"""
-method creates epc_list_item relationship
-Parameters: A ItemClass and Event Object 
-"""
+
 def create_epc_list_item_relationship(item_class, event):
+    """method creates epc_list_item relationship
+    Args: 
+        obj: ItemClass
+        obj: Event 
+    """
     event_name = event.__class__.__name__ 
     query = """
             MATCH (a:ItemClass), (b:"""+event_name+ """) 
@@ -240,11 +250,13 @@ def create_epc_list_item_relationship(item_class, event):
     print(query)
     return query
    
-"""
-method creates epc_list_item_instance relationship
-Parameters: An ItemInstance and an Event Object 
-"""
+
 def create_epc_list_item_instance_relationship(item_instance, event):
+    """method creates epc_list_item_instance relationship
+    Args: 
+        obj: ItemInstance
+        obj: Event 
+    """
     event_name = event.__class__.__name__ 
     query = """
             MATCH (a:ItemInstance), (b:"""+event_name+ """) 
@@ -255,11 +267,13 @@ def create_epc_list_item_instance_relationship(item_instance, event):
     print(query)
     return query
 
-"""
-method creates input_epc_list relationship
-Parameters: An ItemInstance and an Event Object 
-"""
+
 def create_input_epc_list_relationship(item_instance, event):
+    """method creates input_epc_list relationship
+    Args: 
+        obj: ItemInstance
+        obj: Event 
+    """
     event_name = event.__class__.__name__ 
     query = """
             MATCH (a:ItemInstance), (b:"""+event_name+ """) 
@@ -270,11 +284,13 @@ def create_input_epc_list_relationship(item_instance, event):
     print(query)
     return query
 
-"""
-method creates parent_id relationship
-Parameters: An ItemInstance and an Event Object 
-"""
+
 def create_parent_id_relationship(item_instance, event):
+    """method creates parent_id relationship
+    Args: 
+        obj: ItemInstance
+        obj: Event 
+    """
     event_name = event.__class__.__name__ 
     query = """
             MATCH (a:ItemInstance), (b:"""+event_name+ """) 
@@ -285,11 +301,12 @@ def create_parent_id_relationship(item_instance, event):
     print(query)
     return query
 
-"""
-method creates child_epc relationship
-Parameters: An ItemInstance and an Event Object 
-"""
 def create_child_epc_relationship(item_instance, event):
+    """method creates child_epc relationship
+    Args: 
+        obj: ItemInstance
+        obj: Event 
+    """
     event_name = event.__class__.__name__ 
     query = """
             MATCH (a:ItemInstance), (b:"""+event_name+ """) 
@@ -303,7 +320,9 @@ def create_child_epc_relationship(item_instance, event):
 def create_output_epc_list_item_relationship(item_class, event):
     """
     method creates output_epc_list_item relationship
-    Parameters: An ItemInstance and an Event Object 
+       Args: 
+            obj: ItemInstance
+            obj: Event 
     """
     event_name = event.__class__.__name__ 
     query = """
@@ -316,9 +335,10 @@ def create_output_epc_list_item_relationship(item_class, event):
     return query
 
 def create_shared_transformation_relationship(Event1, Event2):
-    """
-    method creates shared_transformation relationship
-    Parameters: Two Transformation Event Objects 
+    """method creates shared_transformation relationship
+       Args: 
+            obj: Transformation
+            obj: Event 
     """
     event1 = Event1.__class__.__name__ 
     event2 = Event2.__class__.__name__ 
@@ -332,11 +352,12 @@ def create_shared_transformation_relationship(Event1, Event2):
     return query
 
 #Test these
-"""
-method creates quantity_list_item relationship
-Parameters: ItemClass and TransformationEvent object
-"""
 def create_quantity_list_item_relationship(item_class, event):
+    """method creates quantity_list_item relationship
+    Args: 
+        obj: ItemClass
+        obj: TransformationEvent
+    """
     event_name = event.__class__.__name__ 
     query = """
             MATCH (a:ItemClass), (b:"""+event_name+ """) 
@@ -347,11 +368,13 @@ def create_quantity_list_item_relationship(item_class, event):
     print(query)
     return query
 
-"""
-method creates quantity_list_item relationship
-Parameters: An ItemInstance and an TransactionEvent Object 
-"""
 def create_quantity_list_item_relationship(item_class, event):
+    """method creates quantity_list_item relationship
+    Args: 
+         obj: ItemInstance
+         obj: TransactionEvent 
+    """
+
     event_name = event.__class__.__name__ 
     query = """
             MATCH (a:ItemClass), (b:"""+event_name+ """) 
@@ -363,11 +386,12 @@ def create_quantity_list_item_relationship(item_class, event):
     return query
 
 
-"""
-method creates quantity_list_item relationship
-Parameters: An ItemInstance and an Event Object 
-"""
 def create_quantity_list_item_relationship(item_class, event):
+    """method creates quantity_list_item relationship
+    Args: 
+         obj: ItemInstance
+         obj: Event  
+    """
     event_name = event.__class__.__name__ 
     query = """
             MATCH (a:ItemClass), (b:"""+event_name+ """) 
@@ -378,11 +402,13 @@ def create_quantity_list_item_relationship(item_class, event):
     print(query)
     return query
 
-"""
-method creates child_quantity_list_item relationship
-Parameters: An ItemInstance and an AggregationEvent Object 
-"""
+
 def create_child_quantity_list_item_relationship(item_class, event):
+    """method creates child_quantity_list_item relationship
+    Args: 
+         obj: ItemInstance
+         obj: AggregationEvent 
+    """
     event_name = event.__class__.__name__ 
     query = """
             MATCH (a:ItemClass), (b:"""+event_name+ """) 
@@ -393,11 +419,13 @@ def create_child_quantity_list_item_relationship(item_class, event):
     print(query)
     return query
 
-"""
-method creates child_quantity_list_item relationship
-Parameters: An ItemInstance and an TransformationEvent Object 
-"""
+
 def create_input_quantity_list_item_relationship(item_class, event):
+    """method creates child_quantity_list_item relationship
+    Args: 
+        obj: ItemInstance
+        obj: TransformationEvent 
+    """
     event_name = event.__class__.__name__ 
     query = """
             MATCH (a:ItemClass), (b:"""+event_name+ """) 
@@ -408,11 +436,13 @@ def create_input_quantity_list_item_relationship(item_class, event):
     print(query)
     return query
 
-"""
-method creates child_quantity_list_item relationship
-Parameters: An ItemInstance and an TransformationEvent Object 
-"""
+
 def create_output_quantity_list_item_relationship(item_class, event):
+    """method creates child_quantity_list_item relationship
+    Args: 
+         obj: ItemInstance
+         obj: TransformationEvent 
+    """
     event_name = event.__class__.__name__ 
     query = """
             MATCH (a:ItemClass), (b:"""+event_name+ """) 
@@ -424,11 +454,12 @@ def create_output_quantity_list_item_relationship(item_class, event):
     return query
 
 
-"""
-method creates child_quantity_list_item relationship
-Parameters: An ItemInstance and an QuantityEvent Object 
-"""
 def create_epc_class_relationship(item_class, event):
+    """method creates child_quantity_list_item relationship
+    Args: 
+         obj: ItemInstance
+         obj: QuantityEvent 
+    """
     event_name = event.__class__.__name__ 
     query = """
             MATCH (a:ItemClass), (b:"""+event_name+ """) 
@@ -440,11 +471,13 @@ def create_epc_class_relationship(item_class, event):
     return query
 
 
-"""
-method creates date relationship
-Parameters: A Location and a LocationDate Object 
-"""
 def create_date_relationship(Location, LocationDate, date):
+    """method creates date relationship
+    Args: 
+        obj: Location
+        obj: LocationDate 
+        str: date
+    """
     query = """
             MATCH (a:LocationDate), (b:"""+Location+ """) 
             WHERE a.date = '"""+LocationDate.date +"""' AND b.id = '"""+str(Location.id) +"""'  
@@ -455,8 +488,7 @@ def create_date_relationship(Location, LocationDate, date):
     return query
 
 def connectdb() -> db_con.Neo4jConnection:
+    """method returns a connection to the database"""
     return db_con.Neo4jConnection(uri="bolt://localhost:7687", 
                        user="neo4j",              
-                       password="hjz!MTkA9_E5")
-
-
+                       password=os.environ['NEO4J_PASSWORD'])
