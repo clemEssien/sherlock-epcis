@@ -1,5 +1,6 @@
-{"attr_key_mapping":
-  {
+{
+  "attr_key_mapping": {
+    "event_id": "eventID",
     "event_type": "isA",
     "event_time": "eventTime",
     "event_timezone_offset": "eventTimeZoneOffset",
@@ -24,5 +25,5 @@
     "destination_list": "destinationList",
     "extension": "extensions",
     "instance_lot_master_data": "instance_lot_master_data"
-    }
+  }
 }
