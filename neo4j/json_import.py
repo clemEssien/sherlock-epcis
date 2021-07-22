@@ -3,11 +3,7 @@ import os
 import db_connect as db_con
 from collections import defaultdict
 
-conn = db_con.Neo4jConnection(uri="bolt://localhost:7687", 
-                       user="neo4j",              
-                       password=os.environ['NEO4J_PASSWORD'])
-
-def create_relationships(dict_list, product):
+def create_relationships(dict_list, product, conn):
     for key, value in dict_list.items():
         for id in value:
             print(id)
@@ -27,6 +23,9 @@ def format_attr_string(attr_str):
     return output
 
 def create_node_from_json(file, product):
+    conn = db_con.Neo4jConnection(uri="bolt://localhost:7687", 
+                       user="neo4j",              
+                       password=os.environ['NEO4J_PASSWORD'])
     lst = []
     exclude_list = ["flowid","connections", "objects", "association" ]
     relationships = defaultdict(list)
@@ -63,10 +62,11 @@ def create_node_from_json(file, product):
         """
         count += 1
         response = conn.query(query,None)
-    create_relationships(relationships,product)        
+    create_relationships(relationships,product, conn)        
     
 create_node_from_json("neo4j/json_files/9991000100016-CT001.json", "cut_tomato")
 create_node_from_json("neo4j/json_files/9991000100023-PS001.json", "ps")
 create_node_from_json("neo4j/json_files/9991000100030-BP001.json", "bp")
 create_node_from_json("neo4j/json_files/9991001100015-TO001.json", "tomato")
 create_node_from_json("neo4j/json_files/9991002100014-OL001.json", "olive")
+
