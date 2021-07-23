@@ -27,6 +27,7 @@ def create_relationships(dict_list, node_label):
             
             response = conn.query(query, None)
             print(response)
+            return response
 
 
 def format_attr_string(attr_str):
@@ -75,4 +76,4 @@ def create_node_from_json(file, node_label):
         """
         count += 1
         response = conn.query(query,None)
-    create_relationships(relationships,node_label)      
+    return create_relationships(relationships,node_label)      
