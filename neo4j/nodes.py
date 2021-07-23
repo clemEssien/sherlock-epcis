@@ -5,10 +5,8 @@ currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
-import datetime
 import json
 import db_connect as db_con
-from JSONDeserialization import epcis_event as epc
 
 node_names: "dict[str]" = {
     "ObjectEvent": "objevt",
