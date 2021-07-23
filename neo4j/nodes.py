@@ -1,23 +1,14 @@
 import os
 import sys
+from typing import Type
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
-import datetime
 import json
 import db_connect as db_con
-from JSONDeserialization import epcis_event as epc
 
-event_types = {
-    "ObjectEvent": epc.ObjectEvent(),
-    "AggregationEvent": epc.AggregationEvent(),
-    "QuantityEvent": epc.QuantityEvent(),
-    "TransactionEvent": epc.TransactionEvent(),
-    "TransformationEvent": epc.TransformationEvent(),
-}
-
-node_names = {
+node_names: "dict[str]" = {
     "ObjectEvent": "objevt",
     "AggregationEvent": "aggevt",
     "QuantityEvent": "qtyevt",
@@ -65,7 +56,7 @@ def create_event_node(event):
              Query String
     """
     event_type = event.__class__.__name__ 
-    node_name = node_names[event_type ]
+    node_name = node_names[event_type]
     attributes = {}
 
     for attr in list(event.__dict__):

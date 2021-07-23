@@ -3,18 +3,23 @@ import os
 import db_connect as db_con
 from collections import defaultdict
 
+global conn 
+conn = None
+
 def connectdb() -> db_con.Neo4jConnection:
     return db_con.Neo4jConnection(uri="bolt://localhost:7687", 
                        user="neo4j",              
                        password=os.environ['NEO4J_PASSWORD']) 
 
 def create_relationships(dict_list, node_label):
+    global conn
     """method creates relationships between nodes in the json files
        Args: 
             obj: defaultdict(list) of node ids as keys 
             obj: list containing connector ids (i.e. event_ids)
     """
-    conn = connectdb()
+    if not conn: conn = connectdb()
+    
     for key, value in dict_list.items():
         for id in value:
             print(id)
@@ -40,7 +45,9 @@ def create_node_from_json(file, node_label):
         file: json file
         str: node label
     """
-    conn = connectdb()
+    global conn    
+    if not conn: conn = connectdb()
+    
     exclude_list = ["flowid","connections", "objects", "association" ]
     relationships = defaultdict(list)
 
