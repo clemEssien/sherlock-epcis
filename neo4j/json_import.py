@@ -75,4 +75,7 @@ def create_node_from_json(file, node_label):
         """
         count += 1
         response = conn.query(query,None)
-    create_relationships(relationships,node_label)        
+    create_relationships(relationships,node_label)    
+
+
+create_node_from_json("neo4j/json_files/9991001100015-TO001.json", "tomato")    

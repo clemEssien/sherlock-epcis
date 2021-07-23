@@ -88,11 +88,11 @@ def test_item_class_node():
 
 def test_create_upload_relationship():
     relationship = n.create_upload_relationship(user, agg_event) 
-    assert isinstance(relationship,list) and len(relationship) ==1
+    assert isinstance(relationship,list) and len(relationship) >=1
 
 def test_create_epc_list_item_relationship(): 
     relationship = n.create_epc_list_item_relationship(item_class, agg_event)
-    assert isinstance(relationship,list) and len(relationship) ==1
+    assert isinstance(relationship,list) and len(relationship) >=1
 
 def test_create_epc_list_item_instance_relationship():
     relationship = n.create_epc_list_item_instance_relationship(item_instance,obj_event)
@@ -104,45 +104,45 @@ def test_create_input_epc_list_relationship():
 
 def test_create_parent_id_relationship():
     relationship = n.create_parent_id_relationship(item_instance, tx_event)
-    assert isinstance(relationship,list) and len(relationship) ==1
+    assert isinstance(relationship,list) and len(relationship) >=1
 
 def test_create_child_epc_relationship():
     relationship =n.create_child_epc_relationship(item_instance, agg_event)
-    assert isinstance(relationship,list) and len(relationship) ==1
+    assert isinstance(relationship,list) and len(relationship) >=1
 
 def test_create_output_epc_list_item_relationship():
     relationship = n.create_output_epc_list_item_relationship(item_class, trans_event)
-    assert isinstance(relationship,list) and len(relationship) ==1
+    assert isinstance(relationship,list) and len(relationship) >=1
 
 def test_create_shared_transformation_relationship():
     relationship = n.create_shared_transformation_relationship(trans_event, trans_event1)
-    assert isinstance(relationship,list) and len(relationship) ==1
+    assert isinstance(relationship,list) and len(relationship) >=1
 
 def test_create_quantity_list_item_relationship():
     relationship =n.create_quantity_list_item_relationship(item_class, tx_event)
-    assert isinstance(relationship,list) and len(relationship) ==1
+    assert isinstance(relationship,list) and len(relationship) >=1
 
 def test_create_quantity_list_item_relationship():
     relationship = n.create_quantity_list_item_relationship(item_class, obj_event)
-    assert isinstance(relationship,list) and len(relationship) ==1
+    assert isinstance(relationship,list) and len(relationship) >=1
 
 def test_create_child_quantity_list_item_relationship():
     relationship = n.create_child_quantity_list_item_relationship(item_class, agg_event)
-    assert isinstance(relationship,list) and len(relationship) ==1
+    assert isinstance(relationship,list) and len(relationship) >=1
 
 def test_create_input_quantity_list_item_relationship():
     relationship = n.create_input_quantity_list_item_relationship(item_class, trans_event)
-    assert isinstance(relationship,list) and len(relationship) ==1
+    assert isinstance(relationship,list) and len(relationship) >=1
 
 def test_create_output_quantity_list_item_relationship():
     relationship = n.create_output_quantity_list_item_relationship(item_class, trans_event)
-    assert isinstance(relationship,list) and len(relationship) ==1
+    assert isinstance(relationship,list) and len(relationship) >=1
 
 def test_create_epc_class_relationship():
     relationship = n.create_epc_class_relationship(item_class, qty_event)
-    assert isinstance(relationship,list) and len(relationship) ==1
+    assert isinstance(relationship,list) and len(relationship) >=1
 
 
 def test_create_date_relationship():
     relationship = n.create_date_relationship(location, location_date)
-    assert isinstance(relationship,list) and len(relationship) ==1
+    assert isinstance(relationship,list) and len(relationship) >=1

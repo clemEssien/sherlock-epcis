@@ -6,6 +6,6 @@ sys.path.append(parentdir)
 
 import json_import as js
 
-result = js.create_node_from_json("neo4j/json_files/9991000100016-CT001.json", "cut_tomato")
-
+# result = js.create_node_from_json("neo4j/json_files/9991000100016-CT001.json", "cut_tomato")
+result = js.create_node_from_json("neo4j/json_files/9991001100015-TO001.json", "tomato")
 print(result)
