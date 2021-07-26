@@ -1,5 +1,6 @@
 import os, sys
 import yaml
+import json
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 parent_dir_path = os.path.abspath(os.path.join(dir_path, os.pardir))
@@ -30,19 +31,37 @@ class CTEDetector:
     def event_chars(self, value: dict) -> None:
         self._event_chars = value
 
-    def init_from_yaml(self, filename: str) -> None:
+    def import_yaml_file(self, filename: str) -> None:
         """Set event_chars to content of a given yaml file"""
-        with open(filename) as f:
-            detection_config = yaml.safe_load(f)
+        with open(filename, "r") as f:
+            try:
+                detection_config = yaml.safe_load(f)
+            except:
+                raise ValueError("File must follow the YAML format.")
             self._event_chars = detection_config
 
-    def _event_type_handler(self, epcis_event, cte, cte_bins):
+    def import_json_file(self, filename: str) -> None:
+        """Set event_chars to content of a given json file"""
+        with open(filename, "r") as f:
+            try:
+                detection_config = json.load(f)
+            except:
+                raise ValueError("File must follow the JSON format.")
+            self._event_chars = detection_config
+
+    def _event_type_handler(
+        self, epcis_event: EPCISEvent, cte: str, cte_bins: dict
+    ) -> None:
         """Handler to determine if event has the event_type characteristic"""
         for event_name in self._event_chars[cte]["non_attributes"]["event_type"]:
             cte_bins[cte] += epcis_event.__class__.__name__ == event_name
 
     def detect_cte(self, epcis_event: EPCISEvent) -> str:
         """Return the most likely CTE for a given epcis_event"""
+        if not isinstance(epcis_event, EPCISEvent):
+            raise TypeError(
+                "Invalid data type. Must be an EPCISEvent or subclass of an EPCISEvent."
+            )
         # Calculate the number of characteristics the event shares with each CTE
         valid_ctes = [key for key in self._event_chars if self._event_chars[key]]
         cte_bins = dict.fromkeys(valid_ctes, 0)
@@ -62,9 +81,9 @@ class CTEDetector:
                             except:
                                 raise Exception("Attribute does not exist")
                             if isinstance(attr_val, URI):
-                                if attr_val.value:
+                                try:
                                     cte_bins[cte] += attr_val.value == possible_val
-                                else:
+                                except:
                                     cte_bins[cte] += possible_val in attr_val.uri_str
                             elif isinstance(attr_val, str):
                                 cte_bins[cte] += possible_val in attr_val
