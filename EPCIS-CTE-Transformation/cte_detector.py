@@ -54,7 +54,7 @@ class CTEDetector:
     def _event_type_handler(
         self, epcis_event: EPCISEvent, cte: str, cte_bins: dict
     ) -> None:
-        """Handler to determine if given event has the event_type characteristic"""
+        """Handler to determine if given event has the given event_type characteristic"""
         for event_name in self._event_chars[cte]["non_attributes"]["event_type"]:
             cte_bins[cte] += epcis_event.__class__.__name__ == event_name
 
@@ -82,15 +82,39 @@ class CTEDetector:
                                 attr_val = getattr(epcis_event, element)
                             except:
                                 raise Exception("Attribute does not exist")
+                            if str(attr_val) == "":
+                                continue
                             if isinstance(attr_val, URI):
-                                try:
-                                    cte_bins[cte] += attr_val.value == possible_val
-                                except:
-                                    cte_bins[cte] += possible_val in attr_val.uri_str
+                                if attr_val._is_split:
+                                    if attr_val.value == possible_val:
+                                        cte_bins[cte] += 1
+                                    elif possible_val[0] == attr_val.value[0]:
+                                        # See if they at least share the first letter, then get the length of the
+                                        # common prefix to catch things like ship, shipment, shipped when the event_char is shipping
+                                        prefix_len = len(
+                                            os.path.commonprefix(
+                                                [attr_val.value, possible_val]
+                                            )
+                                        )
+                                        cte_bins[cte] += prefix_len / len(possible_val)
+                                else:
+                                    if possible_val in attr_val.uri_str:
+                                        cte_bins[cte] += 1
+                                    elif possible_val[0] == attr_val.uri_str[0]:
+                                        prefix_len = len(
+                                            os.path.commonprefix(
+                                                [attr_val.uri_str, possible_val]
+                                            )
+                                        )
+                                        cte_bins[cte] += prefix_len / len(possible_val)
                             elif isinstance(attr_val, str):
-                                cte_bins[cte] += possible_val in attr_val
-                            else:
-                                cte_bins[cte] += possible_val == attr_val
+                                if possible_val == attr_val:
+                                    cte_bins[cte] += 1
+                                elif possible_val[0] == attr_val[0]:
+                                    prefix_len = len(
+                                        os.path.commonprefix([attr_val, possible_val])
+                                    )
+                                    cte_bins[cte] += prefix_len / len(possible_val)
         # Return the CTE with the highest percentage of shared characteristics
         for cte in cte_bins.keys():
             cte_bins[cte] /= len(self._event_chars[cte])
