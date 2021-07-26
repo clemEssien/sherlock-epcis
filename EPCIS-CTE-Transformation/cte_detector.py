@@ -17,6 +17,8 @@ class CTEDetector:
     Attributes:
         event_chars : dict
             A dictionary identifying each FDA CTE by expected characteristics of an EPCIS event.
+        _non_attribute_handlers : dict
+            A dictionary mapping the non_attribute characteristics to their handler functions.
     """
 
     def __init__(self, event_chars: dict = None) -> None:
@@ -52,7 +54,7 @@ class CTEDetector:
     def _event_type_handler(
         self, epcis_event: EPCISEvent, cte: str, cte_bins: dict
     ) -> None:
-        """Handler to determine if event has the event_type characteristic"""
+        """Handler to determine if given event has the event_type characteristic"""
         for event_name in self._event_chars[cte]["non_attributes"]["event_type"]:
             cte_bins[cte] += epcis_event.__class__.__name__ == event_name
 
