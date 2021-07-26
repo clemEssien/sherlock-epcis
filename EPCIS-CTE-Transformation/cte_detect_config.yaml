@@ -1,17 +1,17 @@
-# This is a configuration file used to determine what EPCIS event properties
+# This is a configuration file used to determine what EPCIS event characteristics
 # match to FDA CTEs. For example, an EPCIS event representing a growing CTE
 # would likely have an ADD action, commissioning business step, and be an
 # ObjectEvent.
 #
-# The template for making new config files to support non-CBV vocabularies is:
+# The template for making new config files is:
 #     [CTE name]:
-#       - event_attributes:
-#         - [EPCISEvent attribute name]:
+#        event_attributes:
+#          [EPCISEvent attribute name]:
 #           - [potential value 1]
 #           - [potential value 2]
-#       - non_attributes:
-#           - [characteristic name]:
-#             - [potential value]
+#        non_attributes:
+#          [characteristic name]:
+#           - [potential value]
 #
 # Note that event_attributes are attributes of the EPCISEvent and its
 # subclasses. No additional code is needed to add new event_attributes,
