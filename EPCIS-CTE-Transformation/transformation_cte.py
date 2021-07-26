@@ -71,7 +71,7 @@ class TransformationCTE(CTEBase):
                 output.unit_of_measure.append(qe.uom)
             for epc in event.child_epc_list:  # check if we should use this or parentID
                 output.traceability_product.append(epc.value)
-        elif isinstance(event, QuantityEvent):
+        elif isinstance(event, QuantityEvent):  # is this needed?
             output.location_of_transformation = event.read_point.value
             output.quantity_of_input.append(event.quantity)
             output.traceability_product.append(event.epc_class)
@@ -85,7 +85,8 @@ class TransformationCTE(CTEBase):
                 output.unit_of_measure.append(qe.uom)
             for epc in event.epc_list:  # check if we should use this or parentID
                 output.traceability_product.append(epc.value)
-
+        elif isinstance(event, CommonEvent):
+            output.location_of_transformation = event.read_point.value
         return output
 
     def new_from_json(cls, json_data: str):
@@ -162,3 +163,6 @@ class TransformationCTE(CTEBase):
     def save_as_xlsx(self, filename: str):
         pass
         # code here
+
+
+print("test")

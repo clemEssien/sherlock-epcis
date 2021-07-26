@@ -1,3 +1,4 @@
+from abc import ABC, abstractclassmethod, abstractmethod
 from typing import List
 from cte import CTEBase
 from JSONDeserialization.epcis_event import (
@@ -39,7 +40,6 @@ class ShippingCTE(CTEBase):
         self._location_of_traceability_lot_code_generator = ""
         self._location_of_recipient = ""
         self._location_of_source_of_shipment = ""
-        pass
 
     def new_from_data(cls, data: dict):
         pass
@@ -83,6 +83,9 @@ class ShippingCTE(CTEBase):
                 output.traceability_lot_code.append(qe.epc_class.value)
             for epc in event.input_epc_list:
                 output.traceability_product.append(epc.value)
+        elif isinstance(event, CommonEvent):
+            output.location_of_recipient = event.business_location.value
+            output.location_of_source_of_shipment = event.read_point.value
 
         return output
 
