@@ -20,9 +20,9 @@ from JSONDeserialization.epcis_event import (
 
 def test_init():
     with open("EPCIS-CTE-Transformation/cte_detect_config.yaml") as f:
-        event_chars = yaml.safe_load(f)
-    detector = CTEDetector(event_chars=event_chars)
-    assert detector.event_chars == event_chars
+        event_characteristics = yaml.safe_load(f)
+    detector = CTEDetector(event_characteristics=event_characteristics)
+    assert detector.event_chars == event_characteristics
 
 
 def test_import_yaml():
@@ -48,7 +48,7 @@ def test_import_json():
 def test_detect_cte_invalid_data_type():
     with open("EPCIS-CTE-Transformation/cte_detect_config.yaml") as f:
         event_chars = yaml.safe_load(f)
-    detector = CTEDetector(event_chars=event_chars)
+    detector = CTEDetector(event_characteristics=event_chars)
     with pytest.raises(TypeError):
         detector.detect_cte(42)
 
@@ -94,7 +94,7 @@ def test_detect_cte_invalid_data_type():
 def test_detect_cte(event_class, action, business_step, cte):
     with open("EPCIS-CTE-Transformation/cte_detect_config.yaml") as f:
         event_chars = yaml.safe_load(f)
-    detector = CTEDetector(event_chars=event_chars)
+    detector = CTEDetector(event_characteristics=event_chars)
 
     event = globals()[event_class]()
     event.action = action
@@ -106,7 +106,7 @@ def test_detect_cte(event_class, action, business_step, cte):
 def test_detect_cte_partially_empty_Event():
     with open("EPCIS-CTE-Transformation/cte_detect_config.yaml") as f:
         event_chars = yaml.safe_load(f)
-    detector = CTEDetector(event_chars=event_chars)
+    detector = CTEDetector(event_characteristics=event_chars)
 
     event = ObjectEvent()
     event.business_step = "ship"
