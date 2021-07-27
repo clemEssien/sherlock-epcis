@@ -1,5 +1,8 @@
 from flask import Flask, jsonify, request
 from flask_classful import FlaskView, route
+from flask_mongoengine import MongoEngine
+import mongoengine as me
+from models.user import User
 from neo4j import GraphDatabase
 
 from dotenv import load_dotenv
@@ -22,6 +25,13 @@ URI = os.getenv('DB_URI')
 driver = GraphDatabase.driver(uri=URI, auth=(USER, PASS))
 
 app = Flask(__name__)
+db = MongoEngine(app)
+""" app.config['MONGODB_SETTINGS'] = {
+    'db': 'project1',
+    'username':'webapp',
+    'password':'pwd123'
+} """
+
 
 event_types = {
     "ObjectEvent": epc.ObjectEvent,
@@ -30,6 +40,29 @@ event_types = {
     "TransactionEvent": epc.TransactionEvent,
     "TransformationEvent": epc.TransformationEvent,
 }
+
+class UserView(FlaskView):
+    route_base = "/api/users"
+
+    @route("/create", methods=["POST"])
+    def create_user(self):
+        pass
+
+    @route("/signin", methods=["POST"])
+    def signin(self):
+        pass
+
+    @route("/refresh", methods=["GET"])
+    def refresh(self):
+        pass
+
+    @route("/change_password", methods=["POST"])
+    def change_password(self):
+        pass
+
+    @route("/get_user", methods=["GET"])
+    def get_user(self):
+        pass
 
 class EventView(FlaskView):
     route_base = "/api/events"
