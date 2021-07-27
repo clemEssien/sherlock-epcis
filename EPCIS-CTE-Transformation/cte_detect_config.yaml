@@ -1,0 +1,70 @@
+# This is a configuration file used to determine what EPCIS event characteristics
+# match to FDA CTEs. For example, an EPCIS event representing a growing CTE
+# would likely have an ADD action, commissioning business step, and be an
+# ObjectEvent.
+#
+# The template for making new config files is:
+#     [CTE name]:
+#        event_attributes:
+#          [EPCISEvent attribute name]:
+#           - [potential value 1]
+#           - [potential value 2]
+#        non_attributes:
+#          [characteristic name]:
+#           - [potential value]
+#
+# Note that event_attributes are attributes of the EPCISEvent and its
+# subclasses. No additional code is needed to add new event_attributes,
+# assuming they are already part of the class. non_attributes are not
+# attributes of EPCIS event classes, therefore CTEDetector
+# will have to be modified in order to accomodate them. For example,
+# EPCIS event objects have an action attribute, so the value of that
+# attribute will be compared with "ADD" when testing for the growing CTE.
+# EPCIS event objects do not have an event_type attribute, so _event_type_handler()
+# was written to check event types and the name of the characteristic and 
+# handler function were added to the _non_attribute_handlers dict.
+---
+growing:
+  event_attributes:
+    action:
+    - "ADD"
+    business_step:
+    - "commissioning"
+  non_attributes:
+    event_type:
+    - "ObjectEvent"
+transformation:
+  event_attributes:
+    action:
+    - "ADD"
+    - "DELETE"
+    business_step:
+    - "commissioning"
+    - "packing"
+    - "assembling"
+    - "unpacking"
+  non_attributes:
+    event_type:
+    - "TransformationEvent"
+    - "AggregationEvent"
+shipping:
+  event_attributes:
+    action:
+    - "OBSERVE"
+    business_step:
+    - "shipping"
+    - "departing"
+    - "consigning"
+  non_attributes:
+    event_type:
+    - "ObjectEvent"
+receiving:
+  event_attributes:
+    action:
+    - "OBSERVE"
+    business_step:
+    - "receiving"
+    - "arriving"
+  non_attributes:
+    event_type:
+    - "ObjectEvent"

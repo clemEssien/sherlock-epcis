@@ -1,0 +1,70 @@
+{
+    "growing": {
+        "event_attributes": {
+            "action": [
+                "ADD"
+            ],
+            "business_step": [
+                "commissioning"
+            ]
+        },
+        "non_attributes": {
+            "event_type": [
+                "ObjectEvent"
+            ]
+        }
+    },
+    "transformation": {
+        "event_attributes": {
+            "action": [
+                "ADD",
+                "DELETE"
+            ],
+            "business_step": [
+                "commissioning",
+                "packing",
+                "assembling",
+                "unpacking"
+            ]
+        },
+        "non_attributes": {
+            "event_type": [
+                "TransformationEvent",
+                "AggregationEvent"
+            ]
+        }
+    },
+    "shipping": {
+        "event_attributes": {
+            "action": [
+                "OBSERVE"
+            ],
+            "business_step": [
+                "shipping",
+                "departing",
+                "consigning"
+            ]
+        },
+        "non_attributes": {
+            "event_type": [
+                "ObjectEvent"
+            ]
+        }
+    },
+    "receiving": {
+        "event_attributes": {
+            "action": [
+                "OBSERVE"
+            ],
+            "business_step": [
+                "receiving",
+                "arriving"
+            ]
+        },
+        "non_attributes": {
+            "event_type": [
+                "ObjectEvent"
+            ]
+        }
+    }
+}
