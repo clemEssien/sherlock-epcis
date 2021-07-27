@@ -13,6 +13,7 @@ pathspec==0.8.1
 pytest==6.2.4
 python-dateutil==2.8.1
 python-dotenv==0.18.0
+pyyaml==5.4.1
 regex==2021.4.4
 requests==2.25.1
 toml==0.10.2
