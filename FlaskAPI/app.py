@@ -3,6 +3,7 @@ from flask_classful import FlaskView, route
 from flask_mongoengine import MongoEngine
 import mongoengine as me
 from models.user import User
+from services import user_services
 from neo4j import GraphDatabase
 
 from dotenv import load_dotenv
@@ -58,11 +59,65 @@ class UserView(FlaskView):
 
     @route("/change_password", methods=["POST"])
     def change_password(self):
-        pass
+        """
+        Changes the password for a given user
+
+        Request Body:
+            {
+                user_id: str,
+                old_password: str,
+                new_password: str,
+                confirm_new_password: str,
+            }
+
+        Error Codes:
+            400: Bad request
+            404: User not found
+
+        On Success (200):
+            {
+                success: true
+            }
+        """
+        body_json = json.loads(request.get_data())
+        new_password = body_json["new_password"]
+        confirm_new_passwords = body_json["confirm_new_passwords"]
+        user_id = body_json["user_id"]
+        old_password = body_json["old_password"]
+
+        user = User.objects.get_or_404(_id=user_id, message="User not found")
+        if (user.password_hash != user_services("something", old_password)):
+            return {"error": "Incorrect password"}, 400 
+        if (new_password != confirm_new_passwords):
+            return {"error": "New passwords do not match"}, 400 
+
+        user.update(password_hash=user_services("something", new_password))
+        return {"success": True}
+
 
     @route("/get_user", methods=["GET"])
     def get_user(self):
-        pass
+        """
+        Gets a single user based off of id
+
+        Request Body:
+            {
+                user_id: str,
+            }
+
+        Error Codes:
+            404: User not found
+
+        On Success (200):
+            {
+                user: User
+            }
+        """
+        body_json = json.loads(request.get_data())
+        user_id = body_json["user_id"]
+        user = User.objects.get_or_404(_id=user_id)
+
+        return {"user": jsonify(user)}
 
 class EventView(FlaskView):
     route_base = "/api/events"
