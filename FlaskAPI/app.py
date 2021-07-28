@@ -16,9 +16,9 @@ import JSONDeserialization.extract_gis_from_json as ex_json
 import XMLDeserialization.extract_gis_from_xml as ex_xml
 
 # Temporary sandbox database, probably expired
-USER = os.getenv('DB_USER')
-PASS = os.getenv('DB_PASS')
-URI = os.getenv('DB_URI')
+USER = os.getenv("DB_USER")
+PASS = os.getenv("DB_PASS")
+URI = os.getenv("DB_URI")
 driver = GraphDatabase.driver(uri=URI, auth=(USER, PASS))
 
 app = Flask(__name__)
@@ -30,6 +30,7 @@ event_types = {
     "TransactionEvent": epc.TransactionEvent,
     "TransformationEvent": epc.TransformationEvent,
 }
+
 
 class EventView(FlaskView):
     route_base = "/api/events"
@@ -53,9 +54,9 @@ class EventView(FlaskView):
                 results = session.run(q).data()
             return {"events": results}, 200
         except Exception as e:
-            return {"error": "Error getting events"}, 400 
+            return {"error": "Error getting events"}, 400
 
-    @route("/delete", methods=["DELETE"]) # TEMPORARY 
+    @route("/delete", methods=["DELETE"])  # TEMPORARY
     def delete(self):
         """
         Deletes all EPCIS event data
@@ -74,7 +75,8 @@ class EventView(FlaskView):
                 session.run(q).data()
             return {"success": True}
         except Exception as e:
-            return {"error": "Error deleting events"}, 400 
+            return {"error": "Error deleting events"}, 400
+
 
 class JSONView(FlaskView):
     route_base = "/api/json"
@@ -128,6 +130,35 @@ class JSONView(FlaskView):
         except Exception as e:
             return {"error": "Error adding events"}, 400
 
+    @route("/transformation", methods=["POST"])
+    def transform_epcis_event(self):
+        # Validate User
+
+        # Validate request body is EPCIS Event
+
+        # Create event object and populate it
+        epcis_json = json.loads(request.get_data())
+        event = event_types[epcis_json["isA"]]()
+        ex_json.map_from_epcis(event, epcis_json)
+
+        # Detect CTE from EPCIS event
+
+        # Transform EPCIS event to FDA CTE
+
+        # Store data in Neo4j database
+
+        # Return CTE to user
+
+    @route("/transformation/cte", methods=["POST"])
+    def finish_cte(self):
+        # Edit CTE in database
+
+        # Format CTE as desired document type
+
+        # Return CTE document
+        pass
+
+
 class XMLView(FlaskView):
     route_base = "/api/xml"
 
@@ -138,7 +169,7 @@ class XMLView(FlaskView):
 
         Content Type: application/xml
 
-        Request Body: 
+        Request Body:
             xml data of epcis
 
         Error Codes:
@@ -150,8 +181,8 @@ class XMLView(FlaskView):
                 events: EPCISEvent[]
             }
         """
-        epcis_xml = str(request.get_data(), "utf-8") 
-        
+        epcis_xml = str(request.get_data(), "utf-8")
+
         root = ET.fromstring(epcis_xml)
 
         if root.tag != "{urn:epcglobal:epcis:xsd:1}EPCISDocument":
@@ -180,13 +211,16 @@ class XMLView(FlaskView):
                             session.run(q, qmap)
                     except Exception as e:
                         return {"error": "Error adding events"}, 400
-                    events.append({     #Event object not json serializable
-                        "eventTime": str(event._event_time),
-                        "eventTimeZoneOffset": str(event._event_timezone_offset),
-                    })
+                    events.append(
+                        {  # Event object not json serializable
+                            "eventTime": str(event._event_time),
+                            "eventTimeZoneOffset": str(event._event_timezone_offset),
+                        }
+                    )
 
         return {"success": True, "events": events}, 200
-        
+
+
 EventView.register(app)
 JSONView.register(app)
 XMLView.register(app)
