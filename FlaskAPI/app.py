@@ -14,6 +14,7 @@ sys.path.append(parentdir)
 import JSONDeserialization.epcis_event as epc
 import JSONDeserialization.extract_gis_from_json as ex_json
 import XMLDeserialization.extract_gis_from_xml as ex_xml
+from epcis_cte_transformation.cte_detector import CTEDetector
 
 # Temporary sandbox database, probably expired
 USER = os.getenv("DB_USER")
@@ -125,6 +126,8 @@ class JSONView(FlaskView):
         ex_json.map_from_epcis(event, epcis_json)
 
         # Detect CTE from EPCIS event
+        cte_detector = CTEDetector()
+        cte_detector.import_yaml_file("epcis_cte_transformation")
 
         # Transform EPCIS event to FDA CTE
 
