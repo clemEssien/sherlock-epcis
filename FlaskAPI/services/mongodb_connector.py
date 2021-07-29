@@ -1,4 +1,4 @@
-class MongoDBConnector():
+class MongoDBConnector(): #TODO: create, get_many, get_some, etc.
 
     def __init__(self, collection) -> None:
         self._collection = collection
