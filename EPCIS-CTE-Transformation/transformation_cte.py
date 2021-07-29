@@ -1,5 +1,11 @@
 from abc import ABC, abstractclassmethod, abstractmethod
 from typing import List, Type
+import os, sys
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
+parent_dir_path = os.path.abspath(os.path.join(dir_path, os.pardir))
+sys.path.insert(0, parent_dir_path)
+
 from JSONDeserialization.epcis_event import (
     QuantityElement,
     QuantityEvent,
@@ -11,6 +17,7 @@ from JSONDeserialization.epcis_event import (
     TransactionEvent,
     TransformationEvent,
 )
+
 from cte import CTEBase
 import json
 
@@ -56,7 +63,6 @@ class TransformationCTE(CTEBase):
                 output.traceability_product.append(epc.value)
             for epc in event.output_epc_list:
                 output.new_traceability_product.append(epc.value)
-        # transEvent: TransformationEvent = event
         elif isinstance(event, ObjectEvent):
             output.location_of_transformation = event.read_point.value
             for qe in event.quantity_list:
@@ -71,14 +77,7 @@ class TransformationCTE(CTEBase):
                 output.unit_of_measure.append(qe.uom)
             for epc in event.child_epc_list:  # check if we should use this or parentID
                 output.traceability_product.append(epc.value)
-        elif isinstance(event, QuantityEvent):  # is this needed?
-            output.location_of_transformation = event.read_point.value
-            output.quantity_of_input.append(event.quantity)
-            output.traceability_product.append(event.epc_class)
-        elif isinstance(
-            event, TransactionEvent
-        ):  # TransactionEvent ... check if a CommonEvent could ever be passed in as the event
-            # how to let output know event is a transaction event
+        elif isinstance(event, TransactionEvent):
             output.location_of_transformation = event.read_point.value
             for qe in event.quantity_list:
                 output.quantity_of_input.append(qe.quantity)
@@ -150,6 +149,9 @@ class TransformationCTE(CTEBase):
     def unit_of_measure(self, value: str):
         self._unit_of_measure = value
 
+    def output_json(self) -> str:
+        pass
+
     def output_xlsx(self) -> str:
         """
         Create an excel spreadsheet and output the contents to an XML string
@@ -163,6 +165,3 @@ class TransformationCTE(CTEBase):
     def save_as_xlsx(self, filename: str):
         pass
         # code here
-
-
-print("test")

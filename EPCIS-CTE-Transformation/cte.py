@@ -1,6 +1,10 @@
-from _typeshed import Self
 from abc import ABC, abstractclassmethod, abstractmethod
 from typing import Type
+import os, sys
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
+parent_dir_path = os.path.abspath(os.path.join(dir_path, os.pardir))
+sys.path.insert(0, parent_dir_path)
 from JSONDeserialization.epcis_event import EPCISEvent
 
 
@@ -42,4 +46,16 @@ class CTEBase(ABC):
 
     @abstractmethod
     def save_to_excel(self):
+        pass
+
+    @abstractmethod
+    def output_json(self):
+        pass
+
+    @abstractmethod
+    def output_xlsx(self) -> str:
+        pass
+
+    @abstractmethod
+    def save_as_xlsx(self, filename: str):
         pass
