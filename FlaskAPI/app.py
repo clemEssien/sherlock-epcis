@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, make_response
 from flask_classful import FlaskView, route
 from neo4j import GraphDatabase
 
@@ -115,23 +115,6 @@ class JSONView(FlaskView):
             }
 
         """
-        epcis_json = json.loads(request.get_data())
-        event = event_types[epcis_json["isA"]]()
-        ex_json.map_from_epcis(event, epcis_json)
-        q = "create (:Event{eventTime: $eventTime, eventTimeZoneOffset: $eventTimeZoneOffset})"
-        qmap = {
-            "eventTime": str(event.event_time),
-            "eventTimeZoneOffset": str(event.event_timezone_offset),
-        }
-        try:
-            with driver.session() as session:
-                session.run(q, qmap)
-            return {"success": True}
-        except Exception as e:
-            return {"error": "Error adding events"}, 400
-
-    @route("/transformation", methods=["POST"])
-    def transform_epcis_event(self):
         # Validate User
 
         # Validate request body is EPCIS Event
@@ -146,10 +129,19 @@ class JSONView(FlaskView):
         # Transform EPCIS event to FDA CTE
 
         # Store data in Neo4j database
-
+        q = "create (:Event{eventTime: $eventTime, eventTimeZoneOffset: $eventTimeZoneOffset})"
+        qmap = {
+            "eventTime": str(event.event_time),
+            "eventTimeZoneOffset": str(event.event_timezone_offset),
+        }
+        try:
+            with driver.session() as session:
+                session.run(q, qmap)
+        except Exception as e:
+            return make_response({"error": "Error adding events"}, 400)
         # Return CTE to user
 
-    @route("/transformation/cte", methods=["POST"])
+    @route("/cte", methods=["POST"])
     def finish_cte(self):
         # Edit CTE in database
 
