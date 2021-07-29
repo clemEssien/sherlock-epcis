@@ -26,13 +26,10 @@ URI = os.getenv('DB_URI')
 driver = GraphDatabase.driver(uri=URI, auth=(USER, PASS))
 
 app = Flask(__name__)
+app.config['MONGODB_SETTINGS'] = {
+    "host": "mongodb+srv://admin:test123@userauth.slfja.mongodb.net/UserAuth?retryWrites=true&w=majority"
+}
 db = MongoEngine(app)
-""" app.config['MONGODB_SETTINGS'] = {
-    'db': 'project1',
-    'username':'webapp',
-    'password':'pwd123'
-} """
-
 
 event_types = {
     "ObjectEvent": epc.ObjectEvent,
@@ -47,7 +44,17 @@ class UserView(FlaskView):
 
     @route("/create", methods=["POST"])
     def create_user(self):
-        pass
+        user = User(
+            user_id = 1,
+            first_name = "first",
+            last_name = "last",
+            email = "email",
+            role = "User",
+            password_hash = "123",
+            companyId = "456"
+        )
+        user.save()
+        return {"success": True}
 
     @route("/signin", methods=["POST"])
     def signin(self):
@@ -64,15 +71,16 @@ class UserView(FlaskView):
 
         Request Body:
             {
-                user_id: str,
+                user_id: int,
                 old_password: str,
                 new_password: str,
                 confirm_new_password: str,
             }
 
         Error Codes:
-            400: Bad request
-            404: User not found
+            400: User not found
+            400: Incorrect password
+            400: New passwords do not match
 
         On Success (200):
             {
@@ -81,17 +89,21 @@ class UserView(FlaskView):
         """
         body_json = json.loads(request.get_data())
         new_password = body_json["new_password"]
-        confirm_new_passwords = body_json["confirm_new_passwords"]
+        confirm_new_passwords = body_json["confirm_new_password"]
         user_id = body_json["user_id"]
         old_password = body_json["old_password"]
 
-        user = User.objects.get_or_404(_id=user_id, message="User not found")
-        if (user.password_hash != user_services("something", old_password)):
+        try:
+            user = User.objects.get(user_id=user_id)
+        except:
+            return {"error": "User not found"}, 400
+
+        if (user.password_hash != user_services.create_hash("something", old_password)):
             return {"error": "Incorrect password"}, 400 
         if (new_password != confirm_new_passwords):
             return {"error": "New passwords do not match"}, 400 
 
-        user.update(password_hash=user_services("something", new_password))
+        user.update(password_hash=user_services.create_hash("something", new_password))
         return {"success": True}
 
 
@@ -106,18 +118,22 @@ class UserView(FlaskView):
             }
 
         Error Codes:
-            404: User not found
+            400: User not found
 
         On Success (200):
             {
-                user: User
+                ... (user object)
             }
         """
         body_json = json.loads(request.get_data())
         user_id = body_json["user_id"]
-        user = User.objects.get_or_404(_id=user_id)
+        
+        try:
+            user = User.objects.get(user_id=user_id)
+        except:
+            return {"error": "User not found"}, 400
 
-        return {"user": jsonify(user)}
+        return jsonify(user)
 
 class EventView(FlaskView):
     route_base = "/api/events"
@@ -274,7 +290,8 @@ class XMLView(FlaskView):
                     })
 
         return {"success": True, "events": events}, 200
-        
+
+UserView.register(app)   
 EventView.register(app)
 JSONView.register(app)
 XMLView.register(app)
