@@ -18,6 +18,8 @@ from JSONDeserialization.epcis_event import (
     TransformationEvent,
 )
 
+from openpyxl import Workbook
+
 
 class CreationCTE(CTEBase):
 
