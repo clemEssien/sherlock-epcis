@@ -40,7 +40,7 @@ def get_jsonid(prop):
     try:
         if "json_id=" in prop.__doc__:
             docstr = prop.__doc__
-            i = docstr.find("json_id=") + 12
+            i = docstr.find("json_id=") + 8
             j = docstr.find(")", i)
             return docstr[i:j]
 
@@ -326,7 +326,7 @@ def map_from_json(data, obj, types: dict = None):
 
         if issubclass(type(instvar), JSONValueProvider):
             cls = type(instvar)
-            setattr(obj, attr, cls.newfromvalue(data[fbid]))
+            setattr(obj, attr, cls.newfromvalue(cls, data[fbid]))
 
         elif isinstance(instvar, datetime.datetime):
             try:
