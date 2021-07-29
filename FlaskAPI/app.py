@@ -3,7 +3,7 @@ from flask_classful import FlaskView, route
 from flask_mongoengine import MongoEngine
 import mongoengine as me
 from models.user import User
-from services import user_services
+from services import user_services, mongodb_connector
 from neo4j import GraphDatabase
 
 from dotenv import load_dotenv
@@ -39,6 +39,8 @@ event_types = {
     "TransformationEvent": epc.TransformationEvent,
 }
 
+user_connector = mongodb_connector.MongoDBConnector(User)
+
 class UserView(FlaskView):
     route_base = "/api/users"
 
@@ -51,7 +53,7 @@ class UserView(FlaskView):
             email = "email",
             role = "User",
             password_hash = "123",
-            companyId = "456"
+            company_id = "456"
         )
         user.save()
         return {"success": True}
@@ -94,7 +96,7 @@ class UserView(FlaskView):
         old_password = body_json["old_password"]
 
         try:
-            user = User.objects.get(user_id=user_id)
+            user = user_connector.get(user_id=user_id)
         except:
             return {"error": "User not found"}, 400
 
@@ -103,7 +105,7 @@ class UserView(FlaskView):
         if (new_password != confirm_new_passwords):
             return {"error": "New passwords do not match"}, 400 
 
-        user.update(password_hash=user_services.create_hash("something", new_password))
+        user_connector.update(user, password_hash=user_services.create_hash("something", new_password))
         return {"success": True}
 
 
@@ -129,7 +131,7 @@ class UserView(FlaskView):
         user_id = body_json["user_id"]
         
         try:
-            user = User.objects.get(user_id=user_id)
+            user = user_connector.get(user_id=user_id)
         except:
             return {"error": "User not found"}, 400
 

@@ -7,4 +7,4 @@ class User(me.Document):
     email = me.StringField()
     role = me.StringField() #User, Admin, Superuser
     password_hash = me.StringField()
-    companyId = me.StringField()
+    company_id = me.StringField()
