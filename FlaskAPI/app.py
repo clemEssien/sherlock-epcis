@@ -126,8 +126,9 @@ class JSONView(FlaskView):
         ex_json.map_from_epcis(event, epcis_json)
 
         # Detect CTE from EPCIS event
-        cte_detector = CTEDetector()
-        cte_detector.import_yaml_file("epcis_cte_transformation")
+        cd = CTEDetector()
+        cd.import_yaml_file("epcis_cte_transformation/cte_detect_config.yaml")
+        cte_type = cd.detect_cte(event)
 
         # Transform EPCIS event to FDA CTE
 
