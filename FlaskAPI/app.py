@@ -27,7 +27,7 @@ driver = GraphDatabase.driver(uri=URI, auth=(USER, PASS))
 
 app = Flask(__name__)
 app.config['MONGODB_SETTINGS'] = {
-    "host": "mongodb+srv://admin:test123@userauth.slfja.mongodb.net/UserAuth?retryWrites=true&w=majority"
+    "host": os.getenv('MONGODB_HOST')
 }
 db = MongoEngine(app)
 
@@ -46,7 +46,7 @@ class UserView(FlaskView):
 
     @route("/create", methods=["POST"])
     def create_user(self):
-        user = User(
+        user_connector.create_one(
             user_id = 1,
             first_name = "first",
             last_name = "last",
@@ -55,7 +55,6 @@ class UserView(FlaskView):
             password_hash = "123",
             company_id = "456"
         )
-        user.save()
         return {"success": True}
 
     @route("/signin", methods=["POST"])
@@ -83,6 +82,7 @@ class UserView(FlaskView):
             400: User not found
             400: Incorrect password
             400: New passwords do not match
+            400: Server error
 
         On Success (200):
             {
@@ -96,9 +96,11 @@ class UserView(FlaskView):
         old_password = body_json["old_password"]
 
         try:
-            user = user_connector.get(user_id=user_id)
-        except:
+            user = user_connector.get_one(user_id=user_id)
+        except me.DoesNotExist:
             return {"error": "User not found"}, 400
+        except:
+            return {"error": "Server error"}, 400
 
         if (user.password_hash != user_services.create_hash("something", old_password)):
             return {"error": "Incorrect password"}, 400 
@@ -155,7 +157,7 @@ class UserView(FlaskView):
         user_id = body_json["user_id"]
         
         try:
-            user = user_connector.get(user_id=user_id)
+            user = user_connector.get_one(user_id=user_id)
         except:
             return {"error": "User not found"}, 400
 
