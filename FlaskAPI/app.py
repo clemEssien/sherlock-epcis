@@ -31,6 +31,57 @@ event_types = {
     "TransformationEvent": epc.TransformationEvent,
 }
 
+import os
+from flask import  flash, redirect, url_for, send_from_directory, make_response
+from werkzeug.utils import secure_filename
+import json
+
+UPLOAD_FOLDER = '/var/src/uploads'
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'json', 'csv', 'xlsx', 'xml'}
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+class Ocr(FlaskView):
+    route_base = "/api/ocr"
+
+    def allowed_file(self, filename):
+        return '.' in filename and \
+               filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+               
+    @route("/download_file/<name>", methods=["GET"])
+    def download_file(self, name: str):
+        if (os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], name))):
+            return send_from_directory(
+                app.config['UPLOAD_FOLDER'], name, as_attachment=True
+            )        
+        else:
+            return make_response(json.dumps({ "result": "fail", "message": "File Not Found" }), 404)
+        
+    @route("/upload_file", methods=["GET", "POST"])
+    def upload_file(self):
+
+        DOWNLOAD_URL = request.host_url + "api/ocr/download_file/"
+
+        if request.method == 'POST':
+            # check if the post request has the file part
+            if 'file' not in request.files:
+                return make_response(json.dumps({ "result": "fail", "message": "No file included" }), 400)
+            file = request.files['file']
+            # If the user does not select a file, the browser submits an
+            # empty file without a filename.
+            if file.filename == '':
+                return make_response(json.dumps({ "result": "fail", "message": "No selected file" }), 400)
+            if file and self.allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                
+                return make_response(json.dumps({ "result": "ok", "message": "File uploaded successfully.", "url": DOWNLOAD_URL + filename}), 200)
+        
+        return make_response(json.dumps({ "result": "fail", "message": "Invalid method" }), 400)
+    
 class EventView(FlaskView):
     route_base = "/api/events"
 
@@ -190,6 +241,7 @@ class XMLView(FlaskView):
 EventView.register(app)
 JSONView.register(app)
 XMLView.register(app)
+Ocr.register(app)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0")
