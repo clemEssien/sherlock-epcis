@@ -1,11 +1,11 @@
 from flask import Flask, jsonify, request
-from flask.ext.bcrypt import Bcrypt
 from flask_classful import FlaskView, route
 from flask_mongoengine import MongoEngine
 import mongoengine as me
 from models.user import User
 from services import user_services, mongodb_connector
 from neo4j import GraphDatabase
+from werkzeug.security import check_password_hash
 
 from dotenv import load_dotenv
 import os, sys
@@ -47,21 +47,45 @@ class UserView(FlaskView):
 
     @route("/create", methods=["POST"])
     def create_user(self):
-        user = User(
-            user_id = 1,
-            first_name = "first",
-            last_name = "last",
-            email = "email",
-            role = "User",
-            password_hash = "123",
-            company_id = "456"
-        )
-        user.save()
+        """
+        Allows a new user to sign up and creates id info
+
+        Request Body:
+            {
+                user_id: int,
+                first_name: str,
+                last_name: str,
+                password: str,
+                email: str,
+                company_id: int
+            }
+        """
+        user_id=request.form.get('user')
+        email=request.form.get('email')
+        last_name=request.form.get('last name')
+        first_name=request.form.get('first name')
+        password=request.form.get('password')
+
+        user=User(user_id=user_id, email=email, last_name=last_name, first_name=first_name, password=user_services.create_hash("something", password))
+        driver.session.add(user)
+        driver.session.commit()
+        
         return {"success": True}
 
     @route("/signin", methods=["POST"])
     def signin(self):
+        """
+        Allows a user to sign in to their session
+
+        Request Body:
+            {
+                user_id: int,
+                password: str,
+                email: str,
+            }
+        """
         user_id = request.form.get('user')
+        email=request.form.get('email')
         password = request.form.get('password')
         user = user_connector.get(user_id=user_id)
         if not user or not check_password_hash(user.password, password):
