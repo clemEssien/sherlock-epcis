@@ -12,7 +12,7 @@ ml=$USER
 if [[ $thisos -eq "Darwin" ]]; then
     sudo chown -R $ml /var/src
 else
-    sudo chown -R $ml.$ml /var/src
+    sudo chown $ml.$ml /var/src -R
 fi
 
 
