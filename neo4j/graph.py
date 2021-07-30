@@ -5,9 +5,7 @@ currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
-import json
 import db_connect as db_con
-
 
 global conn 
 conn = None
@@ -33,17 +31,6 @@ class Graph:
         '''
         self.__name = name
 
-    def create_graph(self):
-        '''
-        method creates a graph using the name provided in the constructor
-        
-        '''
-        query = """
-                CALL gds.graph.exists($name) YIELD exists;
-        """
-        response = conn.query(query,self.__name,None)   
-        return  response
-
     def graph_exists(self):
         '''
         method checks to see if a graph with the provided name already exists
@@ -52,27 +39,28 @@ class Graph:
         query = """
                 CALL gds.graph.exists($name) YIELD exists;
         """
-        response = conn.query(query,self.__name)   
+        response = connectdb().query(query,self.__name)   
+        return  response
+
+    def create_graph(self):
+        '''
+        method creates a graph using the name provided in the constructor
+        and projects all existing nodes and relationships unto the graph
+        '''
+        query = """
+                CALL gds.graph.create($graph_name, '*', '*');
+        """
+        response = connectdb().query(query,{"graph_name":self.__name},None)   
         return  response
     
-    def project_nodes_to_graph(self):
+    def remove_graph(self):
         '''
-        method projects existing nodes to an existing graph in the db
+        method removes a graph from the catalog
         '''
-        
-        if graph_exists() == False:
-            query = """
-            CALL gds.graph.create($name, '*', '*')
-            YIELD graphName, nodeCount, relationshipCount;
-            """
-            return conn.query(query,self.__name)
-        else:
-            return "A graph with name ",self.__name," already exists"
-    
-    def remove_node_from_graph(self):
         query = """
-        CALL gds.graph.removeNodeProperties('my-graph', ['pageRank', 'communityId'])
-        """
+                CALL gds.graph.drop('$graph_name', false) YIELD graphName;
+                """
+        return connectdb(query,{"graph_name": self.__name} )
 
 
  
