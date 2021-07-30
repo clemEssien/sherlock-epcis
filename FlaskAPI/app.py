@@ -52,12 +52,12 @@ class UserView(FlaskView):
 
         Request Body:
             {
-                user_id: int,
+                user_id: str,
                 first_name: str,
                 last_name: str,
                 password: str,
                 email: str,
-                company_id: int
+                company_id: str
             }
         """
         user_id=request.form.get('user')
@@ -66,10 +66,15 @@ class UserView(FlaskView):
         first_name=request.form.get('first name')
         password=request.form.get('password')
 
-        user=User(user_id=user_id, email=email, last_name=last_name, first_name=first_name, password=user_services.create_hash("something", password))
-        driver.session.add(user)
-        driver.session.commit()
-        
+        user_connector.create_one(
+            user_id=user_id, 
+            email=email,
+            last_name=last_name, 
+            first_name=first_name,
+            role="User",
+            password=user_services.create_hash("something", password)
+        )
+
         return {"success": True}
 
     @route("/signin", methods=["POST"])
@@ -79,7 +84,7 @@ class UserView(FlaskView):
 
         Request Body:
             {
-                user_id: int,
+                user_id: str,
                 password: str,
                 email: str,
             }
@@ -87,7 +92,8 @@ class UserView(FlaskView):
         user_id = request.form.get('user')
         email=request.form.get('email')
         password = request.form.get('password')
-        user = user_connector.get(user_id=user_id)
+        
+        user = user_connector.get(email=email)
         if not user or not check_password_hash(user.password, password):
             return {"error": "Invalid credentials"}, 400 
 
