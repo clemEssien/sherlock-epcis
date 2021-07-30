@@ -2,11 +2,20 @@
 
 echo "Creating working directories..."
 
-sudo mkdir /usr/src
-sudo mkdir /usr/src/documents
-sudo mkdir /usr/src/uploads
+sudo mkdir /var/src
+sudo mkdir /var/src/documents
+sudo mkdir /var/src/uploads
 
+thisos=$(uname)
 ml=$USER
-sudo chown $ml.$ml /usr/src -R
+
+if [[ $thisos -eq "Darwin" ]]; then
+    sudo chown -R $ml /var/src
+else
+    sudo chown -R $ml.$ml /var/src
+fi
+
+
+
 
 
