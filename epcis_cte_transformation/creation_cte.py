@@ -2,6 +2,7 @@ from abc import ABC, abstractclassmethod, abstractmethod
 from typing import List
 from cte import CTEBase
 import os, sys
+import datetime
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 parent_dir_path = os.path.abspath(os.path.join(dir_path, os.pardir))
@@ -18,7 +19,7 @@ from JSONDeserialization.epcis_event import (
     TransformationEvent,
 )
 
-from openpyxl import Workbook
+from openpyxl import Workbook, workbook
 
 
 class CreationCTE(CTEBase):
@@ -28,7 +29,7 @@ class CreationCTE(CTEBase):
 
     KDEs:
             Traceability Product : List
-            Creation Completion Date : str
+            Creation Completion Date : datetime
             Location Where Food Was Created : str
             Quantity : List
             Unit of Measure : List
@@ -37,7 +38,7 @@ class CreationCTE(CTEBase):
     def __init__(self) -> None:
         """Creates new Shipping CTE"""
         self._traceability_product = []
-        self._creation_completion_date = ""
+        self._creation_completion_date: datetime.datetime(1, 1, 1)
         self._loaction_where_food_was_created = ""
         self._quantity = []
         self._unit_of_measure = []
@@ -46,7 +47,9 @@ class CreationCTE(CTEBase):
         pass
 
     def new_from_epcis(cls, event: EPCISEvent):
-        # your code here
+        """
+        Create a new CTE from an EPCIS event
+        """
         output = cls()
         if isinstance(event, ObjectEvent):
             output.creation_completion_date = event.event_time_local
@@ -118,7 +121,7 @@ class CreationCTE(CTEBase):
         return self._location_where_food_was_created
 
     @location_where_food_was_created.setter
-    def location_where_food_was_creatd(self, value: str):
+    def location_where_food_was_created(self, value: str):
         self._location_where_food_was_created = value
 
     @property
@@ -137,15 +140,41 @@ class CreationCTE(CTEBase):
     def unit_of_measure(self, value: List):
         self._unit_of_measure = value
 
+    def output_json(self):
+        pass
+
     def output_xlsx(self) -> str:
         """
         Create an excel spreadsheet and output the contents to an XML string
         """
 
-        # code here
+        workbook = Workbook()
+        sheet = workbook.active
+        filename = "creation_cte"
+        kde_ids = [
+            "Traceability Product",
+            "Creation Completion Date",
+            "Location Where Food Was Created",
+            "Quantity",
+            "Unit of Measure",
+        ]
+        kde_values = [
+            self.traceability_product,
+            self.creation_completion_date,
+            self.location_where_food_was_created,
+            self.quantity,
+            self.unit_of_measure,
+        ]
+        for i in range(1, 5):
+            cell = sheet.cell(row=1, col=i)
+            cell.value = kde_ids[i - 1]
 
-        v = "foobar"
-        return v
+        for i in range(1, 5):
+            cell = sheet.cell(row=2, col=i)
+            cell.value = kde_values[i - 1]
+
+        workbook.save(filename)
+        return filename  # unsure what to return
 
     def save_as_xlsx(self, filename: str):
         pass
