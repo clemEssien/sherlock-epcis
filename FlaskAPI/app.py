@@ -127,8 +127,39 @@ class JSONView(FlaskView):
 
         # Detect CTE from EPCIS event
         cd = CTEDetector()
-        cd.import_yaml_file("epcis_cte_transformation/cte_detect_config.yaml")
-        cte_type = cd.detect_cte(event)
+        try:
+            cd.import_yaml_file("epcis_cte_transformation/cte_detect_config.yaml")
+        except Exception as e:
+            return make_response(
+                {
+                    "result": "fail",
+                    "message": "Invalid CTE detetion configuration file",
+                    "code": 0,
+                    "data": {},
+                },
+                500,
+            )
+        try:
+            cte_type = cd.detect_cte(event)
+            return make_response(
+                {
+                    "result": "ok",
+                    "message": "CTE detected",
+                    "code": 0,
+                    "data": {"cte_type": cte_type},
+                },
+                200,
+            )
+        except Exception as e:
+            return make_response(
+                {
+                    "result": "fail",
+                    "message": "Could not detect CTE from EPCIS event",
+                    "code": 0,
+                    "data": {},
+                },
+                500,
+            )
 
         # Transform EPCIS event to FDA CTE
 
@@ -142,7 +173,7 @@ class JSONView(FlaskView):
             with driver.session() as session:
                 session.run(q, qmap)
         except Exception as e:
-            return make_response({"error": "Error adding events"}, 400)
+            return make_response({"error": e}, 400)
         # Return CTE to user
 
     @route("/cte", methods=["POST"])
