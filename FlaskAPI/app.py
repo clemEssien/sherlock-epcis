@@ -141,15 +141,6 @@ class JSONView(FlaskView):
             )
         try:
             cte_type = cd.detect_cte(event)
-            return make_response(
-                {
-                    "result": "ok",
-                    "message": "CTE detected",
-                    "code": 0,
-                    "data": {"cte_type": cte_type},
-                },
-                200,
-            )
         except Exception as e:
             return make_response(
                 {
@@ -164,17 +155,17 @@ class JSONView(FlaskView):
         # Transform EPCIS event to FDA CTE
 
         # Store data in Neo4j database
-        q = "create (:Event{eventTime: $eventTime, eventTimeZoneOffset: $eventTimeZoneOffset})"
-        qmap = {
-            "eventTime": str(event.event_time),
-            "eventTimeZoneOffset": str(event.event_timezone_offset),
-        }
-        try:
-            with driver.session() as session:
-                session.run(q, qmap)
-        except Exception as e:
-            return make_response({"error": e}, 400)
+
         # Return CTE to user
+        return make_response(
+            {
+                "result": "ok",
+                "message": "CTE detected",
+                "code": 0,
+                "data": {"cte_type": cte_type},
+            },
+            200,
+        )
 
     @route("/cte", methods=["POST"])
     def finish_cte(self):
