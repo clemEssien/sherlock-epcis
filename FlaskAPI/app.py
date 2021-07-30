@@ -108,6 +108,30 @@ class UserView(FlaskView):
         user_connector.update(user, password_hash=user_services.create_hash("something", new_password))
         return {"success": True}
 
+    @route("/change_email", methods=["POST"])
+    def change_email(self):
+        """
+        Changes the email for a given user
+
+        Request Body:
+            {
+                user_id: int,
+                password: str,
+                new_email: str,
+                confirm_new_email: str,
+            }
+
+        Error Codes:
+            400: User not found
+            400: Incorrect password
+            400: New emails do not match
+
+        On Success (200):
+            {
+                success: true
+            }
+        """
+        pass
 
     @route("/get_user", methods=["GET"])
     def get_user(self):
