@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+from flask.ext.bcrypt import Bcrypt
 from flask_classful import FlaskView, route
 from flask_mongoengine import MongoEngine
 import mongoengine as me
@@ -60,7 +61,15 @@ class UserView(FlaskView):
 
     @route("/signin", methods=["POST"])
     def signin(self):
-        pass
+        user_id = request.form.get('user')
+        password = request.form.get('password')
+        user = user_connector.get(user_id=user_id)
+        if not user or not check_password_hash(user.password, password):
+            return {"error": "Invalid credentials"}, 400 
+
+        return {"success": True}
+
+
 
     @route("/refresh", methods=["GET"])
     def refresh(self):
