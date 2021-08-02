@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request, make_response
 from flask_classful import FlaskView, route
 from neo4j import GraphDatabase
+from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
 
 from dotenv import load_dotenv
@@ -37,10 +38,6 @@ event_types = {
     "TransactionEvent": epc.TransactionEvent,
     "TransformationEvent": epc.TransformationEvent,
 }
-
-
-def allowed_file(filename):
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 class EventView(FlaskView):
@@ -89,48 +86,19 @@ class EventView(FlaskView):
             return {"error": "Error deleting events"}, 400
 
 
-class JSONView(FlaskView):
-    route_base = "/api/json"
+class TransformationView(FlaskView):
+    route_base = "/api/transformation"
 
     @route("/", methods=["POST"])
     def post(self):
         """
-        POST an JSON EPCIS event to add to db
-
-        Content Type: application/json
-
-        Request Body:
-            {
-                isA: str, *event type
-                eventTime: str,
-                eventTimeZoneOffset: str,
-                epcList: str[],
-                action: str,
-                bizStep: str,
-                disposition: str,
-                readPoint: {id: str},
-                bizTransactionList: [
-                    {
-                        type: str,
-                        bizTransaction: str,
-                    }
-                ],
-            }
-
-        Error Codes:
-            400: Bad request
-
-        On Success (200):
-            {
-                success: true
-            }
+        POST an EPCIS event file to add events to graph database
+        and return the appropriate FDA CTE
 
         """
         # Validate User
 
-        # Parse Uploaded File
-        print("request.files", request.files)
-
+        # Get Uploaded File
         if "file" not in request.files:
             return make_response(
                 {
@@ -142,7 +110,6 @@ class JSONView(FlaskView):
                 400,
             )
         file = request.files["file"]
-        print("file", file)
         if file.filename == "":
             return make_response(
                 {
@@ -153,19 +120,25 @@ class JSONView(FlaskView):
                 },
                 400,
             )
-
-        if file and allowed_file(file.filename):
+        file_ext = file.filename.rsplit(".", 1)[1].lower()
+        if file and file_ext in ALLOWED_EXTENSIONS:
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+
+        # Create event object and populate it
+        if file_ext == "json":
             return make_response(
                 {
-                    "result": "ok",
-                    "message": "File received",
+                    "result": "fail",
+                    "message": "JSON Files not currently supported",
                     "code": 0,
-                    "data": {"filename": filename},
+                    "data": {},
                 },
-                200,
+                501,
             )
+            event = epcis_from_json_file(file)
+        elif file_ext == "xml":
+            event = epcis_from_xml_file(file)
         else:
             return make_response(
                 {
@@ -176,13 +149,6 @@ class JSONView(FlaskView):
                 },
                 400,
             )
-
-        # Check that file contains EPCIS events
-
-        # Create event object and populate it
-        epcis_json = json.loads(request.get_data())
-        event = event_types[epcis_json["isA"]]()
-        ex_json.map_from_epcis(event, epcis_json)
 
         # Detect CTE from EPCIS event
         cd = CTEDetector()
@@ -236,28 +202,22 @@ class JSONView(FlaskView):
         pass
 
 
+def epcis_from_json_file(file: FileStorage) -> epc.EPCISEvent:
+    # verify that file is an epcis document
+
+    # isolate epcis events from file
+    pass
+
+
+def epcis_from_xml_file(file: FileStorage) -> epc.EPCISEvent:
+    pass
+
+
 class XMLView(FlaskView):
     route_base = "/api/xml"
 
     @route("/", methods=["POST"])
     def post(self):
-        """
-        Posts XML EPCIS events to add to db
-
-        Content Type: application/xml
-
-        Request Body:
-            xml data of epcis
-
-        Error Codes:
-            400: Bad request
-
-        On Success (200):
-            {
-                success: true
-                events: EPCISEvent[]
-            }
-        """
         epcis_xml = str(request.get_data(), "utf-8")
 
         root = ET.fromstring(epcis_xml)
@@ -278,29 +238,10 @@ class XMLView(FlaskView):
                         event = event_types[event_from_xml]
                     xml_dict = ex_xml.map_to_epcis_dict(xml_doc)
                     ex_xml.map_from_epcis(event, xml_dict)
-                    q = "create (:Event{eventTime: $eventTime, eventTimeZoneOffset: $eventTimeZoneOffset})"
-                    qmap = {
-                        "eventTime": str(event.event_time),
-                        "eventTimeZoneOffset": str(event.event_timezone_offset),
-                    }
-                    try:
-                        with driver.session() as session:
-                            session.run(q, qmap)
-                    except Exception as e:
-                        return {"error": "Error adding events"}, 400
-                    events.append(
-                        {  # Event object not json serializable
-                            "eventTime": str(event._event_time),
-                            "eventTimeZoneOffset": str(event._event_timezone_offset),
-                        }
-                    )
-
-        return {"success": True, "events": events}, 200
 
 
 EventView.register(app)
-JSONView.register(app)
-XMLView.register(app)
+TransformationView.register(app)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0")
