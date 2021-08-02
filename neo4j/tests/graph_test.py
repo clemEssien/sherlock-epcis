@@ -10,7 +10,6 @@ graph = g.Graph("my-graph1")
 existing_graph_name = "my_graph"
 
 existing_graph = g.Graph(existing_graph_name)
-bool_list = [True, False]
 
 def test_exist_graph():
     response = graph.graph_exists()
