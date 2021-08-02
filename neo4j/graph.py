@@ -49,8 +49,44 @@ class Graph:
         except Exception as e:
             return False
 
-        
     
+    def betweenness(self):
+        '''
+        This method calls the between-ness centrality algorithm on a named graph
+        '''
+        cipher_ql = """
+                    CALL gds.betweenness.stream($graph_name)
+                    YIELD nodeId, score
+                    RETURN gds.util.asNode(nodeId).name AS name, score
+                    ORDER BY name ASC
+        """
+        response = connectdb().query(cipher_ql,{"graph_name": self.__name} )
+        return algorithm_response(response)
+
+
+    def betweenness_random(self,sample_size, seed):
+        '''
+        This method calls the between-ness centrality algorithm on a named graph. But
+        as the graph becomes large, it might become an expensive operation to load the
+        complete graph in memory. If we choose to use a random sample size, we could use
+        the betweenness_random() instead and pass an int to specify the sampel size 
+        Args:
+             sample_size: int
+             seed: int
+        '''
+        if verify_algo_args(sample_size, seed):
+                cipher_ql = """
+                            CALL gds.betweenness.stream($graph_name, {samplingSize : $samplingSize, samplingSeed : $samplingSeed})
+                            YIELD nodeId, score
+                            RETURN gds.util.asNode(nodeId).name AS name, score
+                            ORDER BY name ASC
+                """
+                response = connectdb().query(cipher_ql,{"graph_name": self.__name,"samplingSize": sample_size, "samplingSeed": seed} )
+                return algorithm_response(response)
+
+        else:
+            return False
+
     def remove_graph(self):
         '''
         method removes a graph from the catalog
@@ -87,5 +123,18 @@ def string_btw_xters(string, initial, terminating)->str:
     end = string.find(terminating)
     return string[start:end]
 
+def verify_algo_args(sample_size, seed):
+    if isinstance(sample_size, int) and isinstance(seed, int):
+            if sample_size >0 and seed >=0:
+                return True;
+    return False  
 
- 
+def algorithm_response(response):
+    result = {}
+    if response:
+        for record in response:
+            result[record['name']] = record['score']    
+    return result
+
+
+
