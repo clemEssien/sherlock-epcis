@@ -47,7 +47,7 @@ class UserView(FlaskView):
     @route("/create", methods=["POST"])
     def create_user(self):
         user_connector.create_one(
-            user_id = 1,
+            user_id = "1",
             first_name = "first",
             last_name = "last",
             email = "email",
@@ -72,7 +72,7 @@ class UserView(FlaskView):
 
         Request Body:
             {
-                user_id: int,
+                user_id: str,
                 old_password: str,
                 new_password: str,
                 confirm_new_password: str,
@@ -117,7 +117,7 @@ class UserView(FlaskView):
 
         Request Body:
             {
-                user_id: int,
+                user_id: str,
                 password: str,
                 new_email: str,
                 confirm_new_email: str,
@@ -125,6 +125,7 @@ class UserView(FlaskView):
 
         Error Codes:
             400: User not found
+            400: Server error
             400: Incorrect password
             400: New emails do not match
 
@@ -133,7 +134,26 @@ class UserView(FlaskView):
                 success: true
             }
         """
-        pass
+        body_json = json.loads(request.get_data())
+        user_id = body_json["user_id"]
+        password = body_json["password"]
+        new_email = body_json["new_email"]
+        confirm_new_email = body_json["confirm_new_email"]
+
+        try:
+            user = user_connector.get_one(user_id=user_id)
+        except me.DoesNotExist:
+            return {"error": "User not found"}, 400
+        except:
+            return {"error": "Server error"}, 400
+
+        if (user.password_hash != user_services.create_hash("something", password)):
+            return {"error": "Incorrect password"}, 400 
+        if (new_email != confirm_new_email):
+            return {"error": "Emails do not match"}, 400 
+
+        user_connector.update(user, email=new_email)
+        return {"success": True}
 
     @route("/get_user", methods=["GET"])
     def get_user(self):

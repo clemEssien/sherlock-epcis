@@ -43,7 +43,7 @@ def clean():
     user_connector.delete_all()
 
     user_connector.create_one(
-        user_id = 1,
+        user_id = "1",
         first_name = "first",
         last_name = "last",
         email = "email",
@@ -58,7 +58,7 @@ BASE = "http://127.0.0.1:5000"
 @pytest.mark.usefixtures("clean")
 def test_change_password_wrong_pass(client):
     body = {
-        "user_id": 1,
+        "user_id": "1",
         "old_password": "456",
         "new_password": "abc",
         "confirm_new_password": "abc"
@@ -72,7 +72,7 @@ def test_change_password_wrong_pass(client):
 @pytest.mark.usefixtures("clean")
 def test_change_password_not_found(client):
     body = {
-        "user_id": 2,
+        "user_id": "2",
         "old_password": "456",
         "new_password": "abc",
         "confirm_new_password": "abc"
@@ -86,7 +86,7 @@ def test_change_password_not_found(client):
 @pytest.mark.usefixtures("clean")
 def test_change_password_mismatch(client):
     body = {
-        "user_id": 1,
+        "user_id": "1",
         "old_password": "123",
         "new_password": "abc",
         "confirm_new_password": "def"
@@ -100,7 +100,7 @@ def test_change_password_mismatch(client):
 @pytest.mark.usefixtures("clean")
 def test_change_password_success(client):
     body = {
-        "user_id": 1,
+        "user_id": "1",
         "old_password": "123",
         "new_password": "456",
         "confirm_new_password": "456"
@@ -112,9 +112,30 @@ def test_change_password_success(client):
     assert response.json["success"] == True
 
 @pytest.mark.usefixtures("clean")
+def test_change_email(client):
+    body = {
+        "user_id": "1",
+        "password": "123",
+        "new_email": "new@gmail.com",
+        "confirm_new_email": "new@gmail.com"
+    }
+
+    response = client.post(BASE + "/api/users/change_email", data=json.dumps(body))
+
+    body_other = {
+        "user_id": "1"
+    }
+
+    response_other = client.get(BASE + "/api/users/get_user", data=json.dumps(body_other))
+
+    assert response.status_code == 200
+    assert response.json["success"] == True
+    assert response_other.json["email"] == "new@gmail.com"
+
+@pytest.mark.usefixtures("clean")
 def test_get_user(client):
     body = {
-        "user_id": 1
+        "user_id": "1"
     }
 
     response = client.get(BASE + "/api/users/get_user", data=json.dumps(body))
