@@ -10,8 +10,8 @@ class Graph:
     def __init__(self, name) -> None:
         '''
         This method initializes a graph by passing 
-        the name of the graph as a string
-
+        the name of the graph as a string. The remove_graph()
+        should be called at the end of each graph algorithm  
         Args:
              name: str
         '''

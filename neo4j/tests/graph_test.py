@@ -19,10 +19,6 @@ def test_exist_graph():
 def test_create_graph():
     response = graph.create_graph()
     assert response in bool_list
-    
-def test_remove_graph():
-    response = graph.remove_graph()
-    assert type(response)== list and len(response)<=1 
 
 def test_betweenness():
     response = existing_graph.betweenness()
@@ -31,3 +27,7 @@ def test_betweenness():
 def test_betweenness_random():
     response = existing_graph.betweenness_random(2,0)
     assert isinstance(response, dict)
+
+def test_remove_graph():
+    response = graph.remove_graph()
+    assert type(response)== list and len(response)<=1 
