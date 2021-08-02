@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request, make_response
 from flask_classful import FlaskView, route
 from neo4j import GraphDatabase
+from werkzeug.utils import secure_filename
 
 from dotenv import load_dotenv
 import os, sys
@@ -24,6 +25,11 @@ driver = GraphDatabase.driver(uri=URI, auth=(USER, PASS))
 
 app = Flask(__name__)
 
+UPLOAD_FOLDER = "./FlaskAPI/uploads"
+ALLOWED_EXTENSIONS = {"json", "xml"}
+
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
 event_types = {
     "ObjectEvent": epc.ObjectEvent,
     "AggregationEvent": epc.AggregationEvent,
@@ -31,6 +37,10 @@ event_types = {
     "TransactionEvent": epc.TransactionEvent,
     "TransformationEvent": epc.TransformationEvent,
 }
+
+
+def allowed_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 class EventView(FlaskView):
@@ -118,7 +128,56 @@ class JSONView(FlaskView):
         """
         # Validate User
 
-        # Validate request body is EPCIS Event
+        # Parse Uploaded File
+        print("request.files", request.files)
+
+        if "file" not in request.files:
+            return make_response(
+                {
+                    "result": "fail",
+                    "message": "Request does not contain a file",
+                    "code": 0,
+                    "data": {},
+                },
+                400,
+            )
+        file = request.files["file"]
+        print("file", file)
+        if file.filename == "":
+            return make_response(
+                {
+                    "result": "fail",
+                    "message": "No file selected",
+                    "code": 0,
+                    "data": {},
+                },
+                400,
+            )
+
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+            return make_response(
+                {
+                    "result": "ok",
+                    "message": "File received",
+                    "code": 0,
+                    "data": {"filename": filename},
+                },
+                200,
+            )
+        else:
+            return make_response(
+                {
+                    "result": "fail",
+                    "message": "Invalid file type",
+                    "code": 0,
+                    "data": {},
+                },
+                400,
+            )
+
+        # Check that file contains EPCIS events
 
         # Create event object and populate it
         epcis_json = json.loads(request.get_data())
