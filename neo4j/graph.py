@@ -3,7 +3,7 @@ import sys
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
-
+import utils as ut
 import db_connect as db_con
 
 class Graph:
@@ -15,7 +15,19 @@ class Graph:
         Args:
              name: str
         '''
-        self.__name = name
+        self.name = name
+
+    @property
+    def name(self)->str:
+        return self.__name
+    
+    @name.setter
+    def name(self, value)->str:
+        if isinstance(value, str):
+            self.__name = value
+        else:
+            raise ValueError("Graph name has to be a string")
+        
 
     def graph_exists(self) -> bool:
         '''
@@ -26,18 +38,15 @@ class Graph:
                 CALL gds.graph.exists($name) YIELD exists;
         """
         response = connectdb().query(cipher_ql,{"name":self.__name})
-        print(response)
-        if type(response) == list and len(response) ==1:  
-            result = string_btw_xters(str(response),'=','>')
-        return  bool(result)
+        return response[0]['exists']
 
-    def create_graph(self):
+    def create_graph(self)->bool:
         '''
         method creates a graph using the name provided in the constructor
         and projects all existing nodes and relationships unto the graph
         '''
         try: 
-            if not self.graph_exists():
+            if self.graph_exists():
                 response = False
             else:
                 cipher_ql = """
@@ -50,7 +59,7 @@ class Graph:
             return False
 
     
-    def betweenness(self):
+    def betweenness(self)->dict:
         '''
         This method calls the between-ness centrality algorithm on a named graph
         '''
@@ -61,10 +70,10 @@ class Graph:
                     ORDER BY name ASC
         """
         response = connectdb().query(cipher_ql,{"graph_name": self.__name} )
-        return algorithm_response(response)
+        return ut.algorithm_response(response)
 
 
-    def betweenness_random(self,sample_size, seed):
+    def betweenness_random(self,sample_size, seed)->dict:
         '''
         This method calls the between-ness centrality algorithm on a named graph. But
         as the graph becomes large, it might become an expensive operation to load the
@@ -74,7 +83,7 @@ class Graph:
              sample_size: int
              seed: int
         '''
-        if verify_algo_args(sample_size, seed):
+        if ut.verify_algo_args(sample_size, seed):
                 cipher_ql = """
                             CALL gds.betweenness.stream($graph_name, {samplingSize : $samplingSize, samplingSeed : $samplingSeed})
                             YIELD nodeId, score
@@ -82,21 +91,26 @@ class Graph:
                             ORDER BY name ASC
                 """
                 response = connectdb().query(cipher_ql,{"graph_name": self.__name,"samplingSize": sample_size, "samplingSeed": seed} )
-                return algorithm_response(response)
+                return ut.algorithm_response(response)
 
         else:
             return False
 
-    def remove_graph(self):
+    def remove_graph(self)->str:
         '''
         method removes a graph from the catalog
+        returns the name of the graph
         '''
         cipher_ql = """
                 CALL gds.graph.drop($graph_name, false) YIELD graphName;
                 """
-        response = connectdb().query(cipher_ql,{"graph_name": self.__name} )
+        result = connectdb().query(cipher_ql,{"graph_name": self.__name} )
+        response = ""
+        try:
+            response = result[0]['graphName'] 
+        except Exception as e:
+            response = result
         return response
-
 
 global conn 
 conn = None
@@ -109,32 +123,3 @@ def connectdb() -> db_con.Neo4jConnection:
                        password=os.environ['NEO4J_PASSWORD'])
 
     return conn
-
-
-def string_btw_xters(string, initial, terminating)->str:
-    '''
-    method returns the string in between two characters
-    Args:
-        string: str
-        initial character: str
-        terminal character: str
-    '''
-    start = string.find(initial) + len(initial)
-    end = string.find(terminating)
-    return string[start:end]
-
-def verify_algo_args(sample_size, seed):
-    if isinstance(sample_size, int) and isinstance(seed, int):
-            if sample_size >0 and seed >=0:
-                return True;
-    return False  
-
-def algorithm_response(response):
-    result = {}
-    if response:
-        for record in response:
-            result[record['name']] = record['score']    
-    return result
-
-
-
