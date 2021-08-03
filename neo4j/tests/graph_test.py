@@ -20,11 +20,11 @@ def test_create_graph():
     assert isinstance(response, bool)
 
 def test_betweenness():
-    response = existing_graph.betweenness()
+    response = graph.betweenness()
     assert isinstance(response, dict)
 
 def test_betweenness_random():
-    response = existing_graph.betweenness_random(2,0)
+    response = graph.betweenness_random(2,0)
     assert isinstance(response, dict)
 
 def test_remove_graph():
