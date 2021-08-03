@@ -89,9 +89,10 @@ class UserView(FlaskView):
                 email: str,
             }
         """
-        user_id = request.form.get('user')
-        email=request.form.get('email')
-        password = request.form.get('password')
+        body_json = json.loads(request.get_data())
+        email = body_json["email"]
+        user_id = body_json["user_id"]
+        password = body_json["password"]
         
         user = user_connector.get(email=email)
         if not user or not check_password_hash(user.password, password):
