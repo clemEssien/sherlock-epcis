@@ -19,7 +19,7 @@ def verify_algo_args(sample_size, seed):
 
 def algorithm_response(response):
     result = {}
-    if response and len(response.keys()) >1:
+    if response and len(response) >1:
         for record in response:
             result[record['name']] = record['score']    
     return result
