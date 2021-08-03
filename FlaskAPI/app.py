@@ -63,11 +63,13 @@ class UserView(FlaskView):
         """
         #user_id=request.form.get('user')
         user_id = str(uuid.uuid4())
-        
-        email=request.form.get('email')
-        last_name=request.form.get('lastname')
-        first_name=request.form.get('firstname')
-        password=request.form.get('password')
+
+        body_json=json.loads(request.get_data())
+        email = body_json["email"]
+        password = body_json["password"]
+        last_name=body_json["lastname"]
+        first_name=body_json["firstname"]
+
         user_connector.create_one(
             user_id=user_id, 
             email=email,
@@ -76,6 +78,7 @@ class UserView(FlaskView):
             role="User",
             password_hash=generate_password_hash(password)
         )
+
 
         return {"success": True}
 
