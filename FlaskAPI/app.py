@@ -6,7 +6,7 @@ import mongoengine as me
 from models.user import User
 from services import user_services, mongodb_connector
 from neo4j import GraphDatabase
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from dotenv import load_dotenv
 import os, sys
@@ -74,7 +74,7 @@ class UserView(FlaskView):
             last_name=last_name, 
             first_name=first_name,
             role="User",
-            password=user_services.create_hash("something", password)
+            password_hash=generate_password_hash(password)
         )
 
         return {"success": True}
@@ -86,7 +86,6 @@ class UserView(FlaskView):
 
         Request Body:
             {
-                user_id: str,
                 password: str,
                 email: str,
             }
@@ -95,8 +94,8 @@ class UserView(FlaskView):
         email = body_json["email"]
         password = body_json["password"]
         
-        user = user_connector.get(email=email)
-        if not user or not check_password_hash(user.password, password):
+        user = user_connector.get_one(email=email)
+        if not user or not check_password_hash(user.password_hash, password):
             return {"error": "Invalid credentials"}, 400 
 
         return {"success": True}
@@ -114,7 +113,7 @@ class UserView(FlaskView):
 
         Request Body:
             {
-                user_id: str,
+                email: str,
                 old_password: str,
                 new_password: str,
                 confirm_new_password: str,
@@ -132,24 +131,30 @@ class UserView(FlaskView):
             }
         """
         body_json = json.loads(request.get_data())
+
+        # check the body for the minimum required variables for this call:
+        for key in [ "email", "new_password", "confirm_new_password", "old_password" ]:
+            if not key in body_json:
+                return {"error": "Bad Data"}, 401
+
         new_password = body_json["new_password"]
         confirm_new_passwords = body_json["confirm_new_password"]
-        user_id = body_json["user_id"]
+        email = body_json["email"]
         old_password = body_json["old_password"]
 
         try:
-            user = user_connector.get_one(user_id=user_id)
+            user = user_connector.get_one(email=email)
         except me.DoesNotExist:
             return {"error": "User not found"}, 400
         except:
             return {"error": "Server error"}, 400
 
-        if (user.password_hash != user_services.create_hash("something", old_password)):
+        if (user.password_hash != generate_password_hash(old_password)):
             return {"error": "Incorrect password"}, 400 
         if (new_password != confirm_new_passwords):
             return {"error": "New passwords do not match"}, 400 
 
-        user_connector.update(user, password_hash=user_services.create_hash("something", new_password))
+        user_connector.update(user, password_hash=generate_password_hash(new_password))
         return {"success": True}
 
     @route("/change_email", methods=["POST"])
@@ -189,7 +194,7 @@ class UserView(FlaskView):
         except:
             return {"error": "Server error"}, 400
 
-        if (user.password_hash != user_services.create_hash("something", password)):
+        if (user.password_hash != generate_password_hash("something", password)):
             return {"error": "Incorrect password"}, 400 
         if (new_email != confirm_new_email):
             return {"error": "Emails do not match"}, 400 

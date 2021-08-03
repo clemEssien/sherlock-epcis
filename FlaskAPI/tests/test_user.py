@@ -1,4 +1,6 @@
 import os , sys
+
+from werkzeug.security import generate_password_hash
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
@@ -141,4 +143,4 @@ def test_get_user(client):
     response = client.get(BASE + "/api/users/get_user", data=json.dumps(body))
 
     assert response.status_code == 200
-    assert response.json["password_hash"] == user_services.create_hash("something", "123")
+    assert response.json["password_hash"] == generate_password_hash("123")
