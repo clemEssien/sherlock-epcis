@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+import uuid
 from flask_classful import FlaskView, route
 from flask_mongoengine import MongoEngine
 import mongoengine as me
@@ -60,12 +61,13 @@ class UserView(FlaskView):
                 company_id: str
             }
         """
-        user_id=request.form.get('user')
+        #user_id=request.form.get('user')
+        user_id = str(uuid.uuid4())
+        
         email=request.form.get('email')
-        last_name=request.form.get('last name')
-        first_name=request.form.get('first name')
+        last_name=request.form.get('lastname')
+        first_name=request.form.get('firstname')
         password=request.form.get('password')
-
         user_connector.create_one(
             user_id=user_id, 
             email=email,
@@ -91,7 +93,6 @@ class UserView(FlaskView):
         """
         body_json = json.loads(request.get_data())
         email = body_json["email"]
-        user_id = body_json["user_id"]
         password = body_json["password"]
         
         user = user_connector.get(email=email)
