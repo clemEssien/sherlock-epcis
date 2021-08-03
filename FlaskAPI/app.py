@@ -138,7 +138,18 @@ class TransformationView(FlaskView):
             )
             event = epcis_from_json_file(file)
         elif file_ext == "xml":
-            event = epcis_from_xml_file(file)
+            try:
+                event_list = epcis_from_xml_file(file)
+            except:
+                return make_response(
+                    {
+                        "result": "fail",
+                        "message": "XML file is not an EPCIS Document",
+                        "code": 0,
+                        "data": {},
+                    },
+                    400,
+                )
         else:
             return make_response(
                 {
@@ -149,6 +160,9 @@ class TransformationView(FlaskView):
                 },
                 400,
             )
+
+        # temporarily just handle first event
+        event = event_list[0]
 
         # Detect CTE from EPCIS event
         cd = CTEDetector()
@@ -210,34 +224,26 @@ def epcis_from_json_file(file: FileStorage) -> epc.EPCISEvent:
 
 
 def epcis_from_xml_file(file: FileStorage) -> epc.EPCISEvent:
-    pass
-
-
-class XMLView(FlaskView):
-    route_base = "/api/xml"
-
-    @route("/", methods=["POST"])
-    def post(self):
-        epcis_xml = str(request.get_data(), "utf-8")
-
-        root = ET.fromstring(epcis_xml)
-
-        if root.tag != "{urn:epcglobal:epcis:xsd:1}EPCISDocument":
-            return {"error": "Not EPCISDocument"}, 400
-
-        events = []
-        for child in root:
-            for event_list in child:
-                for event in event_list:
-                    d = ex_xml.map_xml_to_dict(event)
-                    try:
-                        xml_doc = d[event.tag]
-                        event = event_types[event.tag]()
-                    except Exception:
-                        event_from_xml = ex_xml.find_event_from_xml(event, event_types)
-                        event = event_types[event_from_xml]
-                    xml_dict = ex_xml.map_to_epcis_dict(xml_doc)
-                    ex_xml.map_from_epcis(event, xml_dict)
+    """Function to return list of EPCISEvent objects from an xml file"""
+    epcis_xml = file.read()
+    root = ET.fromstring(epcis_xml)
+    if "epcis" not in root.tag.lower():
+        raise ValueError("XML File is not an EPCIS document")
+    events = []
+    for child in root:
+        for event_list in child:
+            for event in event_list:
+                d = ex_xml.map_xml_to_dict(event)
+                try:
+                    xml_doc = d[event.tag]
+                    event = event_types[event.tag]()
+                except Exception:
+                    event_from_xml = ex_xml.find_event_from_xml(event, event_types)
+                    event = event_types[event_from_xml]
+                xml_dict = ex_xml.map_to_epcis_dict(xml_doc)
+                ex_xml.map_from_epcis(event, xml_dict)
+                events.append(event)
+    return events
 
 
 EventView.register(app)
