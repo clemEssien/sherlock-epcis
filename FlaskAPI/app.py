@@ -29,7 +29,7 @@ driver = GraphDatabase.driver(uri=URI, auth=(USER, PASS))
 
 app = Flask(__name__)
 app.config['MONGODB_SETTINGS'] = {
-    "host": "mongodb+srv://admin:test123@userauth.slfja.mongodb.net/UserAuth?retryWrites=true&w=majority"
+    "host": os.getenv('MONGODB_HOST')
 }
 db = MongoEngine(app)
 
@@ -114,7 +114,7 @@ class UserView(FlaskView):
 
         Request Body:
             {
-                user_id: int,
+                user_id: str,
                 old_password: str,
                 new_password: str,
                 confirm_new_password: str,
@@ -124,6 +124,7 @@ class UserView(FlaskView):
             400: User not found
             400: Incorrect password
             400: New passwords do not match
+            400: Server error
 
         On Success (200):
             {
@@ -137,9 +138,11 @@ class UserView(FlaskView):
         old_password = body_json["old_password"]
 
         try:
-            user = user_connector.get(user_id=user_id)
-        except:
+            user = user_connector.get_one(user_id=user_id)
+        except me.DoesNotExist:
             return {"error": "User not found"}, 400
+        except:
+            return {"error": "Server error"}, 400
 
         if (user.password_hash != user_services.create_hash("something", old_password)):
             return {"error": "Incorrect password"}, 400 
@@ -149,6 +152,50 @@ class UserView(FlaskView):
         user_connector.update(user, password_hash=user_services.create_hash("something", new_password))
         return {"success": True}
 
+    @route("/change_email", methods=["POST"])
+    def change_email(self):
+        """
+        Changes the email for a given user
+
+        Request Body:
+            {
+                user_id: str,
+                password: str,
+                new_email: str,
+                confirm_new_email: str,
+            }
+
+        Error Codes:
+            400: User not found
+            400: Server error
+            400: Incorrect password
+            400: New emails do not match
+
+        On Success (200):
+            {
+                success: true
+            }
+        """
+        body_json = json.loads(request.get_data())
+        user_id = body_json["user_id"]
+        password = body_json["password"]
+        new_email = body_json["new_email"]
+        confirm_new_email = body_json["confirm_new_email"]
+
+        try:
+            user = user_connector.get_one(user_id=user_id)
+        except me.DoesNotExist:
+            return {"error": "User not found"}, 400
+        except:
+            return {"error": "Server error"}, 400
+
+        if (user.password_hash != user_services.create_hash("something", password)):
+            return {"error": "Incorrect password"}, 400 
+        if (new_email != confirm_new_email):
+            return {"error": "Emails do not match"}, 400 
+
+        user_connector.update(user, email=new_email)
+        return {"success": True}
 
     @route("/get_user", methods=["GET"])
     def get_user(self):
@@ -172,7 +219,7 @@ class UserView(FlaskView):
         user_id = body_json["user_id"]
         
         try:
-            user = user_connector.get(user_id=user_id)
+            user = user_connector.get_one(user_id=user_id)
         except:
             return {"error": "User not found"}, 400
 
