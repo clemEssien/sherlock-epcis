@@ -7,6 +7,7 @@ sys.path.append(parentdir)
 
 import json
 import db_connect as db_con
+import utils as ut
 
 node_names: "dict[str]" = {
     "ObjectEvent": "objevt",
@@ -59,19 +60,11 @@ def create_event_node(event):
     """Method creates an event node from an event object
         Args: 
              Event node
-        Returns:
-             Query String
     """
     event_type = event.__class__.__name__ 
     node_name = node_names[event_type]
-    attributes = {}
+    attributes = ut.retrive_attr_dict_from_event(event)
 
-    for attr in list(event.__dict__):
-        instvar = getattr(event, attr)
-        if isinstance(instvar, dict):
-            attributes[attr[1:]] = json.dumps(getattr(event, attr))
-        else:
-            attributes[attr[1:]] = getattr(event, attr)
     attributes = json.dumps(attributes,default=str)
     query = """ 
             CREATE (""" + \
