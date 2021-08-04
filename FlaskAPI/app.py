@@ -136,8 +136,8 @@ class UserView(FlaskView):
         body_json = json.loads(request.get_data())
 
         # check the body for the minimum required variables for this call:
-        for key in [ "email", "new_password", "confirm_new_password", "old_password" ]:
-            if not key in body_json:
+        for key in ["email", "new_password", "confirm_new_password", "old_password"]:
+            if not (key in body_json):
                 return {"error": "Bad Data"}, 401
 
         new_password = body_json["new_password"]
@@ -152,7 +152,7 @@ class UserView(FlaskView):
         except:
             return {"error": "Server error"}, 400
 
-        if (user.password_hash != generate_password_hash(old_password)):
+        if (not check_password_hash(user.password_hash, old_password)):
             return {"error": "Incorrect password"}, 400 
         if (new_password != confirm_new_passwords):
             return {"error": "New passwords do not match"}, 400 
@@ -197,7 +197,7 @@ class UserView(FlaskView):
         except:
             return {"error": "Server error"}, 400
 
-        if (user.password_hash != generate_password_hash("something", password)):
+        if (not check_password_hash(user.password_hash, password)):
             return {"error": "Incorrect password"}, 400 
         if (new_email != confirm_new_email):
             return {"error": "Emails do not match"}, 400 

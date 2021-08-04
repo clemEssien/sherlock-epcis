@@ -1,6 +1,6 @@
 import os , sys
 
-from werkzeug.security import generate_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
@@ -50,7 +50,7 @@ def clean():
         last_name = "last",
         email = "email",
         role = "User",
-        password_hash = "0B2CC2C0B8A1ACDD81DF59FBA71D255366254B6D1850E7BE9435959303D9D1EB", #hash for "123"
+        password_hash = generate_password_hash("123"), #hash for "123"
         company_id = "456"
     )
 
@@ -60,7 +60,7 @@ BASE = "http://127.0.0.1:5000"
 @pytest.mark.usefixtures("clean")
 def test_change_password_wrong_pass(client):
     body = {
-        "user_id": "1",
+        "email": "email",
         "old_password": "456",
         "new_password": "abc",
         "confirm_new_password": "abc"
@@ -74,7 +74,7 @@ def test_change_password_wrong_pass(client):
 @pytest.mark.usefixtures("clean")
 def test_change_password_not_found(client):
     body = {
-        "user_id": "2",
+        "email": "bademail",
         "old_password": "456",
         "new_password": "abc",
         "confirm_new_password": "abc"
@@ -88,7 +88,7 @@ def test_change_password_not_found(client):
 @pytest.mark.usefixtures("clean")
 def test_change_password_mismatch(client):
     body = {
-        "user_id": "1",
+        "email": "email",
         "old_password": "123",
         "new_password": "abc",
         "confirm_new_password": "def"
@@ -102,7 +102,7 @@ def test_change_password_mismatch(client):
 @pytest.mark.usefixtures("clean")
 def test_change_password_success(client):
     body = {
-        "user_id": "1",
+        "email": "email",
         "old_password": "123",
         "new_password": "456",
         "confirm_new_password": "456"
@@ -143,4 +143,4 @@ def test_get_user(client):
     response = client.get(BASE + "/api/users/get_user", data=json.dumps(body))
 
     assert response.status_code == 200
-    assert response.json["password_hash"] == generate_password_hash("123")
+    assert check_password_hash(response.json["password_hash"], "123")
