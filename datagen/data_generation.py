@@ -7,39 +7,43 @@ import os
 import sys
 
 report_mode = False
+json_mode = False
 
 if len(sys.argv) >= 2:
     if "--report" in sys.argv:
         report_mode = True
+    if "--json" in sys.argv:
+        json_mode = True
 
 data = {}
 text = ""
 
-_f = os.listdir("./data")
-files = []
+if not json_mode:
+    _f = os.listdir("./data")
+    files = []
 
-for fp in _f:
-    if ".xml" in fp:
-        files.append(fp)
+    for fp in _f:
+        if ".xml" in fp:
+            files.append(fp)
 
-files.sort()
-nodes = []
+    files.sort()
+    nodes = []
 
-for file in files:
-    fullpath = join("./data", file)
-    
-    with open(fullpath) as f:
+    for file in files:
+        fullpath = join("./data", file)
+        
+        with open(fullpath) as f:
+            text = f.read()
+        
+        dr = xmltodict.parse(text)
+        nodes.append(dr)
+else:
+    with open("neo4j/json_files/9991000100023-PS001.json") as f:
         text = f.read()
-    
-    dr = xmltodict.parse(text)
-    nodes.append(dr)
 
-# with open("neo4j/json_files/9991000100023-PS001.json") as f:
-#     text = f.read()
+    data = json.loads(text)
 
-# data = json.loads(text)
-
-# nodes: list = data["data"]["events"]
+    nodes: list = data["data"]["events"]
 
 a = []
 
@@ -111,12 +115,26 @@ for x in range(0, len(f)):
                     #     except:
                     #         pass
                     #         continue
-                    if not ("gtin" in key or "gtin" in pieces1["key"]) and not ("gln" in key or "gln" in pieces1["key"]):
-                            continue
+                    if not json_mode:
+                        if not ("gtin" in key or "gtin" in pieces1["key"]) and not ("gln" in key or "gln" in pieces1["key"]):
+                                continue
 
                     if not key in values.keys():
                         values[key] = []
+                    
+                    parts = pieces1["key"].split("/")
+                    for pc in range(0, len(parts)):
+                        itest = None
+                        try:
+                            itest = int(parts[pc])
+                        except:
+                            pass
                         
+                        if not itest is None:
+                            parts[pc] = "#"
+                    
+                    pieces1["key"] = "/".join(parts)
+                    
                     if not pieces1["key"] in values[key]:
                             values[key].append(pieces1["key"])
                             values[key].append(pieces1["key"])
@@ -128,13 +146,30 @@ if not report_mode:
     print(json.dumps(values))
 else:
     props = {}
-    
+
     for key in values.keys():
         for path in values[key]:
-            parts = split(path)
-            for pc in range(0, len(parts)):
-                path = join(parts[1:])
-            
-            
-    
-    
+            parts = path.split("/")
+            path = "/".join(parts[1:])
+
+            if not path in props.keys():
+                props[path] = 1
+            else:
+                props[path] += 1
+
+    tolist = []
+
+    for key in props.keys():
+
+        tolist.append({
+            "key": key,
+            "count": props[key]
+        })
+
+    tolist.sort(key=lambda x: -x["count"])
+
+    for l in tolist:
+
+        print("Key: " + l['key'])
+        print(str(l['count']) + " Occurrances")
+        print("")
