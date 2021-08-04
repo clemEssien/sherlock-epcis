@@ -72,7 +72,8 @@ def flatten_data(node, path = None):
             if v and isinstance(v, list) and len(v):
                 for r in v:
                     d.append(r)    
-
+            elif v:
+                d.append(v)
 
         pass    
     
