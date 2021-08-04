@@ -8,12 +8,18 @@ import sys
 
 report_mode = False
 json_mode = False
+gtin_only = False
+list_only = False
 
 if len(sys.argv) >= 2:
     if "--report" in sys.argv:
         report_mode = True
     if "--json" in sys.argv:
         json_mode = True
+    if "--gtin" in sys.argv:
+        gtin_only = True
+    if "--list" in sys.argv:
+        list_only = True
 
 data = {}
 text = ""
@@ -115,7 +121,7 @@ for x in range(0, len(f)):
                     #     except:
                     #         pass
                     #         continue
-                    if not json_mode:
+                    if (not json_mode) and gtin_only:
                         if not ("gtin" in key or "gtin" in pieces1["key"]) and not ("gln" in key or "gln" in pieces1["key"]):
                                 continue
 
@@ -169,7 +175,10 @@ else:
     tolist.sort(key=lambda x: -x["count"])
 
     for l in tolist:
-
-        print("Key: " + l['key'])
-        print(str(l['count']) + " Occurrances")
-        print("")
+        if list_only:
+            print(l['key'])
+            
+        else:
+            print("Key: " + l['key'])
+            print(str(l['count']) + " Occurrances")
+            print("")
