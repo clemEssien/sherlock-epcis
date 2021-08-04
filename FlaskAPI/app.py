@@ -7,6 +7,7 @@ from models.user import User
 from services import user_services, mongodb_connector
 from neo4j import GraphDatabase
 from werkzeug.security import check_password_hash, generate_password_hash
+from flask_login import login_user, logout_user, login_required
 
 from dotenv import load_dotenv
 import os, sys
@@ -79,7 +80,6 @@ class UserView(FlaskView):
             password_hash=generate_password_hash(password)
         )
 
-
         return {"success": True}
 
     @route("/signin", methods=["POST"])
@@ -94,12 +94,25 @@ class UserView(FlaskView):
             }
         """
         body_json = json.loads(request.get_data())
+
+        for key in ["password", "email"]:
+            if not (key in body_json):
+                return {"error": "Bad Data"}, 401
+
         email = body_json["email"]
         password = body_json["password"]
         
-        user = user_connector.get_one(email=email)
+        try:
+            user = user_connector.get_one(email=email)
+        except me.DoesNotExist:
+            return {"error": "User not found"}, 400
+        except:
+            return {"error": "Server error"}, 400
+        
         if not user or not check_password_hash(user.password_hash, password):
             return {"error": "Invalid credentials"}, 400 
+
+        login_user(user)
 
         return {"success": True}
 
@@ -185,6 +198,11 @@ class UserView(FlaskView):
             }
         """
         body_json = json.loads(request.get_data())
+
+        for key in ["user_id", "password", "new_email", "confirm_new_email"]:
+            if not (key in body_json):
+                return {"error": "Bad Data"}, 401
+
         user_id = body_json["user_id"]
         password = body_json["password"]
         new_email = body_json["new_email"]

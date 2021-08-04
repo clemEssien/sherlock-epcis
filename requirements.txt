@@ -21,3 +21,4 @@ toml==0.10.2
 urllib3==1.26.5
 wheel==0.36.2
 flask-mongoengine==1.0.0
+flask-login==0.5.0

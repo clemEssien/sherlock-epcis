@@ -1,6 +1,7 @@
 import mongoengine as me
+from flask_login import UserMixin
 
-class User(me.Document):
+class User(UserMixin, me.Document):
     user_id = me.StringField()
     first_name = me.StringField()
     last_name = me.StringField()
