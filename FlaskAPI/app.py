@@ -7,7 +7,7 @@ from models.user import User
 from services import user_services, mongodb_connector
 from neo4j import GraphDatabase
 from werkzeug.security import check_password_hash, generate_password_hash
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user, LoginManager
 
 from dotenv import load_dotenv
 import os, sys
@@ -32,7 +32,10 @@ app = Flask(__name__)
 app.config['MONGODB_SETTINGS'] = {
     "host": os.getenv('MONGODB_HOST')
 }
+app.secret_key = 'some key'
 db = MongoEngine(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 event_types = {
     "ObjectEvent": epc.ObjectEvent,
@@ -44,6 +47,17 @@ event_types = {
 
 user_connector = mongodb_connector.MongoDBConnector(User)
 
+@login_manager.user_loader
+def load_user(user_id):
+    try:
+        return user_connector.get_one(id=user_id)
+    except:
+        return None
+
+@login_manager.unauthorized_handler
+def unauthorized():
+    return {"error": "Not logged in"}, 401
+
 class UserView(FlaskView):
     route_base = "/api/users"
 
@@ -54,22 +68,19 @@ class UserView(FlaskView):
 
         Request Body:
             {
-                user_id: str,
                 first_name: str,
                 last_name: str,
                 password: str,
                 email: str,
-                company_id: str
             }
         """
-        #user_id=request.form.get('user')
         user_id = str(uuid.uuid4())
 
         body_json=json.loads(request.get_data())
         email = body_json["email"]
         password = body_json["password"]
-        last_name=body_json["lastname"]
-        first_name=body_json["firstname"]
+        last_name=body_json["last_name"]
+        first_name=body_json["first_name"]
 
         user_connector.create_one(
             user_id=user_id, 
@@ -116,7 +127,11 @@ class UserView(FlaskView):
 
         return {"success": True}
 
-
+    @route("/signout", methods=["POST"])
+    @login_required
+    def signout(self):
+        logout_user()
+        return {"success": True}
 
     @route("/refresh", methods=["GET"])
     def refresh(self):
@@ -250,6 +265,15 @@ class UserView(FlaskView):
             return {"error": "User not found"}, 400
 
         return jsonify(user)
+
+    @route("/profile", methods=["GET"])
+    @login_required
+    def profile(self):
+        """
+        Returns the user that is currently logged in
+        """
+        return jsonify(current_user)
+
 
 class EventView(FlaskView):
     route_base = "/api/events"

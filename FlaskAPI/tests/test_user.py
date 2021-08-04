@@ -6,6 +6,7 @@ parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
 from flask import Flask
+from flask_login import login_user, logout_user, login_required, current_user, LoginManager
 import pytest
 import json
 from models.user import User
@@ -39,9 +40,12 @@ def client():
     client = app.test_client()
     return client
 
+@pytest.fixture(scope="module")
+def user_connector():
+    return mongodb_connector.MongoDBConnector(User)
+
 @pytest.fixture
-def clean():
-    user_connector = mongodb_connector.MongoDBConnector(User)
+def clean(user_connector):
     user_connector.delete_all()
 
     user_connector.create_one(
@@ -57,6 +61,24 @@ def clean():
 BASE = "http://127.0.0.1:5000"
 
 # TESTS
+
+@pytest.mark.usefixtures("clean")
+def test_create(client, user_connector):
+    body = {
+        "first_name": "Nathaniel",
+        "last_name": "Moschkin",
+        "password": "nathan123",
+        "email": "nathaniel.moschkin@precise-soft.com",
+    }
+
+    response = client.post(BASE + "/api/users/create", data=json.dumps(body))
+
+    user = user_connector.get_one(email="nathaniel.moschkin@precise-soft.com")
+
+    assert response.status_code == 200
+    assert response.json["success"] == True
+    assert user.first_name == "Nathaniel"
+
 @pytest.mark.usefixtures("clean")
 def test_change_password_wrong_pass(client):
     body = {
@@ -100,7 +122,7 @@ def test_change_password_mismatch(client):
     assert response.json["error"] == "New passwords do not match"
 
 @pytest.mark.usefixtures("clean")
-def test_change_password_success(client):
+def test_change_password_success(client, user_connector):
     body = {
         "email": "email",
         "old_password": "123",
@@ -110,11 +132,14 @@ def test_change_password_success(client):
 
     response = client.post(BASE + "/api/users/change_password", data=json.dumps(body))
 
+    user = user_connector.get_one(email="email")
+
     assert response.status_code == 200
     assert response.json["success"] == True
+    assert check_password_hash(user.password_hash, "456")
 
 @pytest.mark.usefixtures("clean")
-def test_change_email(client):
+def test_change_email(client, user_connector):
     body = {
         "user_id": "1",
         "password": "123",
@@ -124,15 +149,11 @@ def test_change_email(client):
 
     response = client.post(BASE + "/api/users/change_email", data=json.dumps(body))
 
-    body_other = {
-        "user_id": "1"
-    }
-
-    response_other = client.get(BASE + "/api/users/get_user", data=json.dumps(body_other))
+    user = user_connector.get_one(user_id="1")
 
     assert response.status_code == 200
     assert response.json["success"] == True
-    assert response_other.json["email"] == "new@gmail.com"
+    assert user.email == "new@gmail.com"
 
 @pytest.mark.usefixtures("clean")
 def test_get_user(client):
