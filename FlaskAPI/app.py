@@ -124,7 +124,6 @@ class TransformationView(FlaskView):
         if file and file_ext in ALLOWED_EXTENSIONS:
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-
         # Create event object and populate it
         if file_ext == "json":
             return make_response(
@@ -144,7 +143,7 @@ class TransformationView(FlaskView):
                 return make_response(
                     {
                         "result": "fail",
-                        "message": "XML file is not an EPCIS Document",
+                        "message": "Couldn't extract EPCIS events from XML File",
                         "code": 0,
                         "data": {},
                     },
@@ -223,10 +222,15 @@ def epcis_from_json_file(file: FileStorage) -> epc.EPCISEvent:
     pass
 
 
-def epcis_from_xml_file(file: FileStorage) -> epc.EPCISEvent:
+def epcis_from_xml_file(file: FileStorage) -> "list[epc.EPCISEvent]":
     """Function to return list of EPCISEvent objects from an xml file"""
-    epcis_xml = file.read()
-    root = ET.fromstring(epcis_xml)
+    try:
+        tree = ET.parse(
+            os.path.join(app.config["UPLOAD_FOLDER"], secure_filename(file.filename))
+        )
+    except:
+        raise ValueError("Couldn't parse file")
+    root = tree.getroot()
     if "epcis" not in root.tag.lower():
         raise ValueError("XML File is not an EPCIS document")
     events = []
