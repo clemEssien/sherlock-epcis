@@ -1,3 +1,4 @@
+import enum
 from flask import Flask, jsonify, request, make_response
 from flask_classful import FlaskView, route
 from neo4j import GraphDatabase
@@ -135,7 +136,7 @@ class TransformationView(FlaskView):
                 },
                 501,
             )
-            event = epcis_from_json_file(file)
+            event_list = epcis_from_json_file(file)
         elif file_ext == "xml":
             try:
                 event_list = epcis_from_xml_file(file)
@@ -159,48 +160,48 @@ class TransformationView(FlaskView):
                 },
                 400,
             )
+        cte_list = []
+        for event in event_list:
 
-        # temporarily just handle first event
-        event = event_list[0]
+            # Detect CTE from EPCIS event
+            cd = CTEDetector()
+            try:
+                cd.import_yaml_file("epcis_cte_transformation/cte_detect_config.yaml")
+            except Exception as e:
+                return make_response(
+                    {
+                        "result": "fail",
+                        "message": "Invalid CTE detetion configuration file",
+                        "code": 0,
+                        "data": {},
+                    },
+                    500,
+                )
+            try:
+                cte_type = cd.detect_cte(event)
+            except Exception as e:
+                return make_response(
+                    {
+                        "result": "fail",
+                        "message": "Could not detect CTE from EPCIS event",
+                        "code": 0,
+                        "data": {},
+                    },
+                    500,
+                )
+            cte_list.append(cte_type)
+            # Transform EPCIS event to FDA CTE
 
-        # Detect CTE from EPCIS event
-        cd = CTEDetector()
-        try:
-            cd.import_yaml_file("epcis_cte_transformation/cte_detect_config.yaml")
-        except Exception as e:
-            return make_response(
-                {
-                    "result": "fail",
-                    "message": "Invalid CTE detetion configuration file",
-                    "code": 0,
-                    "data": {},
-                },
-                500,
-            )
-        try:
-            cte_type = cd.detect_cte(event)
-        except Exception as e:
-            return make_response(
-                {
-                    "result": "fail",
-                    "message": "Could not detect CTE from EPCIS event",
-                    "code": 0,
-                    "data": {},
-                },
-                500,
-            )
-
-        # Transform EPCIS event to FDA CTE
-
-        # Store data in Neo4j database
+            # Store data in Neo4j database
 
         # Return CTE to user
+        response_data = {key: value for key, value in enumerate(cte_list)}
         return make_response(
             {
                 "result": "ok",
                 "message": "CTE detected",
                 "code": 0,
-                "data": {"cte_type": cte_type},
+                "data": response_data,
             },
             200,
         )
@@ -215,7 +216,7 @@ class TransformationView(FlaskView):
         pass
 
 
-def epcis_from_json_file(file: FileStorage) -> epc.EPCISEvent:
+def epcis_from_json_file(file: FileStorage) -> "list[epc.EPCISEvent]":
     # verify that file is an epcis document
 
     # isolate epcis events from file
@@ -229,7 +230,7 @@ def epcis_from_xml_file(file: FileStorage) -> "list[epc.EPCISEvent]":
             os.path.join(app.config["UPLOAD_FOLDER"], secure_filename(file.filename))
         )
     except:
-        raise ValueError("Couldn't parse file")
+        raise ValueError("Couldn't parse XML file")
     root = tree.getroot()
     if "epcis" not in root.tag.lower():
         raise ValueError("XML File is not an EPCIS document")
