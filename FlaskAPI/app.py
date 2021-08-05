@@ -141,10 +141,6 @@ class UserView(FlaskView):
         logout_user()
         return {"success": True}
 
-    @route("/refresh", methods=["GET"])
-    def refresh(self):
-        pass
-
     @route("/change_password", methods=["POST"])
     def change_password(self):
         """
