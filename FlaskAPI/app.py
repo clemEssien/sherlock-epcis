@@ -217,6 +217,7 @@ class TransformationView(FlaskView):
 
 
 def epcis_from_json_file(file: FileStorage) -> "list[epc.EPCISEvent]":
+    """Function to return a list of EPCISEvent objects from a JSON file"""
     # verify that file is an epcis document
 
     # isolate epcis events from file
@@ -224,7 +225,7 @@ def epcis_from_json_file(file: FileStorage) -> "list[epc.EPCISEvent]":
 
 
 def epcis_from_xml_file(file: FileStorage) -> "list[epc.EPCISEvent]":
-    """Function to return list of EPCISEvent objects from an xml file"""
+    """Function to return list of EPCISEvent objects from an XML file"""
     try:
         tree = ET.parse(
             os.path.join(app.config["UPLOAD_FOLDER"], secure_filename(file.filename))
