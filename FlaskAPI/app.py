@@ -47,6 +47,8 @@ event_types = {
 
 user_connector = mongodb_connector.MongoDBConnector(User)
 
+# LOGIN HANDLERS
+
 @login_manager.user_loader
 def load_user(user_id):
     try:
@@ -57,6 +59,9 @@ def load_user(user_id):
 @login_manager.unauthorized_handler
 def unauthorized():
     return {"error": "Not logged in"}, 401
+
+#@login_manager.needs_refresh_handler TODO
+
 
 class UserView(FlaskView):
     route_base = "/api/users"
