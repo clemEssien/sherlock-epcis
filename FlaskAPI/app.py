@@ -60,7 +60,10 @@ def load_user(user_id):
 def unauthorized():
     return {"error": "Not logged in"}, 401
 
-#@login_manager.needs_refresh_handler TODO
+@login_manager.needs_refresh_handler
+def refresh():
+    login_user(current_user)
+    return {"success": True}, 200
 
 
 class UserView(FlaskView):
