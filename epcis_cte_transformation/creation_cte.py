@@ -3,6 +3,7 @@ from typing import List
 from cte import CTEBase
 import os, sys
 import datetime
+import json
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 parent_dir_path = os.path.abspath(os.path.join(dir_path, os.pardir))
@@ -19,7 +20,8 @@ from JSONDeserialization.epcis_event import (
     TransformationEvent,
 )
 
-from openpyxl import Workbook, workbook
+from openpyxl import Workbook, load_workbook
+from tools.serializer import JSONValueProvider, jsonid, map_from_json, map_to_json
 
 
 class CreationCTE(CTEBase):
@@ -57,7 +59,7 @@ class CreationCTE(CTEBase):
             for epc in event.epc_list:
                 output.traceability_product.append(epc.value)
             for qe in event.quantity_list:
-                output.quantity.append(qe.quantity)
+                output.quantity.append(str(qe.quantity))
                 output.unit_of_measure.append(qe.uom)
         elif isinstance(event, AggregationEvent):
             output.creation_completion_date = event.event_time_local
@@ -89,7 +91,20 @@ class CreationCTE(CTEBase):
         return output
 
     def new_from_json(cls, json_data: str):
-        pass
+        """
+        Create a new CTE from JSON data
+        """
+        output = cls()
+        types = {
+            output.traceability_product: list,
+            output.creation_completion_date: datetime,
+            output.location_where_food_was_created: str,
+            output.quantity: list,
+            output.unit_of_measure: list,
+        }
+
+        map_from_json(json_data, output, types)
+        return output
 
     def new_from_csv(cls, csv_lines: "list[str]"):
         pass
@@ -141,11 +156,15 @@ class CreationCTE(CTEBase):
         self._unit_of_measure = value
 
     def output_json(self):
-        pass
+        """
+        Returnns serialized JSON data
+        """
+        data = map_to_json(self)
+        return json.dumps(data)
 
     def output_xlsx(self) -> str:
         """
-        Create an excel spreadsheet and output the contents to an XML string
+        Create an excel spreadsheet
         """
 
         workbook = Workbook()
@@ -158,24 +177,28 @@ class CreationCTE(CTEBase):
             "Quantity",
             "Unit of Measure",
         ]
+        traceability_product_str = ", ".join(self.traceability_product)
+        quantity_str = ", ".join(self.quantity)
+        uom_str = ", ".join(self.unit_of_measure)
         kde_values = [
-            self.traceability_product,
-            self.creation_completion_date,
+            traceability_product_str,
+            str(self.creation_completion_date),
             self.location_where_food_was_created,
-            self.quantity,
-            self.unit_of_measure,
+            quantity_str,
+            uom_str,
         ]
-        for i in range(1, 5):
-            cell = sheet.cell(row=1, col=i)
+        for i in range(1, 6):
+            cell = sheet.cell(row=1, column=i)
             cell.value = kde_ids[i - 1]
 
-        for i in range(1, 5):
-            cell = sheet.cell(row=2, col=i)
+        for i in range(1, 6):
+            cell = sheet.cell(row=2, column=i)
             cell.value = kde_values[i - 1]
-
-        workbook.save(filename)
-        return filename  # unsure what to return
+        # /var/src/documents/<companyid>/<userid>/<cte types>/<name/id>_<timestamp>.xlsx
+        # Unknown: companyID, userID, CTETypes, name/id
+        # workbook.save('/var/src/documents/' + filename + " " + datetime.datetime.now + '.xlsx')
+        workbook.save(filename + ".xlsx")
+        return filename
 
     def save_as_xlsx(self, filename: str):
         pass
-        # code here

@@ -2,6 +2,9 @@ from abc import ABC, abstractclassmethod, abstractmethod
 from typing import List
 from cte import CTEBase
 import os, sys
+import datetime
+import json
+
 dir_path = os.path.dirname(os.path.realpath(__file__))
 parent_dir_path = os.path.abspath(os.path.join(dir_path, os.pardir))
 sys.path.insert(0, parent_dir_path)
@@ -16,6 +19,9 @@ from JSONDeserialization.epcis_event import (
     TransactionEvent,
     TransformationEvent,
 )
+
+from openpyxl import Workbook, load_workbook
+from tools.serializer import JSONValueProvider, jsonid, map_from_json, map_to_json
 
 
 class ShippingCTE(CTEBase):
@@ -172,12 +178,58 @@ class ShippingCTE(CTEBase):
     def output_xlsx(self) -> str:
         """
         Create an excel spreadsheet and output the contents to an XML string
+        KDEs:
+            Traceability Lot Code : List
+            Entry Number : str
+            Quantity : List
+            Unit of Measure : List
+            Traceability Product : List
+            Location of Traceability Lot Code Generator : str
+            Location of Recipient : str
+            Location of Source of Shipment : str
         """
+        workbook = Workbook()
+        sheet = workbook.active
+        filename = "shipping_cte"
 
-        # code here
+        kde_ids = [
+            "Traceability Lot Code",
+            "Entry Number",
+            "Quantity",
+            "Unit of Measure",
+            "Traceability Product",
+            "Location of Traceability Lot Code Generator",
+            "Location of Recipient",
+            "Location of Source of Shipment",
+        ]
 
-        v = "foobar"
-        return v
+        traceability_lot_code_str = ", ".join(self.traceability_lot_code)
+        quantity_str = ", ".join(self.quantity)
+        uom_str = ", ".join(self.unit_of_measure)
+        traceability_product_str = ", ".join(self.traceability_product)
+
+        kde_values = [
+            traceability_lot_code_str,
+            self.entry_number,
+            quantity_str,
+            uom_str,
+            traceability_product_str,
+            self.location_of_traceability_lot_code_generator,
+            self.location_of_recipient,
+            self.location_of_source_of_shipment,
+        ]
+        for i in range(1, 9):
+            cell = sheet.cell(row=1, column=i)
+            cell.value = kde_ids[i - 1]
+
+        for i in range(1, 9):
+            cell = sheet.cell(row=2, column=i)
+            cell.value = kde_values[i - 1]
+        # /var/src/documents/<companyid>/<userid>/<cte types>/<name/id>_<timestamp>.xlsx
+        # Unknown: companyID, userID, CTETypes, name/id
+        # workbook.save('/var/src/documents/' + filename + " " + datetime.datetime.now + '.xlsx')
+        workbook.save(filename + ".xlsx")
+        return filename
 
     def save_as_xlsx(self, filename: str):
         pass

@@ -1,6 +1,8 @@
 from abc import ABC, abstractclassmethod, abstractmethod
 from typing import List, Type
 import os, sys
+import datetime
+import json
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 parent_dir_path = os.path.abspath(os.path.join(dir_path, os.pardir))
@@ -19,7 +21,9 @@ from JSONDeserialization.epcis_event import (
 )
 
 from cte import CTEBase
-import json
+
+from openpyxl import Workbook, load_workbook
+from tools.serializer import JSONValueProvider, jsonid, map_from_json, map_to_json
 
 
 class TransformationCTE(CTEBase):
@@ -154,13 +158,47 @@ class TransformationCTE(CTEBase):
 
     def output_xlsx(self) -> str:
         """
-        Create an excel spreadsheet and output the contents to an XML string
+        Create an excel spreadsheet
         """
 
-        # code here
+        workbook = Workbook()
+        sheet = workbook.active
+        filename = "transformation_cte"
 
-        v = "foobar"
-        return v
+        kde_ids = [
+            "Traceability Product",
+            "Quantity of Input",
+            "Quantity of Output",
+            "Location of Transformation",
+            "New Traceability Product",
+            "Unit of Measure",
+        ]
+        traceability_product_str = ", ".join(self.traceability_product)
+        quantity_of_input_str = ", ".join(self.quantity_of_input)
+        quantity_of_output_str = ", ".join(self.quantity_of_output)
+        new_traceability_product_str = ", ".join(self.new_traceability_product)
+        uom_str = ", ".join(self.unit_of_measure)
+        kde_values = [
+            traceability_product_str,
+            quantity_of_input_str,
+            quantity_of_output_str,
+            self.location_of_transformation,
+            new_traceability_product_str,
+            uom_str,
+        ]
+
+        for i in range(1, 7):
+            cell = sheet.cell(row=1, column=i)
+            cell.value = kde_ids[i - 1]
+
+        for i in range(1, 7):
+            cell = sheet.cell(row=2, column=i)
+            cell.value = kde_values[i - 1]
+        # /var/src/documents/<companyid>/<userid>/<cte types>/<name/id>_<timestamp>.xlsx
+        # Unknown: companyID, userID, CTETypes, name/id
+        # workbook.save('/var/src/documents/' + filename + " " + datetime.datetime.now + '.xlsx')
+        workbook.save(filename + ".xlsx")
+        return filename
 
     def save_as_xlsx(self, filename: str):
         pass
