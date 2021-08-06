@@ -1,9 +1,21 @@
+<<<<<<< HEAD
 import json
 from flask import Flask, jsonify, request, make_response
+=======
+from flask import Flask, jsonify, request
+import uuid
+>>>>>>> main
 from flask_classful import FlaskView, route
+from flask_mongoengine import MongoEngine
+import mongoengine as me
+from models.user import User
+from services import user_services, mongodb_connector
+from init_app import create_app
 from neo4j import GraphDatabase
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
+
+from routes.user import UserView
 
 from dotenv import load_dotenv
 import os, sys
@@ -25,7 +37,7 @@ PASS = os.getenv("DB_PASS")
 URI = os.getenv("DB_URI")
 driver = GraphDatabase.driver(uri=URI, auth=(USER, PASS))
 
-app = Flask(__name__)
+app = create_app()
 
 UPLOAD_FOLDER = "./FlaskAPI/uploads"
 ALLOWED_EXTENSIONS = {"json", "xml"}
