@@ -56,6 +56,7 @@ class Graph:
                 response = 'Record nodeProjection' in str(response[0])
             return  response
         except Exception as e:
+            print(str(e))
             return False
 
     
