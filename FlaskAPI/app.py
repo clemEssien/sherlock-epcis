@@ -5,6 +5,7 @@ from flask_mongoengine import MongoEngine
 import mongoengine as me
 from models.user import User
 from services import user_services, mongodb_connector
+from init_app import create_app
 from neo4j import GraphDatabase
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import login_user, logout_user, login_required, current_user, LoginManager
@@ -28,14 +29,7 @@ PASS = os.getenv('DB_PASS')
 URI = os.getenv('DB_URI')
 driver = GraphDatabase.driver(uri=URI, auth=(USER, PASS))
 
-app = Flask(__name__)
-app.config['MONGODB_SETTINGS'] = {
-    "host": os.getenv('MONGODB_HOST')
-}
-app.secret_key = 'some key'
-db = MongoEngine(app)
-login_manager = LoginManager()
-login_manager.init_app(app)
+app = create_app()
 
 event_types = {
     "ObjectEvent": epc.ObjectEvent,
@@ -46,25 +40,6 @@ event_types = {
 }
 
 user_connector = mongodb_connector.MongoDBConnector(User)
-
-# LOGIN HANDLERS
-
-@login_manager.user_loader
-def load_user(user_id):
-    try:
-        return user_connector.get_one(id=user_id)
-    except:
-        return None
-
-@login_manager.unauthorized_handler
-def unauthorized():
-    return {"error": "Not logged in"}, 401
-
-@login_manager.needs_refresh_handler
-def refresh():
-    login_user(current_user)
-    return {"success": True}, 200
-
 
 class UserView(FlaskView):
     route_base = "/api/users"

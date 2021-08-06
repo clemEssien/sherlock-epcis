@@ -1,26 +1,31 @@
-import mongoengine as me
 from flask_login import UserMixin
+import os, sys
 
-class User(UserMixin, me.Document):
-    user_id = me.StringField()
-    first_name = me.StringField()
-    last_name = me.StringField()
-    email = me.StringField()
-    role = me.StringField() #User, Admin, Superuser
-    password_hash = me.StringField()
-    company_id = me.StringField()
-    last_sign_in = me.DateTimeField()
-    first_sign_in = me.DateTimeField()
-    last_password_change = me.DateTimeField()
-    password_reset = me.BooleanField()
-    account_locked = me.BooleanField()
-    auth_token = me.StringField()
-    refresh_token = me.StringField()
-    address1 = me.StringField()
-    address2 = me.StringField(required=False)
-    city = me.StringField()
-    state = me.StringField()
-    zip = me.StringField()
-    country = me.StringField()
-    phone = me.IntField()
-    email = me.StringField()
+currentdir = os.path.dirname(os.path.realpath(__file__))
+parentdir = os.path.dirname(currentdir)
+sys.path.append(parentdir)
+from init_db import db
+
+class User(UserMixin, db.Document):
+    user_id = db.StringField()
+    first_name = db.StringField()
+    last_name = db.StringField()
+    email = db.StringField()
+    role = db.StringField() #User, Admin, Superuser
+    password_hash = db.StringField()
+    company_id = db.StringField()
+    last_sign_in = db.DateTimeField()
+    first_sign_in = db.DateTimeField()
+    last_password_change = db.DateTimeField()
+    password_reset = db.BooleanField()
+    account_locked = db.BooleanField()
+    auth_token = db.StringField()
+    refresh_token = db.StringField()
+    address1 = db.StringField()
+    address2 = db.StringField(required=False)
+    city = db.StringField()
+    state = db.StringField()
+    zip = db.StringField()
+    country = db.StringField()
+    phone = db.IntField()
+    email = db.StringField()

@@ -9,6 +9,7 @@ from flask import Flask
 from flask_login import login_user, logout_user, login_required, current_user, LoginManager
 import pytest
 import json
+from init_app import create_app
 from models.user import User
 from services import mongodb_connector, user_services
 
@@ -26,11 +27,7 @@ from app import (
 # FIXTURES
 @pytest.fixture(scope="module")
 def client():
-    app = Flask(__name__)
-    app.config['MONGODB_SETTINGS'] = {
-        "host": os.getenv('MONGODB_HOST')
-    }
-    db = MongoEngine(app)
+    app = create_app()
 
     UserView.register(app)
     EventView.register(app)
@@ -46,6 +43,9 @@ def user_connector():
 
 @pytest.fixture
 def clean(user_connector):
+    if current_user and current_user.is_authenticated:
+        logout_user(current_user)
+
     user_connector.delete_all()
 
     user_connector.create_one(
@@ -61,6 +61,48 @@ def clean(user_connector):
 BASE = "http://127.0.0.1:5000"
 
 # TESTS
+
+@pytest.mark.usefixtures("clean")
+def test_signin(client):
+    body = {
+        "password": "123",
+        "email": "email",
+    }
+
+    response = client.post(BASE + "/api/users/signin", data=json.dumps(body))
+
+    assert response.status_code == 200
+    assert response.json["success"] == True
+
+@pytest.mark.usefixtures("clean")
+def test_signout_fail(client):
+
+    response = client.post(BASE + "/api/users/signout")
+
+    assert response.status_code == 401
+    assert response.json["error"] == "Not logged in"
+
+@pytest.mark.usefixtures("clean")
+def test_profile_fail(client):
+
+    response = client.get(BASE + "/api/users/profile")
+
+    assert response.status_code == 401
+    assert response.json["error"] == "Not logged in"
+
+@pytest.mark.usefixtures("clean")
+def test_profile(client):
+    body = {
+        "password": "123",
+        "email": "email",
+    }
+
+    response = client.post(BASE + "/api/users/signin", data=json.dumps(body))
+
+    response_profile = client.get(BASE + "/api/users/profile")
+
+    assert response.status_code == 200
+    assert response_profile.json["email"] == "email"
 
 @pytest.mark.usefixtures("clean")
 def test_create(client, user_connector):
