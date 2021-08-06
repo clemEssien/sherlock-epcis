@@ -167,7 +167,7 @@ class EPCISEvent:
 
     def __init__(self):
         """Creates a new EPCISEvent instance with empty, but type-hinted, attributes"""
-        self._event_id: UUID = None
+        self._event_id = UUID("00000000000000000000000000000000")
         self._event_time = datetime.datetime(1, 1, 1)
         self._event_timezone_offset = datetime.timezone(datetime.timedelta(hours=0))
         self._extensions: "list[dict]" = []
