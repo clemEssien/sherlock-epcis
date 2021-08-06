@@ -182,9 +182,14 @@ def test_change_password_success(client, user_connector):
 
 @pytest.mark.usefixtures("clean")
 def test_change_email(client, user_connector):
-    body = {
-        "user_id": "1",
+    body_signin = {
         "password": "123",
+        "email": "email",
+    }
+
+    client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+
+    body = {
         "new_email": "new@gmail.com",
         "confirm_new_email": "new@gmail.com"
     }
