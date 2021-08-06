@@ -1,10 +1,6 @@
-<<<<<<< HEAD
 import json
 from flask import Flask, jsonify, request, make_response
-=======
-from flask import Flask, jsonify, request
 import uuid
->>>>>>> main
 from flask_classful import FlaskView, route
 from flask_mongoengine import MongoEngine
 import mongoengine as me
