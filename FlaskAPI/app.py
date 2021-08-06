@@ -1,4 +1,4 @@
-import enum
+import json
 from flask import Flask, jsonify, request, make_response
 from flask_classful import FlaskView, route
 from neo4j import GraphDatabase
@@ -125,18 +125,20 @@ class TransformationView(FlaskView):
         if file and file_ext in ALLOWED_EXTENSIONS:
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-        # Create event object and populate it
+        # Create event objects and populate them
         if file_ext == "json":
-            return make_response(
-                {
-                    "result": "fail",
-                    "message": "JSON Files not currently supported",
-                    "code": 0,
-                    "data": {},
-                },
-                501,
-            )
-            event_list = epcis_from_json_file(file)
+            try:
+                event_list = epcis_from_json_file(file)
+            except:
+                return make_response(
+                    {
+                        "result": "fail",
+                        "message": "Couldn't extract EPCIS events from JSON File",
+                        "code": 0,
+                        "data": {},
+                    },
+                    400,
+                )
         elif file_ext == "xml":
             try:
                 event_list = epcis_from_xml_file(file)
@@ -218,10 +220,26 @@ class TransformationView(FlaskView):
 
 def epcis_from_json_file(file: FileStorage) -> "list[epc.EPCISEvent]":
     """Function to return a list of EPCISEvent objects from a JSON file"""
-    # verify that file is an epcis document
+    with open(
+        os.path.join(app.config["UPLOAD_FOLDER"], secure_filename(file.filename))
+    ) as f:
+        json_dict = json.load(f)
 
-    # isolate epcis events from file
-    pass
+    # document follows proposed EPCIS2.0 JSON bindings
+    if json_dict["isA"].lower() == "epcisdocument":
+        json_event_list = json_dict["epcisBody"]["eventList"]
+    # document does not follow proposed EPCIS2.0 JSON bindings
+    else:
+        pass
+
+    # populate EPCISEvent object from JSON events
+    event_list = []
+    for json_event in json_event_list:
+        event = event_types[json_event["isA"]]()
+        ex_json.map_from_epcis(event, json_event)
+        event_list.append(event)
+
+    return event_list
 
 
 def epcis_from_xml_file(file: FileStorage) -> "list[epc.EPCISEvent]":
