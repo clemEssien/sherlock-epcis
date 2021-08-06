@@ -28,27 +28,30 @@ class UserView(FlaskView):
 
         Request Body:
             {
-                first_name: str,
-                last_name: str,
                 password: str,
+                confirmPassword: str,
                 email: str,
             }
         """
-        user_id = str(uuid.uuid4())
+        userId = str(uuid.uuid4())
+        bodyJson=json.loads(request.get_data())
 
-        body_json=json.loads(request.get_data())
-        email = body_json["email"]
-        password = body_json["password"]
-        last_name=body_json["last_name"]
-        first_name=body_json["first_name"]
+        for key in ["email", "password", "confirmPassword"]:
+            if not (key in bodyJson):
+                return {"error": "Bad Data"}, 401
+
+        email = bodyJson["email"]
+        password = bodyJson["password"]
+        confirmPassword = bodyJson["confirmPassword"]
+
+        if password != confirmPassword:
+            return {"error": "Passwords do not match"}, 400 
 
         user_connector.create_one(
-            user_id=user_id, 
+            userId=userId, 
             email=email,
-            last_name=last_name, 
-            first_name=first_name,
             role="User",
-            password_hash=generate_password_hash(password)
+            passwordHash=generate_password_hash(password)
         )
 
         return {"success": True}
@@ -64,14 +67,14 @@ class UserView(FlaskView):
                 email: str,
             }
         """
-        body_json = json.loads(request.get_data())
+        bodyJson = json.loads(request.get_data())
 
         for key in ["password", "email"]:
-            if not (key in body_json):
+            if not (key in bodyJson):
                 return {"error": "Bad Data"}, 401
 
-        email = body_json["email"]
-        password = body_json["password"]
+        email = bodyJson["email"]
+        password = bodyJson["password"]
         
         try:
             user = user_connector.get_one(email=email)
@@ -80,7 +83,7 @@ class UserView(FlaskView):
         except:
             return {"error": "Server error"}, 400
         
-        if not user or not check_password_hash(user.password_hash, password):
+        if not user or not check_password_hash(user.passwordHash, password):
             return {"error": "Invalid credentials"}, 400 
 
         login_user(user)
@@ -93,7 +96,7 @@ class UserView(FlaskView):
         logout_user()
         return {"success": True}
 
-    @route("/change_password", methods=["POST"])
+    @route("/changePassword", methods=["POST"])
     def change_password(self):
         """
         Changes the password for a given user
@@ -101,9 +104,9 @@ class UserView(FlaskView):
         Request Body:
             {
                 email: str,
-                old_password: str,
-                new_password: str,
-                confirm_new_password: str,
+                oldPassword: str,
+                newPassword: str,
+                confirmNewPassword: str,
             }
 
         Error Codes:
@@ -117,17 +120,17 @@ class UserView(FlaskView):
                 success: true
             }
         """
-        body_json = json.loads(request.get_data())
+        bodyJson = json.loads(request.get_data())
 
         # check the body for the minimum required variables for this call:
-        for key in ["email", "new_password", "confirm_new_password", "old_password"]:
-            if not (key in body_json):
+        for key in ["email", "newPassword", "confirmNewPassword", "oldPassword"]:
+            if not (key in bodyJson):
                 return {"error": "Bad Data"}, 401
 
-        new_password = body_json["new_password"]
-        confirm_new_passwords = body_json["confirm_new_password"]
-        email = body_json["email"]
-        old_password = body_json["old_password"]
+        newPassword = bodyJson["newPassword"]
+        confirmNewPassword = bodyJson["confirmNewPassword"]
+        email = bodyJson["email"]
+        oldPassword = bodyJson["oldPassword"]
 
         try:
             user = user_connector.get_one(email=email)
@@ -136,15 +139,15 @@ class UserView(FlaskView):
         except:
             return {"error": "Server error"}, 400
 
-        if (not check_password_hash(user.password_hash, old_password)):
+        if (not check_password_hash(user.passwordHash, oldPassword)):
             return {"error": "Incorrect password"}, 400 
-        if (new_password != confirm_new_passwords):
+        if (newPassword != confirmNewPassword):
             return {"error": "New passwords do not match"}, 400 
 
-        user_connector.update(user, password_hash=generate_password_hash(new_password))
+        user_connector.update(user, passwordHash=generate_password_hash(newPassword))
         return {"success": True}
 
-    @route("/change_email", methods=["POST"])
+    @route("/changeEmail", methods=["POST"])
     @login_required
     def change_email(self):
         """
@@ -152,8 +155,8 @@ class UserView(FlaskView):
 
         Request Body:
             {
-                new_email: str,
-                confirm_new_email: str,
+                newEmail: str,
+                confirmNewEmail: str,
             }
 
         Error Codes:
@@ -167,29 +170,29 @@ class UserView(FlaskView):
                 success: true
             }
         """
-        body_json = json.loads(request.get_data())
+        bodyJson = json.loads(request.get_data())
 
-        for key in ["new_email", "confirm_new_email"]:
-            if not (key in body_json):
+        for key in ["newEmail", "confirmNewEmail"]:
+            if not (key in bodyJson):
                 return {"error": "Bad Data"}, 401
 
-        new_email = body_json["new_email"]
-        confirm_new_email = body_json["confirm_new_email"]
+        newEmail = bodyJson["newEmail"]
+        confirmNewEmail = bodyJson["confirmNewEmail"]
 
-        if (new_email != confirm_new_email):
+        if (newEmail != confirmNewEmail):
             return {"error": "Emails do not match"}, 400 
 
-        user_connector.update(current_user, email=new_email)
+        user_connector.update(current_user, email=newEmail)
         return {"success": True}
 
-    @route("/get_user", methods=["GET"])
+    @route("/getUser", methods=["GET"])
     def get_user(self):
         """
         Gets a single user based off of id
 
         Request Body:
             {
-                user_id: str,
+                userId: str,
             }
 
         Error Codes:
@@ -200,11 +203,16 @@ class UserView(FlaskView):
                 ... (user object)
             }
         """
-        body_json = json.loads(request.get_data())
-        user_id = body_json["user_id"]
+        bodyJson = json.loads(request.get_data())
+
+        for key in ["userId"]:
+            if not (key in bodyJson):
+                return {"error": "Bad Data"}, 401
+
+        userId = bodyJson["userId"]
         
         try:
-            user = user_connector.get_one(user_id=user_id)
+            user = user_connector.get_one(userId=userId)
         except:
             return {"error": "User not found"}, 400
 

@@ -6,6 +6,6 @@ sys.path.append(parentdir)
 from init_app import db
 
 class Company(db.Document):
-    company_id = db.StringField()
+    companyId = db.StringField()
     name = db.StringField()
     address = db.StringField()

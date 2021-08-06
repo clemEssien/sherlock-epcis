@@ -49,13 +49,13 @@ def clean(user_connector):
     user_connector.delete_all()
 
     user_connector.create_one(
-        user_id = "1",
-        first_name = "first",
-        last_name = "last",
+        userId = "1",
+        firstName = "first",
+        lastName = "last",
         email = "email",
         role = "User",
-        password_hash = generate_password_hash("123"), #hash for "123"
-        company_id = "456"
+        passwordHash = generate_password_hash("123"), #hash for "123"
+        companyId = "456"
     )
 
 BASE = "http://127.0.0.1:5000"
@@ -107,9 +107,8 @@ def test_profile(client):
 @pytest.mark.usefixtures("clean")
 def test_create(client, user_connector):
     body = {
-        "first_name": "Nathaniel",
-        "last_name": "Moschkin",
         "password": "nathan123",
+        "confirmPassword": "nathan123",
         "email": "nathaniel.moschkin@precise-soft.com",
     }
 
@@ -119,18 +118,18 @@ def test_create(client, user_connector):
 
     assert response.status_code == 200
     assert response.json["success"] == True
-    assert user.first_name == "Nathaniel"
+    assert user.email == "nathaniel.moschkin@precise-soft.com"
 
 @pytest.mark.usefixtures("clean")
 def test_change_password_wrong_pass(client):
     body = {
         "email": "email",
-        "old_password": "456",
-        "new_password": "abc",
-        "confirm_new_password": "abc"
+        "oldPassword": "456",
+        "newPassword": "abc",
+        "confirmNewPassword": "abc"
     }
 
-    response = client.post(BASE + "/api/users/change_password", data=json.dumps(body))
+    response = client.post(BASE + "/api/users/changePassword", data=json.dumps(body))
 
     assert response.status_code == 400
     assert response.json["error"] == "Incorrect password"
@@ -139,12 +138,12 @@ def test_change_password_wrong_pass(client):
 def test_change_password_not_found(client):
     body = {
         "email": "bademail",
-        "old_password": "456",
-        "new_password": "abc",
-        "confirm_new_password": "abc"
+        "oldPassword": "456",
+        "newPassword": "abc",
+        "confirmNewPassword": "abc"
     }
 
-    response = client.post(BASE + "/api/users/change_password", data=json.dumps(body))
+    response = client.post(BASE + "/api/users/changePassword", data=json.dumps(body))
 
     assert response.status_code == 400
     assert response.json["error"] == "User not found"
@@ -153,12 +152,12 @@ def test_change_password_not_found(client):
 def test_change_password_mismatch(client):
     body = {
         "email": "email",
-        "old_password": "123",
-        "new_password": "abc",
-        "confirm_new_password": "def"
+        "oldPassword": "123",
+        "newPassword": "abc",
+        "confirmNewPassword": "def"
     }
 
-    response = client.post(BASE + "/api/users/change_password", data=json.dumps(body))
+    response = client.post(BASE + "/api/users/changePassword", data=json.dumps(body))
 
     assert response.status_code == 400
     assert response.json["error"] == "New passwords do not match"
@@ -167,18 +166,18 @@ def test_change_password_mismatch(client):
 def test_change_password_success(client, user_connector):
     body = {
         "email": "email",
-        "old_password": "123",
-        "new_password": "456",
-        "confirm_new_password": "456"
+        "oldPassword": "123",
+        "newPassword": "456",
+        "confirmNewPassword": "456"
     }
 
-    response = client.post(BASE + "/api/users/change_password", data=json.dumps(body))
+    response = client.post(BASE + "/api/users/changePassword", data=json.dumps(body))
 
     user = user_connector.get_one(email="email")
 
     assert response.status_code == 200
     assert response.json["success"] == True
-    assert check_password_hash(user.password_hash, "456")
+    assert check_password_hash(user.passwordHash, "456")
 
 @pytest.mark.usefixtures("clean")
 def test_change_email(client, user_connector):
@@ -190,13 +189,13 @@ def test_change_email(client, user_connector):
     client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
 
     body = {
-        "new_email": "new@gmail.com",
-        "confirm_new_email": "new@gmail.com"
+        "newEmail": "new@gmail.com",
+        "confirmNewEmail": "new@gmail.com"
     }
 
-    response = client.post(BASE + "/api/users/change_email", data=json.dumps(body))
+    response = client.post(BASE + "/api/users/changeEmail", data=json.dumps(body))
 
-    user = user_connector.get_one(user_id="1")
+    user = user_connector.get_one(userId="1")
 
     assert response.status_code == 200
     assert response.json["success"] == True
@@ -205,10 +204,10 @@ def test_change_email(client, user_connector):
 @pytest.mark.usefixtures("clean")
 def test_get_user(client):
     body = {
-        "user_id": "1"
+        "userId": "1"
     }
 
-    response = client.get(BASE + "/api/users/get_user", data=json.dumps(body))
+    response = client.get(BASE + "/api/users/getUser", data=json.dumps(body))
 
     assert response.status_code == 200
-    assert check_password_hash(response.json["password_hash"], "123")
+    assert check_password_hash(response.json["passwordHash"], "123")
