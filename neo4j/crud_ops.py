@@ -2,14 +2,6 @@ import utils as ut
 import json
 import db_connect as db_con
 import os
-import sys
-currentdir = os.path.dirname(os.path.realpath(__file__))
-parentdir = os.path.dirname(currentdir)
-sys.path.append(parentdir)
-
-from JSONDeserialization import epcis_event as epc
-from JSONDeserialization import extract_gis_from_json as gis
-
 
 class Node:
     '''
@@ -30,24 +22,19 @@ class Node:
         returns an epcis event
         '''
         attribute_dict = self.retrieve_node_properties()
-        # print(attribute_dict)
         event_name = attribute_dict["name"]
-        event = event_types[event_name]()
-        # print(event)
+        event = ut.event_types[event_name]()
         for attr in list(event.__dict__.keys()):
             attr = attr[1:]
 
             try:
                 instvar = getattr(event, attr)
-                # print(attribute_dict[attr])
-                value = ut.attr_type_check(instvar, attr)
-                print(instvar," : ",(attr), " : ", type(attr))
+                value = ut.attr_type_check(instvar, attribute_dict[attr])
                 setattr(event, attr, value)
             except Exception as e:
-                e
-                # print(str(e))
+                print(str(e), " : ",attr)
 
-        # return event
+        return event
 
     def update_node(self):
         '''
@@ -63,11 +50,8 @@ class Node:
                         WHERE m.event_id = $event_id""" +\
                     """ SET  m = """+attr_dict + \
                     """ RETURN m"""
-        # print(cipher_ql)
+        
         result = connectdb().query(cipher_ql,{"event_id": str(self.event_id)})
-        a = result[0].data()
-        # print((list(a['m'])))
-        print(a['m'])
         return result
 
     def remove_node_property(self,attribute):
@@ -77,10 +61,12 @@ class Node:
         Arg:
             attrubute: str
         '''
-        cipher_ql = """
-                    MATCH (m:$event_name)
+        cipher_ql = """ 
+                    MATCH (m:"""+ \
+                                self.event_name + """
+                               )
                     WHERE m.event_id = $event_id
-                    REMOVE m.$attribute
+                    REMOVE m."""+attribute + """
                     RETURN m
         """
         result = connectdb().query(cipher_ql,{"event_id": str(self.event_id), "event_name":self.event_name, "attribute":attribute})
@@ -107,32 +93,33 @@ class Node:
         '''
         this method creates relationship between the class node and another
         Args:
-             Event_b : Event
+             Event_b : Event (i.e. event to create a relationship with)
              relationship_label: str
              relationship_values: list (optional)
         '''
         event_b_name =  Event_b.__class__.__name__ 
-        cipher_ql = """ MATCH (a:$event_a_name), (m:$event_b_name)
-                        WHERE a.event_id = $event_a_id AND m.event_id = $event_b_id
-                        CREATE (a)-[rel: $relationship_label {name : $relationship_values}]->(m)
-                        RETURN a.name, rel 
-                    """
-        result = connectdb().query(cipher_ql,{"event_a_id": str(self.event_id), "event_b_id": Event_b.event_id,
-        "event_a_name":self.event_name, "event_b_name":event_b_name, "relationship_label":relationship_label,
-        "relationship_values":relationship_values})
-        # print(result)
+        
+        cipher_ql = """
+                    MATCH (a:"""+ self.event_name +"""), (m: """+ event_b_name +""")
+                    WHERE a.event_id = $event_a_id AND m.event_id = $event_b_id
+                    CREATE (a)-[rel: """+relationship_label+ """ {name : $relationship_values}]->(m)
+                    RETURN a.name, rel
+        """
+        print(cipher_ql)
+        result = connectdb().query(cipher_ql,{"event_a_id": str(self.event_id), "event_b_id": str(Event_b._event_id),
+        "relationship_label":relationship_label,"relationship_values":relationship_values})
+        
         return result
 
     def delete_node(self):
         '''
         This method deletes a node/event using its event_id
         '''
-        cipher_ql = """ MATCH (n:$event_name {event_id : $event_id})
+        cipher_ql = """ MATCH (n:"""+ self.event_name + """{event_id : $event_id})
                         DETACH DELETE n
                     """
-        result = connectdb().query(cipher_ql,{"event_id": str(self.event_id), "event_name":self.event_name})
+        result = connectdb().query(cipher_ql,{"event_id": str(self.event_id)})
         return result
-
 
 global conn 
 conn = None
@@ -145,36 +132,3 @@ def connectdb() -> db_con.Neo4jConnection:
                        password=os.environ['NEO4J_PASSWORD'])
 
     return conn
-
-event_types = {
-    "ObjectEvent": epc.ObjectEvent,
-    "AggregationEvent": epc.AggregationEvent,
-    "QuantityEvent": epc.QuantityEvent,
-    "TransactionEvent": epc.TransactionEvent,
-    "TransformationEvent": epc.TransformationEvent,
-}
-
-import uuid
-obj_event = event_types["ObjectEvent"]()
-agg_event = event_types["AggregationEvent"]()
-tx_event = epc.TransactionEvent
-trans_event = epc.TransformationEvent
-trans_event1 = epc.TransformationEvent
-qty_event = epc.QuantityEvent
-
-obj_event.event_id = uuid.UUID("14ab0519-c147-43c6-a6ea-9bd21c259752").hex
-obj_event._read_point = "urn:epc:id:sgln:0012345.11111.400"
-
-obj_event.name = "ObjectEvent"
-obj_event.epc_list = ["urn:epc:id:sgtin:0614141.107346.2017","urn:epc:id:sgtin:0614141.107346.2018"]
-node = Node(obj_event)
-
-
-
-node.update_node()
-my_dict = node.retrieve_node_properties()
-# print(my_dict)
-# a = node.retrieve_node_by_event_id()
-# print("**********************************************")
-# print(a)
-# print(obj_event.event_id, str(obj_event.read_point))

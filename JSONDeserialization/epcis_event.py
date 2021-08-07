@@ -167,7 +167,7 @@ class EPCISEvent:
 
     def __init__(self):
         """Creates a new EPCISEvent instance with empty, but type-hinted, attributes"""
-        self._event_id = UUID
+        self._event_id = UUID("00000000000000000000000000000000")
         self._event_time = datetime.datetime(1, 1, 1)
         self._event_timezone_offset = datetime.timezone(datetime.timedelta(hours=0))
         self._extensions: "list[dict]" = []
@@ -187,7 +187,6 @@ class EPCISEvent:
     @event_id.setter
     def event_id(self, value: UUID):
         if isinstance(value, str):
-            print("setting event_id")
             try:
                 value = UUID(value)
             except:
@@ -265,10 +264,10 @@ class EPCISEvent:
         return self._extensions
 
     @extensions.setter
-    def extensions(self, value: dict):
+    def extensions(self, value: list):
         """Append dict to list of extensions."""
-        if isinstance(value, dict):
-            self._extensions.append(value)
+        if isinstance(value, list):
+            self._extensions = value
         else:
             raise TypeError("Invalid data type. Must be a dict.")
 
