@@ -6,6 +6,8 @@ parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
 import json
+from dotenv import load_dotenv
+load_dotenv()
 import db_connect as db_con
 import utils as ut
 
