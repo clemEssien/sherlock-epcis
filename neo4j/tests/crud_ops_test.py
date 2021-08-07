@@ -1,8 +1,4 @@
-import re
 import uuid
-from datetime import datetime, timezone, timedelta
-from dateutil import tz
-
 import os
 import sys
 currentdir = os.path.dirname(os.path.realpath(__file__))
@@ -12,7 +8,6 @@ import crud_ops as c
 import nodes as n
 
 from JSONDeserialization import epcis_event as epc
-
 
 obj_event = epc.ObjectEvent()
 agg_event = epc.AggregationEvent()

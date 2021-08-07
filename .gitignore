@@ -58,3 +58,4 @@ env/
 .vs/
 .vs
 json_files/
+.env
