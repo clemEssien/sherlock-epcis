@@ -178,6 +178,11 @@ class ShippingCTE(CTEBase):
             output.location_of_traceability_lot_code_generator: str,
             output.location_of_recipient: str,
             output.location_of_source_of_shipment: str,
+            output.transporter_name: str,
+            output.lot_code_poc_name: str,
+            output.lot_code_poc_phone: str,
+            output.lot_code_poc_email: str,
+            output.shipment_datetime: datetime.datetime,
         }
 
         map_from_json(json_data, output, types)

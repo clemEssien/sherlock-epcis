@@ -131,7 +131,7 @@ class CreationCTE(CTEBase):
         output = cls()
         types = {
             output.traceability_product: list,
-            output.creation_completion_date: datetime,
+            output.creation_completion_date: datetime.datetime,
             output.location_where_food_was_created: str,
             output.quantity: list,
             output.unit_of_measure: list,
