@@ -24,11 +24,11 @@ from JSONDeserialization.epcis_event import (
 from cte import CTEBase
 import json
 import datetime
-
+from tools.serializer import jsonid
 
 class GrowingCTE:
     """
-    Provides a class for the Receiving CTE and defines its KDEs
+    Provides a class for the Growing CTE and defines its KDEs
 
     KDEs:
 
@@ -72,10 +72,11 @@ class GrowingCTE:
         self._sprout_traceability_lot_code = ""
         self._seed_lot_code_production_dates = []
 
-
+    @classmethod 
     def new_from_data(cls, data: dict):
         pass
 
+    @classmethod 
     def new_from_epcis(cls, event: EPCISEvent):
         output = cls()
 
@@ -88,20 +89,25 @@ class GrowingCTE:
         
         return output
 
+    @classmethod 
     def new_from_json(cls, json_data: str):
         data = json.loads(json_data)
         return cls.new_from_data(data)
 
+    @classmethod 
     def new_from_excel(cls, excel_data: str):
         pass
 
+    @classmethod 
     def save_to_excel(self):
         pass
 
+    @classmethod 
     def new_from_csv(cls, csv_lines: "list[str]"):
         pass
 
     @property
+    @jsonid("traceabilityLotCode")
     def traceability_lot_code(self) -> List:
         return self._traceability_lot_code
 
@@ -110,6 +116,7 @@ class GrowingCTE:
         self._traceability_lot_code = value
 
     @property
+    @jsonid("growingLocation")
     def growing_location(self) -> str:
         return self._growing_location
 
@@ -118,6 +125,7 @@ class GrowingCTE:
         self._growing_location = value  
 
     @property
+    @jsonid("seedGrowerLocation")
     def seed_grower_location(self) -> str:
         return self._seed_grower_location
 
@@ -126,6 +134,7 @@ class GrowingCTE:
         self._seed_grower_location = value
 
     @property
+    @jsonid("seedGrowerLotCode")
     def seed_grower_lot_code(self) -> str:
         return self._seed_grower_lot_code
 
@@ -134,6 +143,7 @@ class GrowingCTE:
         self._seed_grower_lot_code = value 
 
     @property
+    @jsonid("seedHarvestDate")
     def seed_harvest_date(self) -> datetime.datetime:
         return self._seed_harvest_date
 
@@ -142,6 +152,7 @@ class GrowingCTE:
         self._seed_harvest_date = value 
 
     @property
+    @jsonid("seedConditionerLocation")
     def seed_conditioner_location(self) -> str:
         return self._seed_conditioner_location
 
@@ -150,6 +161,7 @@ class GrowingCTE:
         self._seed_conditioner_location = value 
 
     @property
+    @jsonid("seedConditionerLotCode")
     def seed_conditioner_lot_code(self) -> str:
         return self._seed_conditioner_lot_code
 
@@ -158,6 +170,7 @@ class GrowingCTE:
         self._seed_conditioner_lot_code = value 
 
     @property
+    @jsonid("seedConditioningDate")
     def seed_conditioning_date(self) -> datetime.datetime:
         return self._seed_conditioning_date
 
@@ -166,6 +179,7 @@ class GrowingCTE:
         self._seed_conditioning_date = value 
 
     @property
+    @jsonid("seedPackinghouseLocation")
     def seed_packinghouse_location(self) -> List:
         return self._seed_packinghouse_location
 
@@ -174,6 +188,7 @@ class GrowingCTE:
         self._seed_packinghouse_location = value 
 
     @property
+    @jsonid("seedPackinghouseLotCode")
     def seed_packinghouse_lot_code(self) -> List:
         return self._seed_packinghouse_lot_code
 
@@ -182,6 +197,7 @@ class GrowingCTE:
         self._seed_packinghouse_lot_code = value 
 
     @property
+    @jsonid("seedPackinghouseDate")
     def seed_packinghouse_date(self) -> List[datetime.datetime]:
         return self._seed_packinghouse_date
 
@@ -190,6 +206,7 @@ class GrowingCTE:
         self._seed_packinghouse_date = value 
 
     @property
+    @jsonid("seedSupplierLocation")
     def seed_supplier_location(self) -> str:
         return self._seed_supplier_location
 
@@ -198,6 +215,7 @@ class GrowingCTE:
         self._seed_supplier_location = value 
 
     @property
+    @jsonid("seedDescription")
     def seed_description(self) -> str:
         return self._seed_description
 
@@ -206,6 +224,7 @@ class GrowingCTE:
         self._seed_description = value 
 
     @property
+    @jsonid("seedSupplierLotCode")
     def seed_supplier_lot_code(self) -> str:
         return self._seed_supplier_lot_code
 
@@ -214,6 +233,7 @@ class GrowingCTE:
         self._seed_supplier_lot_code = value 
 
     @property
+    @jsonid("seedReceiptData")
     def seed_receipt_date(self) -> datetime.datetime:
         return self._seed_receipt_date
 
@@ -222,6 +242,7 @@ class GrowingCTE:
         self._seed_receipt_date = value 
 
     @property
+    @jsonid("sproutTraceabilityLotCode")
     def sprout_traceability_lot_code(self) -> str:
         return self._sprout_traceability_lot_code
 
@@ -230,6 +251,7 @@ class GrowingCTE:
         self._sprout_traceability_lot_code = value 
 
     @property
+    @jsonid("seedLotCodeProductionDates")
     def seed_lot_code_production_dates(self) -> List:
         return self._seed_lot_code_production_dates
 
@@ -237,6 +259,7 @@ class GrowingCTE:
     def seed_lot_code_production_dates(self, value: List):
         self._seed_lot_code_production_dates = value          
 
+    @classmethod 
     def output_xlsx(self) -> str:
         """
         Create an excel spreadsheet and output the contents to an XML string
@@ -247,6 +270,7 @@ class GrowingCTE:
         v = "foobar"
         return v
 
+    @classmethod 
     def save_as_xlsx(self, filename: str):
         pass
         # code here
