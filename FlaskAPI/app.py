@@ -18,6 +18,10 @@ import mongoengine as me
 
 from .models.user import User
 
+from ..JSONDeserialization import epcis_event as epc
+from ..JSONDeserialization import extract_gis_from_json as ex_json
+
+
 from services import user_services, mongodb_connector
 from init_app import create_app
 from neo4j import GraphDatabase
@@ -35,10 +39,10 @@ load_dotenv()
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
-import JSONDeserialization.epcis_event as epc
-import JSONDeserialization.extract_gis_from_json as ex_json
-import XMLDeserialization.extract_gis_from_xml as ex_xml
-from epcis_cte_transformation.cte_detector import CTEDetector
+# import JSONDeserialization.epcis_event as epc
+# import JSONDeserialization.extract_gis_from_json as ex_json
+# import XMLDeserialization.extract_gis_from_xml as ex_xml
+# from epcis_cte_transformation.cte_detector import CTEDetector
 
 # Temporary sandbox database, probably expired
 USER = os.getenv("DB_USER")
@@ -347,7 +351,8 @@ def epcis_from_json_file(file: FileStorage) -> "list[epc.EPCISEvent]":
     else:
         pass
     # populate EPCISEvent object from JSON events
-    for e in json_event_list: print("event:",e)
+    for e in json_event_list:
+        print("event:", e)
     event_list = []
     for json_event in json_event_list:
         print("for json_Event in json_event_list")
