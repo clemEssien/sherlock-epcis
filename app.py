@@ -1,21 +1,39 @@
 import os, sys
 
 import json
-from flask import Flask, jsonify, request, make_response
+from flask import (
+    Flask,
+    jsonify,
+    request,
+    make_response,
+    flash,
+    redirect,
+    url_for,
+    send_from_directory,
+)
 import uuid
 from flask_classful import FlaskView, route
 from flask_mongoengine import MongoEngine
 import mongoengine as me
+from pymongo.common import EVENTS_QUEUE_FREQUENCY
 
-from .models.user import User
+from FlaskAPI.models.user import User
 
-from services import user_services, mongodb_connector
-from init_app import create_app
+from FlaskAPI.services import user_services, mongodb_connector
+from FlaskAPI.init_app import create_app
 from neo4j import GraphDatabase
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
+from tools.serializer import map_to_json
 
-from routes.user import UserView
+# from epcis_cte_transformation.cte import CTEBase
+# from epcis_cte_transformation.creation_cte import CreationCTE
+# from epcis_cte_transformation.growing_cte import GrowingCTE
+# from epcis_cte_transformation.receiving_cte import ReceivingCTE
+# from epcis_cte_transformation.shipping_cte import ShippingCTE
+# from epcis_cte_transformation.transformation_cte import TransformationCTE
+
+from FlaskAPI.routes.user import UserView
 
 from dotenv import load_dotenv
 import xml.etree.ElementTree as ET
@@ -39,11 +57,6 @@ driver = GraphDatabase.driver(uri=URI, auth=(USER, PASS))
 
 app = create_app()
 
-UPLOAD_FOLDER = "./FlaskAPI/uploads"
-ALLOWED_EXTENSIONS = {"json", "xml"}
-
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-
 event_types = {
     "ObjectEvent": epc.ObjectEvent,
     "AggregationEvent": epc.AggregationEvent,
@@ -51,12 +64,6 @@ event_types = {
     "TransactionEvent": epc.TransactionEvent,
     "TransformationEvent": epc.TransformationEvent,
 }
-
-
-import os
-from flask import flash, redirect, url_for, send_from_directory, make_response
-from werkzeug.utils import secure_filename
-import json
 
 UPLOAD_FOLDER = "/var/src/uploads"
 ALLOWED_EXTENSIONS = {
@@ -289,39 +296,42 @@ class TransformationView(FlaskView):
             if cte_type == "creation":
                 from epcis_cte_transformation.creation_cte import CreationCTE
 
-                cte = CreationCTE.new_from_epcis(CreationCTE, event)
+                cte = CreationCTE.new_from_epcis(event)
             elif cte_type == "growing":
                 # from epcis_cte_transformation.growing_cte import GrowingCTE
-                # cte = GrowingCTE.new_from_epcis(GrowingCTE, event)
+                # cte = GrowingCTE.new_from_epcis(event)
+                cte = None
                 pass
             elif cte_type == "transformation":
                 from epcis_cte_transformation.transformation_cte import (
                     TransformationCTE,
                 )
 
-                cte = TransformationCTE.new_from_epcis(TransformationCTE, event)
+                cte = TransformationCTE.new_from_epcis(event)
             elif cte_type == "shipping":
                 from epcis_cte_transformation.shipping_cte import ShippingCTE
 
-                cte = ShippingCTE.new_from_epcis(ShippingCTE, event)
+                cte = ShippingCTE.new_from_epcis(event)
             elif cte_type == "receiving":
                 from epcis_cte_transformation.receiving_cte import ReceivingCTE
 
-                cte = ShippingCTE.new_from_epcis(ShippingCTE, event)
+                cte = ReceivingCTE.new_from_epcis(event)
+
             else:
                 # invalid cte type
-                raise ValueError("CTE is an invalid type")
+                return "CTE is an invalid type", 400
 
             # Store data in Neo4j database
+            if cte:
+                cte_list.append(map_to_json(cte))
 
-            cte_list.append(cte)
         # Return CTEs to user
         return make_response(
             {
                 "result": "ok",
                 "message": "CTE detected",
                 "code": 0,
-                "data": cte_list,
+                "CTEs": cte_list,
             },
             200,
         )
@@ -342,19 +352,22 @@ def epcis_from_json_file(file: FileStorage) -> "list[epc.EPCISEvent]":
         os.path.join(app.config["UPLOAD_FOLDER"], secure_filename(file.filename))
     ) as f:
         json_dict = json.load(f)
-
     # document follows proposed EPCIS2.0 JSON bindings
     if json_dict["isA"].lower() == "epcisdocument":
         json_event_list = json_dict["epcisBody"]["eventList"]
     # document does not follow proposed EPCIS2.0 JSON bindings
     else:
         pass
-
     # populate EPCISEvent object from JSON events
     event_list = []
     for json_event in json_event_list:
         event = event_types[json_event["isA"]]()
-        ex_json.map_from_epcis(event, json_event)
+        print("json_event: ", json_event)
+        print("json_event type:", type(json_event))
+        try:
+            ex_json.map_from_epcis(event, json_event)
+        except Exception as e:
+            print("map_from_epcis error", e)
         event_list.append(event)
 
     return event_list
@@ -366,6 +379,7 @@ def epcis_from_xml_file(file: FileStorage) -> "list[epc.EPCISEvent]":
         tree = ET.parse(
             os.path.join(app.config["UPLOAD_FOLDER"], secure_filename(file.filename))
         )
+
     except:
         raise ValueError("Couldn't parse XML file")
     root = tree.getroot()
@@ -383,7 +397,10 @@ def epcis_from_xml_file(file: FileStorage) -> "list[epc.EPCISEvent]":
                     event_from_xml = ex_xml.find_event_from_xml(event, event_types)
                     event = event_types[event_from_xml]
                 xml_dict = ex_xml.map_to_epcis_dict(xml_doc)
-                ex_xml.map_from_epcis(event, xml_dict)
+                try:
+                    ex_xml.map_from_epcis(event, xml_dict)
+                except Exception as e:
+                    print("map_from_epcis error:", e)
                 events.append(event)
     return events
 

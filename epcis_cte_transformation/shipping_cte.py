@@ -1,6 +1,6 @@
 from abc import ABC, abstractclassmethod, abstractmethod
-from typing import List, ValuesView
-from cte import CTEBase
+from typing import List
+from epcis_cte_transformation.cte import CTEBase
 import os, sys
 import datetime
 import json

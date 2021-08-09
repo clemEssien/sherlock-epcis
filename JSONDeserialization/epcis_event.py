@@ -269,7 +269,7 @@ class EPCISEvent:
         if isinstance(value, list):
             self._extensions = value
         else:
-            raise TypeError("Invalid data type. Must be a dict.")
+            raise TypeError("Invalid data type. Must be a list.")
 
     def delete_extensions(self):
         """Delete the list of extensions."""
