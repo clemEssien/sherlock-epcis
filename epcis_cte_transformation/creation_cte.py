@@ -45,9 +45,11 @@ class CreationCTE(CTEBase):
         self._quantity = []
         self._unit_of_measure = []
 
+    @classmethod
     def new_from_data(cls, data: dict):
         pass
 
+    @classmethod
     def new_from_epcis(cls, event: EPCISEvent):
         """
         Create a new CTE from an EPCIS event
@@ -121,6 +123,7 @@ class CreationCTE(CTEBase):
                 output.location_where_food_was_created = ""
         return output
 
+    @classmethod
     def new_from_json(cls, json_data: str):
         """
         Create a new CTE from JSON data
@@ -128,7 +131,7 @@ class CreationCTE(CTEBase):
         output = cls()
         types = {
             output.traceability_product: list,
-            output.creation_completion_date: datetime,
+            output.creation_completion_date: datetime.datetime,
             output.location_where_food_was_created: str,
             output.quantity: list,
             output.unit_of_measure: list,
@@ -147,6 +150,7 @@ class CreationCTE(CTEBase):
         pass
 
     @property
+    @jsonid("traceabilityProduct")
     def traceability_product(self) -> List:
         return self._traceability_product
 
@@ -155,6 +159,7 @@ class CreationCTE(CTEBase):
         self._traceability_product = value
 
     @property
+    @jsonid("creationCompletionDate")
     def creation_completion_date(self) -> datetime.datetime:
         return self._creation_completion_date
 
@@ -163,6 +168,7 @@ class CreationCTE(CTEBase):
         self._creation_completion_date = value
 
     @property
+    @jsonid("locationWhereFoodWasCreated")
     def location_where_food_was_created(self) -> str:
         return self._location_where_food_was_created
 
@@ -171,6 +177,7 @@ class CreationCTE(CTEBase):
         self._location_where_food_was_created = value
 
     @property
+    @jsonid("quantity")
     def quantity(self) -> List:
         return self._quantity
 
@@ -179,6 +186,7 @@ class CreationCTE(CTEBase):
         self._quantity = value
 
     @property
+    @jsonid("unit")
     def unit_of_measure(self) -> List:
         return self._unit_of_measure
 

@@ -48,6 +48,7 @@ class TransformationCTE(CTEBase):
         self._new_traceability_product = []
         self._unit_of_measure = []
 
+    @classmethod
     def new_from_data(cls, data: dict):
         pass
 
@@ -108,6 +109,7 @@ class TransformationCTE(CTEBase):
                 output.location_of_transformation = ""
         return output
 
+    @classmethod
     def new_from_json(cls, json_data: str):
         """
         Create a new CTE from JSON data
@@ -127,12 +129,14 @@ class TransformationCTE(CTEBase):
         map_from_json(json_data, output, types)
         return output
 
+    @classmethod
     def new_from_excel(cls, excel_data: str):
         pass
 
     def save_to_excel(self):
         pass
 
+    @classmethod
     def new_from_csv(cls, csv_lines: "list[str]"):
         pass
 

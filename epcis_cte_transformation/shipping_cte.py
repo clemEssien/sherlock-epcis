@@ -1,5 +1,5 @@
 from abc import ABC, abstractclassmethod, abstractmethod
-from typing import List
+from typing import List, ValuesView
 from cte import CTEBase
 import os, sys
 import datetime
@@ -40,6 +40,12 @@ class ShippingCTE(CTEBase):
             Location of Traceability Lot Code Generator : str
             Location of Recipient : str
             Location of Source of Shipment : str
+            Transporter Name: str
+            Lot Code PoC Name: str
+            Lot Code PoC Phone: str
+            Lot Code PoC Email: str
+            Shipment Datetime: datetime
+
     """
 
     def __init__(self) -> None:
@@ -52,13 +58,17 @@ class ShippingCTE(CTEBase):
         self._location_of_traceability_lot_code_generator = ""
         self._location_of_recipient = ""
         self._location_of_source_of_shipment = ""
+        self._transporter_name = ""
+        self._lot_code_poc_name = ""
+        self._lot_code_poc_phone = ""
+        self._lot_code_poc_email = ""
+        self._shipment_datetime: datetime.datetime(1, 1, 1)
 
+    @classmethod
     def new_from_data(cls, data: dict):
         pass
-    
     @classmethod
     def new_from_epcis(cls, event: EPCISEvent):
-        # your code here
         output = cls()
         if isinstance(event, ObjectEvent):
             try:
@@ -69,6 +79,10 @@ class ShippingCTE(CTEBase):
                 output.location_of_source_of_shipment = event.read_point.value
             except ValueError:
                 output.location_of_source_of_shipment = ""
+            try:
+                output.shipment_datetime = event.event_time_local
+            except ValueError:
+                output.shipment_datetime = ""
             for qe in event.quantity_list:
                 output.quantity.append(qe.quantity)
                 output.unit_of_measure.append(qe.uom)
@@ -84,6 +98,10 @@ class ShippingCTE(CTEBase):
                 output.location_of_source_of_shipment = event.read_point.value
             except ValueError:
                 output.location_of_source_of_shipment = ""
+            try:
+                output.shipment_datetime = event.event_time_local
+            except ValueError:
+                output.shipment_datetime = ""
             for qe in event.child_quantity_list:
                 output.quantity.append(qe.quantity)
                 output.unit_of_measure.append(qe.uom)
@@ -99,6 +117,10 @@ class ShippingCTE(CTEBase):
                 output.location_of_source_of_shipment = event.read_point.value
             except ValueError:
                 output.location_of_source_of_shipment = ""
+            try:
+                output.shipment_datetime = event.event_time_local
+            except ValueError:
+                output.shipment_datetime = ""
             for qe in event.quantity_list:
                 output.quantity.append(qe.quantity)
                 output.unit_of_measure.append(qe.uom)
@@ -114,6 +136,10 @@ class ShippingCTE(CTEBase):
                 output.location_of_source_of_shipment = event.read_point.value
             except ValueError:
                 output.location_of_source_of_shipment = ""
+            try:
+                output.shipment_datetime = event.event_time_local
+            except ValueError:
+                output.shipment_datetime = ""
             for qe in event.input_quantity_list:
                 output.quantity.append(qe.quantity)
                 output.unit_of_measure.append(qe.uom)
@@ -129,6 +155,10 @@ class ShippingCTE(CTEBase):
                 output.location_of_source_of_shipment = event.read_point.value
             except ValueError:
                 output.location_of_source_of_shipment = ""
+            try:
+                output.shipment_datetime = event.event_time_local
+            except ValueError:
+                output.shipment_datetime = ""
 
         return output
 
@@ -147,21 +177,28 @@ class ShippingCTE(CTEBase):
             output.location_of_traceability_lot_code_generator: str,
             output.location_of_recipient: str,
             output.location_of_source_of_shipment: str,
+            output.transporter_name: str,
+            output.lot_code_poc_name: str,
+            output.lot_code_poc_phone: str,
+            output.lot_code_poc_email: str,
+            output.shipment_datetime: datetime.datetime,
         }
 
         map_from_json(json_data, output, types)
         return output
 
+    @classmethod
     def new_from_csv(cls, csv_lines: "list[str]"):
         pass
 
+    @classmethod
     def new_from_excel(cls, excel_data: str):
         pass
 
     def save_to_excel(self):
         pass
- 
-    #  transporterName: "",
+
+    #     transporterName: "",
     #     importEntryNumber: "",
     #     lotCode: "OL001",
     #     quantity: "100",
@@ -173,7 +210,7 @@ class ShippingCTE(CTEBase):
     #     immediateRecipientLocationId: "9991000100023",
     #     shippedLocationId: "9991002100014",
     #     shipmentDateTime: "2021-07-15T00:00:00+02:00",
- 
+
     @property
     @jsonid("lotCode")
     def traceability_lot_code(self) -> str:
@@ -211,7 +248,7 @@ class ShippingCTE(CTEBase):
         self._unit_of_measure = value
 
     @property
-    @jsonid("traceability_product")
+    @jsonid("traceabilityPid")
     def traceability_product(self) -> List:
         return self._traceability_product
 
@@ -220,7 +257,7 @@ class ShippingCTE(CTEBase):
         self._traceability_product = value
 
     @property
-    @jsonid("location_of_traceability_lot_code_generator")
+    @jsonid("locationId")
     def location_of_traceability_lot_code_generator(self) -> str:
         return self._location_of_traceability_lot_code_generator
 
@@ -229,7 +266,7 @@ class ShippingCTE(CTEBase):
         self._location_of_traceability_lot_code_generator = value
 
     @property
-    @jsonid("location_of_recipient")
+    @jsonid("immediateRecipientLocationId")
     def location_of_recipient(self) -> str:
         return self._location_of_recipient
 
@@ -238,13 +275,58 @@ class ShippingCTE(CTEBase):
         self._location_of_recipient = value
 
     @property
-    @jsonid("location_of_source_of_shipment")
+    @jsonid("shippedLocationId")
     def location_of_source_of_shipment(self) -> str:
         return self._location_of_source_of_shipment
 
     @location_of_source_of_shipment.setter
     def location_of_source_of_shipment(self, value: str):
         self._location_of_source_of_shipment = value
+
+    @property
+    @jsonid("transporterName")
+    def transporter_name(self) -> str:
+        return self._transporter_name
+
+    @transporter_name.setter
+    def transporter_name(self, value: str):
+        self._transporter_name = value
+
+    @property
+    @jsonid("lotCodePocName")
+    def lot_code_poc_name(self) -> str:
+        return self._lot_code_poc_name
+
+    @lot_code_poc_name.setter
+    def lot_code_poc_name(self, value: str):
+        self._lot_code_poc_name = value
+
+    @property
+    @jsonid("lotCodePocPhone")
+    def lot_code_poc_phone(self) -> str:
+        return self._lot_code_poc_phone
+
+    @lot_code_poc_phone.setter
+    def lot_code_poc_phone(self, value: str):
+        self._lot_code_poc_phone = value
+
+    @property
+    @jsonid("lotCodePocEmail")
+    def lot_code_poc_email(self) -> str:
+        return self._lot_code_poc_email
+
+    @lot_code_poc_email.setter
+    def lot_code_poc_email(self, value: str) -> str:
+        self._lot_code_poc_email = value
+
+    @property
+    @jsonid("shipmentDateTime")
+    def shipment_datetime(self) -> datetime.datetime:
+        return self._shipment_datetime
+
+    @shipment_datetime.setter
+    def shipment_datetime(self, value: str):
+        self._shipment_datetime = value
 
     def output_json(self):
         """
@@ -270,6 +352,11 @@ class ShippingCTE(CTEBase):
             "Location of Traceability Lot Code Generator",
             "Location of Recipient",
             "Location of Source of Shipment",
+            "Transporter Name",
+            "Lot Code PoC Name",
+            "Lot Code PoC Phone",
+            "Lot Code PoC Email",
+            "Shipment Datetime",
         ]
 
         traceability_lot_code_str = ", ".join(self.traceability_lot_code)
@@ -286,12 +373,17 @@ class ShippingCTE(CTEBase):
             self.location_of_traceability_lot_code_generator,
             self.location_of_recipient,
             self.location_of_source_of_shipment,
+            self.transporter_name,
+            self.lot_code_poc_name,
+            self.lot_code_poc_phone,
+            self.lot_code_poc_email,
+            str(self.shipment_datetime),
         ]
-        for i in range(1, 9):
+        for i in range(1, 14):
             cell = sheet.cell(row=1, column=i)
             cell.value = kde_ids[i - 1]
 
-        for i in range(1, 9):
+        for i in range(1, 14):
             cell = sheet.cell(row=2, column=i)
             cell.value = kde_values[i - 1]
 
@@ -305,6 +397,11 @@ class ShippingCTE(CTEBase):
         sheet.column_dimensions["F"].width = 40
         sheet.column_dimensions["G"].width = 40
         sheet.column_dimensions["H"].width = 40
+        sheet.column_dimensions["I"].width = 40
+        sheet.column_dimensions["J"].width = 40
+        sheet.column_dimensions["K"].width = 40
+        sheet.column_dimensions["L"].width = 40
+        sheet.column_dimensions["M"].width = 40
         # /var/src/documents/<companyid>/<userid>/<cte types>/<name/id>_<timestamp>.xlsx
         # Unknown: companyID, userID, CTETypes, name/id
         # workbook.save('/var/src/documents/' + filename + " " + datetime.datetime.now + '.xlsx')
