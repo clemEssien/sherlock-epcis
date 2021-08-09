@@ -340,20 +340,23 @@ def epcis_from_json_file(file: FileStorage) -> "list[epc.EPCISEvent]":
         os.path.join(app.config["UPLOAD_FOLDER"], secure_filename(file.filename))
     ) as f:
         json_dict = json.load(f)
-    print("file successfully opened")
     # document follows proposed EPCIS2.0 JSON bindings
     if json_dict["isA"].lower() == "epcisdocument":
         json_event_list = json_dict["epcisBody"]["eventList"]
     # document does not follow proposed EPCIS2.0 JSON bindings
     else:
         pass
-
     # populate EPCISEvent object from JSON events
+    for e in json_event_list: print("event:",e)
     event_list = []
     for json_event in json_event_list:
+        print("for json_Event in json_event_list")
         event = event_types[json_event["isA"]]()
+        print("event object created from event_types")
         ex_json.map_from_epcis(event, json_event)
+        print("event mapped to object")
         event_list.append(event)
+        print("event appended")
 
     return event_list
 
@@ -364,9 +367,8 @@ def epcis_from_xml_file(file: FileStorage) -> "list[epc.EPCISEvent]":
         tree = ET.parse(
             os.path.join(app.config["UPLOAD_FOLDER"], secure_filename(file.filename))
         )
-        print("File successfully opened")
+
     except:
-        print("File could not be opened or parsed")
         raise ValueError("Couldn't parse XML file")
     root = tree.getroot()
     if "epcis" not in root.tag.lower():
