@@ -1,5 +1,8 @@
 import json
 import os
+from dotenv import load_dotenv
+load_dotenv()
+
 import db_connect as db_con
 from collections import defaultdict
 
@@ -7,9 +10,9 @@ global conn
 conn = None
 
 def connectdb() -> db_con.Neo4jConnection:
-    return db_con.Neo4jConnection(uri="bolt://localhost:7687", 
-                       user="neo4j",              
-                       password=os.environ['NEO4J_PASSWORD']) 
+    return db_con.Neo4jConnection(uri=os.getenv("DB_URI"), 
+                       user=os.getenv('DB_USER'),              
+                       password=os.getenv('DB_PASS'))
 
 def create_relationships(dict_list, node_label):
     global conn
