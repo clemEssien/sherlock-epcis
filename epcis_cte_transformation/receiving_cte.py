@@ -163,7 +163,7 @@ class ReceivingCTE:
         self._quantity_received = value
 
     @property
-    @jsonid("unitOfMeasure")
+    @jsonid("unit")
     def unit_of_measure(self) -> List:
         return self._unit_of_measure
 

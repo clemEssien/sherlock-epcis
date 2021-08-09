@@ -2,6 +2,7 @@ from tools.serializer import jsonid, map_from_json, map_to_json
 import json
 
 from cte import CTEBase
+from creation_cte import CreationCTE
 from growing_cte import GrowingCTE
 from receiving_cte import ReceivingCTE
 from shipping_cte import ShippingCTE
@@ -21,21 +22,69 @@ from transformation_cte import TransformationCTE
 # packagingStyle: "Palette" //Receiving, Transformation, Creation, Shipping (unit_of_measure)
 # },
     
-data = {
-    "productId": {
-        "types": [ GrowingCTE ],
-        "key": "traceability_lot_code"
-    }
+ftl_map = {
+    "packagingStyle": [
+        {
+            "types": [ ReceivingCTE, TransformationCTE, CreationCTE, ShippingCTE ],
+            "key": "unit"
+        }
+    ],
+    "packagingSize": [
+        {
+            "types": [ ReceivingCTE ],
+            "key": "quantityReceived"
+        },
+        {
+            "types": [ ShippingCTE, CreationCTE ],
+            "key": "quantity"
+        },
+        {
+            "types": [ TransformationCTE ],
+            "key": "inputQuantity"
+        }
+    ],
+    "productId": [
+        {
+            "types": [ GrowingCTE ],
+            "key": "traceabilityLotCode"
+        },
+        {
+            "types": [ ReceivingCTE, TransformationCTE ],
+            "key": "traceabilityProduct"
+        },
+        {
+            "types": [ ShippingCTE ],
+            "key": "traceabilityPid"
+        }
+    ]
 }
 
+def get_map_from_type(key, type):
+    map = ftl_map[key]
+    if not map:
+        return None
+    for cte_type in map["types"]:
+        if type == cte_type:
+            return map["key"]
+    
+    return None
     
 class FTLFood:
     
     @classmethod
     def new_from_cte(cls, cte):
         result = cls()
+        search = type(cte)
         
-        pass
+        data1 = map_to_json(cte)
+        data2 = map_to_json(result)
+        
+        for key in data2.keys():
+            newkey = get_map_from_type(key, search)
+            if newkey:
+                data1[newkey] = data2[key]
+
+        return result
     
     def __init__(self, json = None):
         
