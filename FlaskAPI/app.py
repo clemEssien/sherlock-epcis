@@ -41,8 +41,8 @@ parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 # import JSONDeserialization.epcis_event as epc
 # import JSONDeserialization.extract_gis_from_json as ex_json
-# import XMLDeserialization.extract_gis_from_xml as ex_xml
-# from epcis_cte_transformation.cte_detector import CTEDetector
+import XMLDeserialization.extract_gis_from_xml as ex_xml
+from epcis_cte_transformation.cte_detector import CTEDetector
 
 # Temporary sandbox database, probably expired
 USER = os.getenv("DB_USER")
