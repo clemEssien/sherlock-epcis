@@ -1,7 +1,16 @@
 import os, sys
 
 import json
-from flask import Flask, jsonify, request, make_response
+from flask import (
+    Flask,
+    jsonify,
+    request,
+    make_response,
+    flash,
+    redirect,
+    url_for,
+    send_from_directory,
+)
 import uuid
 from flask_classful import FlaskView, route
 from flask_mongoengine import MongoEngine
@@ -39,11 +48,6 @@ driver = GraphDatabase.driver(uri=URI, auth=(USER, PASS))
 
 app = create_app()
 
-UPLOAD_FOLDER = "./FlaskAPI/uploads"
-ALLOWED_EXTENSIONS = {"json", "xml"}
-
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-
 event_types = {
     "ObjectEvent": epc.ObjectEvent,
     "AggregationEvent": epc.AggregationEvent,
@@ -51,12 +55,6 @@ event_types = {
     "TransactionEvent": epc.TransactionEvent,
     "TransformationEvent": epc.TransformationEvent,
 }
-
-
-import os
-from flask import flash, redirect, url_for, send_from_directory, make_response
-from werkzeug.utils import secure_filename
-import json
 
 UPLOAD_FOLDER = "/var/src/uploads"
 ALLOWED_EXTENSIONS = {
