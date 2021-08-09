@@ -264,10 +264,10 @@ class EPCISEvent:
         return self._extensions
 
     @extensions.setter
-    def extensions(self, value: dict):
+    def extensions(self, value: list):
         """Append dict to list of extensions."""
-        if isinstance(value, dict):
-            self._extensions.append(value)
+        if isinstance(value, list):
+            self._extensions = value
         else:
             raise TypeError("Invalid data type. Must be a dict.")
 
