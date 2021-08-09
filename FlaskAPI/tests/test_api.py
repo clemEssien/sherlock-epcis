@@ -9,8 +9,7 @@ sys.path.append(parentdir)
 
 from app import (
     EventView,
-    JSONView,
-    XMLView
+    TransformationView,    
 )
 
 # FIXTURES
@@ -19,8 +18,7 @@ def client():
     app = Flask(__name__)
 
     EventView.register(app)
-    JSONView.register(app)
-    XMLView.register(app)
+    TransformationView.register(app)
 
     client = app.test_client()
     return client

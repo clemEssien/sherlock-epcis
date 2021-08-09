@@ -80,7 +80,7 @@ def attr_type_check(instvar, data, attr):
                 arr.append(item)
             else:
                 arr.append(data)
-        dict_out= arr[0]
+        dict_out= arr
         value = dict_out
 
     elif isinstance(instvar, dict):

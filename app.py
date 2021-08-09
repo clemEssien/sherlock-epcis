@@ -84,6 +84,7 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
+from epcis_cte_transformation.ftl_food import FTLFood
 
 class Ocr(FlaskView):
     route_base = "/api/ocr"
@@ -323,7 +324,13 @@ class TransformationView(FlaskView):
 
             # Store data in Neo4j database
             if cte:
-                cte_list.append(map_to_json(cte))
+                data = map_to_json(cte)
+                data["cteType"] = cte_type
+                
+                ftl = FTLFood.new_from_cte(cte)
+                data['ftlFood'] = map_to_json(ftl)
+                cte_list.append(data)
+                
 
         # Return CTEs to user
         return make_response(
