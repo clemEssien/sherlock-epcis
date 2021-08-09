@@ -51,6 +51,7 @@ class TransformationCTE(CTEBase):
     def new_from_data(cls, data: dict):
         pass
 
+    @classmethod
     def new_from_epcis(cls, event: EPCISEvent):
         output = cls()
 
@@ -135,53 +136,71 @@ class TransformationCTE(CTEBase):
     def new_from_csv(cls, csv_lines: "list[str]"):
         pass
 
+
     @property
+    @jsonid("traceabilityProduct")
     def traceability_product(self) -> str:
         return self._traceability_product
 
     @traceability_product.setter
-    def traceability_product(self, value: str):
+    def traceability_product(self, value: str) -> None:
         self._traceability_product = value
 
+
+
     @property
+    @jsonid("inputQuantity")
     def quantity_of_input(self) -> str:
         return self._quantity_of_input
 
     @quantity_of_input.setter
-    def quantity_of_input(self, value: str):
+    def quantity_of_input(self, value: str) -> None:
         self._quantity_of_input = value
 
+
+
     @property
-    def quantity_of_output(self) -> List:
+    @jsonid("outputQuantity")
+    def quantity_of_output(self) -> str:
         return self._quantity_of_output
 
     @quantity_of_output.setter
-    def quantity_of_output(self, value: str):
+    def quantity_of_output(self, value: str) -> None:
         self._quantity_of_output = value
 
+
+
     @property
+    @jsonid("transformationLocation")
     def location_of_transformation(self) -> str:
         return self._location_of_transformation
 
     @location_of_transformation.setter
-    def location_of_transformation(self, value: str):
+    def location_of_transformation(self, value: str) -> None:
         self._location_of_transformation = value
 
+
+
     @property
+    @jsonid("newTraceabilityProduct")
     def new_traceability_product(self) -> str:
         return self._new_traceability_product
 
     @new_traceability_product.setter
-    def new_traceability_product(self, value: str):
+    def new_traceability_product(self, value: str) -> None:
         self._new_traceability_product = value
 
+
+
     @property
+    @jsonid("unit")
     def unit_of_measure(self) -> str:
         return self._unit_of_measure
 
     @unit_of_measure.setter
-    def unit_of_measure(self, value: str):
+    def unit_of_measure(self, value: str) -> None:
         self._unit_of_measure = value
+
 
     def output_json(self) -> str:
         """
