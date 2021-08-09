@@ -1,5 +1,6 @@
 import json
 import datetime
+from re import A
 from dateutil import tz, parser
 import os
 import sys
@@ -56,6 +57,12 @@ def retrive_attr_dict_from_event(event):
         instvar = getattr(event, attr)
         if isinstance(instvar, dict):
             attributes[attr[1:]] = json.dumps(getattr(event, attr))
+        elif isinstance(instvar, list):
+            for item in instvar:
+                if gis.is_primitive(item):
+                    attributes[attr[1:]]  = getattr(event, attr)
+                else:
+                    attributes[attr[1:]] = str(getattr(event, attr))              
         else:
             attributes[attr[1:]] = getattr(event, attr)
         attributes["name"] = event.__class__.__name__ 
@@ -78,7 +85,7 @@ def attr_type_check(instvar, data):
             dict_out = json.loads(data)
             for item in dict_out:
                 arr.append(item)
-            value = arr
+            value =  dict_out
         else:
             for item in data:
                 if gis.is_primitive(item):
