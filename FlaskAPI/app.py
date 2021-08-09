@@ -1,6 +1,14 @@
 from flask import Flask, jsonify, request
+import uuid
 from flask_classful import FlaskView, route
+from flask_mongoengine import MongoEngine
+import mongoengine as me
+from models.user import User
+from services import user_services, mongodb_connector
+from init_app import create_app
 from neo4j import GraphDatabase
+
+from routes.user import UserView
 
 from dotenv import load_dotenv
 import os, sys
@@ -21,7 +29,7 @@ PASS = os.getenv('DB_PASS')
 URI = os.getenv('DB_URI')
 driver = GraphDatabase.driver(uri=URI, auth=(USER, PASS))
 
-app = Flask(__name__)
+app = create_app()
 
 event_types = {
     "ObjectEvent": epc.ObjectEvent,
@@ -237,7 +245,8 @@ class XMLView(FlaskView):
                     })
 
         return {"success": True, "events": events}, 200
-        
+
+UserView.register(app)   
 EventView.register(app)
 JSONView.register(app)
 XMLView.register(app)
