@@ -58,8 +58,14 @@ class ShippingCTE(CTEBase):
         # your code here
         output = cls()
         if isinstance(event, ObjectEvent):
-            output.location_of_recipient = event.business_location.value
-            output.location_of_source_of_shipment = event.read_point.value
+            try:
+                output.location_of_recipient = event.business_location.value
+            except ValueError:
+                output.location_of_recipient = ""
+            try:
+                output.location_of_source_of_shipment = event.read_point.value
+            except ValueError:
+                output.location_of_source_of_shipment = ""
             for qe in event.quantity_list:
                 output.quantity.append(qe.quantity)
                 output.unit_of_measure.append(qe.uom)
@@ -67,8 +73,14 @@ class ShippingCTE(CTEBase):
             for epc in event.epc_list:  # check what should be traceability lot code
                 output.traceability_product.append(epc.value)
         elif isinstance(event, AggregationEvent):
-            output.location_of_recipient = event.business_location.value
-            output.location_of_source_of_shipment = event.read_point.value
+            try:
+                output.location_of_recipient = event.business_location.value
+            except ValueError:
+                output.location_of_recipient = ""
+            try:
+                output.location_of_source_of_shipment = event.read_point.value
+            except ValueError:
+                output.location_of_source_of_shipment = ""
             for qe in event.child_quantity_list:
                 output.quantity.append(qe.quantity)
                 output.unit_of_measure.append(qe.uom)
@@ -76,8 +88,14 @@ class ShippingCTE(CTEBase):
             for epc in event.child_epc_list:
                 output.traceability_product.append(epc.value)
         elif isinstance(event, TransactionEvent):
-            output.location_of_recipient = event.business_location.value
-            output.location_of_source_of_shipment = event.read_point.value
+            try:
+                output.location_of_recipient = event.business_location.value
+            except ValueError:
+                output.location_of_recipient = ""
+            try:
+                output.location_of_source_of_shipment = event.read_point.value
+            except ValueError:
+                output.location_of_source_of_shipment = ""
             for qe in event.quantity_list:
                 output.quantity.append(qe.quantity)
                 output.unit_of_measure.append(qe.uom)
@@ -85,8 +103,14 @@ class ShippingCTE(CTEBase):
             for epc in event.epc_list:
                 output.traceability_product.append(epc.value)
         elif isinstance(event, TransformationEvent):
-            output.location_of_recipient = event.business_location.value
-            output.location_of_source_of_shipment = event.read_point.value
+            try:
+                output.location_of_recipient = event.business_location.value
+            except ValueError:
+                output.location_of_recipient = ""
+            try:
+                output.location_of_source_of_shipment = event.read_point.value
+            except ValueError:
+                output.location_of_source_of_shipment = ""
             for qe in event.input_quantity_list:
                 output.quantity.append(qe.quantity)
                 output.unit_of_measure.append(qe.uom)
@@ -94,8 +118,14 @@ class ShippingCTE(CTEBase):
             for epc in event.input_epc_list:
                 output.traceability_product.append(epc.value)
         elif isinstance(event, CommonEvent):
-            output.location_of_recipient = event.business_location.value
-            output.location_of_source_of_shipment = event.read_point.value
+            try:
+                output.location_of_recipient = event.business_location.value
+            except ValueError:
+                output.location_of_recipient = ""
+            try:
+                output.location_of_source_of_shipment = event.read_point.value
+            except ValueError:
+                output.location_of_source_of_shipment = ""
 
         return output
 

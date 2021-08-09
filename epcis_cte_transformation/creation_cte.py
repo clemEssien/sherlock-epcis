@@ -155,11 +155,11 @@ class CreationCTE(CTEBase):
         self._traceability_product = value
 
     @property
-    def creation_completion_date(self) -> List:
+    def creation_completion_date(self) -> datetime.datetime:
         return self._creation_completion_date
 
     @creation_completion_date.setter
-    def creation_completion_date(self, value: str):
+    def creation_completion_date(self, value: datetime.datetime):
         self._creation_completion_date = value
 
     @property

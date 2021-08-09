@@ -57,7 +57,10 @@ class TransformationCTE(CTEBase):
         # check if TransformationCTE must come from TransformationEvent
         # transEvent: TransformationEvent = event
         if isinstance(event, TransformationEvent):
-            output.location_of_transformation = event.read_point.value
+            try:
+                output.location_of_transformation = event.read_point.value
+            except ValueError:
+                output.location_of_transformation = ""
             for qe in event.input_quantity_list:
                 output.quantity_of_input.append(qe.quantity)
                 output.unit_of_measure.append(qe.uom)
@@ -68,28 +71,40 @@ class TransformationCTE(CTEBase):
             for epc in event.output_epc_list:
                 output.new_traceability_product.append(epc.value)
         elif isinstance(event, ObjectEvent):
-            output.location_of_transformation = event.read_point.value
+            try:
+                output.location_of_transformation = event.read_point.value
+            except ValueError:
+                output.location_of_transformation = ""
             for qe in event.quantity_list:
                 output.quantity_of_input.append(qe.quantity)
                 output.unit_of_measure.append(qe.uom)
             for epc in event.epc_list:
                 output.traceability_product.append(epc.value)
         elif isinstance(event, AggregationEvent):
-            output.location_of_transformation = event.read_point.value
+            try:
+                output.location_of_transformation = event.read_point.value
+            except ValueError:
+                output.location_of_transformation = ""
             for qe in event.child_quantity_list:
                 output.quantity_of_input.append(qe.quantity)
                 output.unit_of_measure.append(qe.uom)
             for epc in event.child_epc_list:  # check if we should use this or parentID
                 output.traceability_product.append(epc.value)
         elif isinstance(event, TransactionEvent):
-            output.location_of_transformation = event.read_point.value
+            try:
+                output.location_of_transformation = event.read_point.value
+            except ValueError:
+                output.location_of_transformation = ""
             for qe in event.quantity_list:
                 output.quantity_of_input.append(qe.quantity)
                 output.unit_of_measure.append(qe.uom)
             for epc in event.epc_list:  # check if we should use this or parentID
                 output.traceability_product.append(epc.value)
         elif isinstance(event, CommonEvent):
-            output.location_of_transformation = event.read_point.value
+            try:
+                output.location_of_transformation = event.read_point.value
+            except ValueError:
+                output.location_of_transformation = ""
         return output
 
     def new_from_json(cls, json_data: str):
