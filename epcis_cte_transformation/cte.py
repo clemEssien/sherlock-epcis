@@ -5,6 +5,9 @@ import os, sys
 dir_path = os.path.dirname(os.path.realpath(__file__))
 parent_dir_path = os.path.abspath(os.path.join(dir_path, os.pardir))
 sys.path.insert(0, parent_dir_path)
+from _typeshed import Self
+from abc import ABC, abstractclassmethod, abstractmethod
+from typing import Type
 from JSONDeserialization.epcis_event import EPCISEvent
 
 
@@ -49,6 +52,7 @@ class CTEBase(ABC):
         pass
 
     @abstractmethod
+<<<<<<< HEAD
     def output_json(self):
         pass
 
@@ -59,3 +63,7 @@ class CTEBase(ABC):
     @abstractmethod
     def save_as_xlsx(self, filename: str):
         pass
+=======
+    def export_to_json(self):
+        pass
+>>>>>>> TNT-116-Receiving-CTE-Class
