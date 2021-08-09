@@ -4,6 +4,7 @@ import uuid
 from flask_classful import FlaskView, route
 from flask_mongoengine import MongoEngine
 import mongoengine as me
+
 from models.user import User
 from services import user_services, mongodb_connector
 from init_app import create_app
@@ -50,56 +51,87 @@ event_types = {
 
 
 import os
-from flask import  flash, redirect, url_for, send_from_directory, make_response
+from flask import flash, redirect, url_for, send_from_directory, make_response
 from werkzeug.utils import secure_filename
 import json
 
-UPLOAD_FOLDER = '/var/src/uploads'
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'json', 'csv', 'xlsx', 'xml'}
+UPLOAD_FOLDER = "/var/src/uploads"
+ALLOWED_EXTENSIONS = {
+    "txt",
+    "pdf",
+    "png",
+    "jpg",
+    "jpeg",
+    "gif",
+    "json",
+    "csv",
+    "xlsx",
+    "xml",
+}
 
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
+
 
 class Ocr(FlaskView):
     route_base = "/api/ocr"
 
     def allowed_file(self, filename):
-        return '.' in filename and \
-               filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-               
+        return (
+            "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+        )
+
     @route("/download_file/<name>", methods=["GET"])
     def download_file(self, name: str):
-        if (os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], name))):
+        if os.path.exists(os.path.join(app.config["UPLOAD_FOLDER"], name)):
             return send_from_directory(
-                app.config['UPLOAD_FOLDER'], name, as_attachment=True
-            )        
+                app.config["UPLOAD_FOLDER"], name, as_attachment=True
+            )
         else:
-            return make_response(json.dumps({ "result": "fail", "message": "File Not Found" }), 404)
-        
+            return make_response(
+                json.dumps({"result": "fail", "message": "File Not Found"}), 404
+            )
+
     @route("/upload_file", methods=["GET", "POST"])
     def upload_file(self):
 
         DOWNLOAD_URL = request.host_url + "api/ocr/download_file/"
 
-        if request.method == 'POST':
+        if request.method == "POST":
             # check if the post request has the file part
-            if 'file' not in request.files:
-                return make_response(json.dumps({ "result": "fail", "message": "No file included" }), 400)
-            file = request.files['file']
+            if "file" not in request.files:
+                return make_response(
+                    json.dumps({"result": "fail", "message": "No file included"}), 400
+                )
+            file = request.files["file"]
             # If the user does not select a file, the browser submits an
             # empty file without a filename.
-            if file.filename == '':
-                return make_response(json.dumps({ "result": "fail", "message": "No selected file" }), 400)
+            if file.filename == "":
+                return make_response(
+                    json.dumps({"result": "fail", "message": "No selected file"}), 400
+                )
             if file and self.allowed_file(file.filename):
                 filename = secure_filename(file.filename)
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                
-                return make_response(json.dumps({ "result": "ok", "message": "File uploaded successfully.", "url": DOWNLOAD_URL + filename}), 200)
-        
-        return make_response(json.dumps({ "result": "fail", "message": "Invalid method" }), 400)
-    
+                file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+
+                return make_response(
+                    json.dumps(
+                        {
+                            "result": "ok",
+                            "message": "File uploaded successfully.",
+                            "url": DOWNLOAD_URL + filename,
+                        }
+                    ),
+                    200,
+                )
+
+        return make_response(
+            json.dumps({"result": "fail", "message": "Invalid method"}), 400
+        )
+
+
 class EventView(FlaskView):
     route_base = "/api/events"
 
@@ -250,25 +282,43 @@ class TransformationView(FlaskView):
                     },
                     500,
                 )
-            cte_list.append(cte_type)
             # Transform EPCIS event to FDA CTE
-            for found_cte in cte_type:
-                if cte_type == "receiving":
-                    from epcis_cte_transformation.receiving_cte import ReceivingCTE
-                    
-                    
-                    
-                
+            if cte_type == "creation":
+                from epcis_cte_transformation.creation_cte import CreationCTE
+
+                cte = CreationCTE.new_from_epcis(CreationCTE, event)
+            elif cte_type == "growing":
+                # from epcis_cte_transformation.growing_cte import GrowingCTE
+                # cte = GrowingCTE.new_from_epcis(GrowingCTE, event)
+                pass
+            elif cte_type == "transformation":
+                from epcis_cte_transformation.transformation_cte import (
+                    TransformationCTE,
+                )
+
+                cte = TransformationCTE.new_from_epcis(TransformationCTE, event)
+            elif cte_type == "shipping":
+                from epcis_cte_transformation.shipping_cte import ShippingCTE
+
+                cte = ShippingCTE.new_from_epcis(ShippingCTE, event)
+            elif cte_type == "receiving":
+                from epcis_cte_transformation.receiving_cte import ReceivingCTE
+
+                cte = ShippingCTE.new_from_epcis(ShippingCTE, event)
+            else:
+                # invalid cte type
+                raise ValueError("CTE is an invalid type")
+
             # Store data in Neo4j database
 
-        # Return CTE to user
-        response_data = {key: value for key, value in enumerate(cte_list)}
+            cte_list.append(cte)
+        # Return CTEs to user
         return make_response(
             {
                 "result": "ok",
                 "message": "CTE detected",
                 "code": 0,
-                "data": response_data,
+                "data": cte_list,
             },
             200,
         )
