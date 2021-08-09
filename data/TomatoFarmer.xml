@@ -1,0 +1,63 @@
+<?xml version="1.0" ?>
+<epcis:EPCISDocument xmlns:epcis="urn:epcglobal:epcis:xsd:1" schemaVersion="1.2" creationDate="2021-08-03T14:52:30.732Z">
+    <EPCISBody>
+        <EventList>
+            <ObjectEvent>
+                <eventTime>2021-08-02T00:00:00.000-04:00</eventTime>
+                <recordTime>2021-08-02T00:00:00.000-04:00</recordTime>
+                <eventTimeZoneOffset>-04:00</eventTimeZoneOffset>
+                <epcList></epcList>
+                <action>ADD</action>
+                <bizStep>urn:epcglobal:cbv:bizstep:commissioning</bizStep>
+                <disposition>urn:epcglobal:cbv:disp:active</disposition>
+                <readPoint>
+                    <id>urn:epc:id:sgln:103880.000000.001</id>
+                </readPoint>
+                <bizLocation>
+                    <id>urn:epc:id:sgln:103880.000000.002</id>
+                </bizLocation>
+                <extension>
+                    <quantityList>
+                        <quantityElement>
+                            <epcClass>urn:epc:class:lgtin:038802.1222222.001</epcClass>
+                            <quantity>5.0</quantity>
+                            <uom>KGM</uom>
+                        </quantityElement>
+                    </quantityList>
+                </extension>
+            </ObjectEvent>
+            <ObjectEvent>
+                <eventTime>2021-08-01T00:00:00.000-04:00</eventTime>
+                <recordTime>2021-08-01T00:00:00.000-04:00</recordTime>
+                <eventTimeZoneOffset>-04:00</eventTimeZoneOffset>
+                <epcList></epcList>
+                <action>OBSERVE</action>
+                <bizStep>urn:epcglobal:cbv:bizstep:shipping</bizStep>
+                <disposition>urn:epcglobal:cbv:disp:in_transit</disposition>
+                <readPoint>
+                    <id>urn:epc:id:sgln:103880.000000.003</id>
+                </readPoint>
+                <bizLocation>
+                    <id>urn:epc:id:sgln:103880.000000.004</id>
+                </bizLocation>
+                <extension>
+                    <quantityList>
+                        <quantityElement>
+                            <epcClass>urn:epc:class:lgtin:038802.1222222.001</epcClass>
+                            <quantity>5.0</quantity>
+                            <uom>KGM</uom>
+                        </quantityElement>
+                    </quantityList>
+                    <sourceList>
+                        <source type="urn:epcglobal:cbv:sdt:owning_party">103880.0000000</source>
+                        <source type="urn:epcglobal:cbv:sdt:location">103880.0000001.003</source>
+                    </sourceList>
+                    <destinationList>
+                        <destination type="urn:epcglobal:cbv:sdt:location">938101.0000000</destination>
+                        <destination type="urn:epcglobal:cbv:sdt:owning_party">938101.0000001.001</destination>
+                    </destinationList>
+                </extension>
+            </ObjectEvent>
+        </EventList>
+    </EPCISBody>
+</epcis:EPCISDocument>
