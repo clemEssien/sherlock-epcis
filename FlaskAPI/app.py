@@ -357,7 +357,6 @@ def epcis_from_json_file(file: FileStorage) -> "list[epc.EPCISEvent]":
             ex_json.map_from_epcis(event, json_event)
         except Exception as e:
             print("map_from_epcis error", e)
-            raise Exception("Could not map event dictionary to EPCISEvent object")
         event_list.append(event)
 
     return event_list
@@ -387,7 +386,10 @@ def epcis_from_xml_file(file: FileStorage) -> "list[epc.EPCISEvent]":
                     event_from_xml = ex_xml.find_event_from_xml(event, event_types)
                     event = event_types[event_from_xml]
                 xml_dict = ex_xml.map_to_epcis_dict(xml_doc)
-                ex_xml.map_from_epcis(event, xml_dict)
+                try:
+                    ex_xml.map_from_epcis(event, xml_dict)
+                except Exception as e:
+                    print("map_from_epcis error:", e)
                 events.append(event)
     return events
 
