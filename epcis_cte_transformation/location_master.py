@@ -1,121 +1,98 @@
 from tools.serializer import jsonid, map_from_json, map_to_json
 import json
 
+# export const locationMasterOliveRows = [
+# {
+# "locationId": "9991002100014", //Receiving (receiver_location_identifier), Creation(location_where_food_was_created), Shipping(location_of_source_of_shipment), Transformation(location_of_transformation), Growing (growing_location)
+# "businessName": "Olive Oil Company", //Not Found
+# "physicalLocationName": "Olive Oil Company", // Not found
+# "phone": "111.111.1111", //Receiving (point_of_contact_phone)
+# "address": "100 Italy", //Not Found
+# "city": "Italy", //Not Found
+# "state": "Italy", //Not Found
+# "zip": "10000" //Not Found
+# },
+# ];
 class LocationMaster:
-    def __init__(self, json = None):
+    
+    def __init__(self) -> None:
+        self._location_id: str = None
+        self._business_name: str = None
+        self._physical_location_name: str = None
+        self._phone: str = None
+        self._address: str = None
+        self._city: str = None
+        self._state: str = None
+        self._zip: str = None
         
-        json_dict = None
-
-        if json:
-            if isinstance(json, str):
-                json_dict = json.loads(json)
-            elif isinstance(json, dict):
-                json_dict = json
-            else:
-                raise TypeError
-        
-        self._id: str = None
-        self._product_id: str = None
-        self._category_code: str = None
-        self._category_name: str = None
-        self._brand_name: str = None
-        self._commodity: str = None
-        self._variety: str = None
-        self._product_name: str = None
-        self._packaging_size: str = None
-        self._packaging_style: str = None
-
-        if json_dict:
-            map_from_json(json_dict, self)
+    @property
+    @jsonid("locationId")
+    def location_id(self) -> str:
+        return self._location_id
+    
+    @location_id.setter
+    def location_id(self, value: str) -> None:
+        self._location_id = value
 
     @property
-    @jsonid("id")
-    def id(self) -> str:
-        return self._id
+    @jsonid("businessName")
+    def business_name(self) -> str:
+        return self._business_name
+    
+    @business_name.setter
+    def business_name(self, value: str) -> None:
+        self._business_name = value
 
     @property
-    @jsonid("productId")
-    def product_id(self) -> str:
-        return self._product_id
+    @jsonid("physicalLocationName")
+    def physical_location_name(self) -> str:
+        return self._physical_location_name
+    
+    @physical_location_name.setter
+    def physical_location_name(self, value: str) -> None:
+        self._physical_location_name = value
 
     @property
-    @jsonid("categoryCode")
-    def category_code(self) -> str:
-        return self._category_code
+    @jsonid("phone")
+    def phone(self) -> str:
+        return self._phone
+    
+    @phone.setter
+    def phone(self, value: str) -> None:
+        self._phone = value
 
     @property
-    @jsonid("categoryName")
-    def category_name(self) -> str:
-        return self._category_name
+    @jsonid("address")
+    def address(self) -> str:
+        return self._address
+    
+    @address.setter
+    def address(self, value: str) -> None:
+        self._address = value
 
     @property
-    @jsonid("brandName")
-    def brand_name(self) -> str:
-        return self._brand_name
+    @jsonid("city")
+    def city(self) -> str:
+        return self._city
+    
+    @city.setter
+    def city(self, value: str) -> None:
+        self._city = value
 
     @property
-    @jsonid("commodity")
-    def commodity(self) -> str:
-        return self._commodity
+    @jsonid("state")
+    def state(self) -> str:
+        return self._state
+    
+    @state.setter
+    def state(self, value: str) -> None:
+        self._state = value
 
     @property
-    @jsonid("variety")
-    def variety(self) -> str:
-        return self._variety
-
-    @property
-    @jsonid("productName")
-    def product_name(self) -> str:
-        return self._product_name
-
-    @property
-    @jsonid("packagingSize")
-    def packaging_size(self) -> str:
-        return self._packaging_size
-
-    @property
-    @jsonid("packagingStyle")
-    def packaging_style(self) -> str:
-        return self._packaging_style
-
-    @id.setter
-    def id(self, value: str) -> None:
-        self._id = value
-
-    @product_id.setter
-    def product_id(self, value: str) -> None:
-        self._product_id = value
-
-    @category_code.setter
-    def category_code(self, value: str) -> None:
-        self._category_code = value
-
-    @category_name.setter
-    def category_name(self, value: str) -> None:
-        self._category_name = value
-
-    @brand_name.setter
-    def brand_name(self, value: str) -> None:
-        self._brand_name = value
-
-    @commodity.setter
-    def commodity(self, value: str) -> None:
-        self._commodity = value
-
-    @variety.setter
-    def variety(self, value: str) -> None:
-        self._variety = value
-
-    @product_name.setter
-    def product_name(self, value: str) -> None:
-        self._product_name = value
-
-    @packaging_size.setter
-    def packaging_size(self, value: str) -> None:
-        self._packaging_size = value
-
-    @packaging_style.setter
-    def packaging_style(self, value: str) -> None:
-        self._packaging_style = value
-
-
+    @jsonid("zip")
+    def zip(self) -> str:
+        return self._zip
+    
+    @zip.setter
+    def zip(self, value: str) -> None:
+        self._zip = value

@@ -26,7 +26,7 @@ import json
 import datetime
 
 
-class ReceivingCTE:
+class GrowingCTE:
     """
     Provides a class for the Receiving CTE and defines its KDEs
 
