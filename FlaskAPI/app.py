@@ -252,7 +252,13 @@ class TransformationView(FlaskView):
                 )
             cte_list.append(cte_type)
             # Transform EPCIS event to FDA CTE
-
+            for found_cte in cte_type:
+                if cte_type == "receiving":
+                    from epcis_cte_transformation.receiving_cte import ReceivingCTE
+                    
+                    
+                    
+                
             # Store data in Neo4j database
 
         # Return CTE to user
