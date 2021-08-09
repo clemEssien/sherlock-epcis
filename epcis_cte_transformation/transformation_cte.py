@@ -48,9 +48,11 @@ class TransformationCTE(CTEBase):
         self._new_traceability_product = []
         self._unit_of_measure = []
 
+    @classmethod
     def new_from_data(cls, data: dict):
         pass
 
+    @classmethod
     def new_from_epcis(cls, event: EPCISEvent):
         output = cls()
 
@@ -107,6 +109,7 @@ class TransformationCTE(CTEBase):
                 output.location_of_transformation = ""
         return output
 
+    @classmethod
     def new_from_json(cls, json_data: str):
         """
         Create a new CTE from JSON data
@@ -126,16 +129,19 @@ class TransformationCTE(CTEBase):
         map_from_json(json_data, output, types)
         return output
 
+    @classmethod
     def new_from_excel(cls, excel_data: str):
         pass
 
     def save_to_excel(self):
         pass
 
+    @classmethod
     def new_from_csv(cls, csv_lines: "list[str]"):
         pass
 
     @property
+    @jsonid("traceabilityProduct")
     def traceability_product(self) -> str:
         return self._traceability_product
 
@@ -144,6 +150,7 @@ class TransformationCTE(CTEBase):
         self._traceability_product = value
 
     @property
+    @jsonid("quantityOfInput")
     def quantity_of_input(self) -> str:
         return self._quantity_of_input
 
@@ -152,6 +159,7 @@ class TransformationCTE(CTEBase):
         self._quantity_of_input = value
 
     @property
+    @jsonid("quantityOfOutput")
     def quantity_of_output(self) -> List:
         return self._quantity_of_output
 
@@ -160,6 +168,7 @@ class TransformationCTE(CTEBase):
         self._quantity_of_output = value
 
     @property
+    @jsonid("locationOfTransformation")
     def location_of_transformation(self) -> str:
         return self._location_of_transformation
 
@@ -168,6 +177,7 @@ class TransformationCTE(CTEBase):
         self._location_of_transformation = value
 
     @property
+    @jsonid("newTraceabilityProduct")
     def new_traceability_product(self) -> str:
         return self._new_traceability_product
 
@@ -176,6 +186,7 @@ class TransformationCTE(CTEBase):
         self._new_traceability_product = value
 
     @property
+    @jsonid("unit")
     def unit_of_measure(self) -> str:
         return self._unit_of_measure
 
