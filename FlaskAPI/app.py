@@ -18,10 +18,6 @@ import mongoengine as me
 
 from .models.user import User
 
-from ..JSONDeserialization import epcis_event as epc
-from ..JSONDeserialization import extract_gis_from_json as ex_json
-
-
 from services import user_services, mongodb_connector
 from init_app import create_app
 from neo4j import GraphDatabase
@@ -39,8 +35,8 @@ load_dotenv()
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
-# import JSONDeserialization.epcis_event as epc
-# import JSONDeserialization.extract_gis_from_json as ex_json
+import JSONDeserialization.epcis_event as epc
+import JSONDeserialization.extract_gis_from_json as ex_json
 import XMLDeserialization.extract_gis_from_xml as ex_xml
 from epcis_cte_transformation.cte_detector import CTEDetector
 
@@ -323,7 +319,7 @@ class TransformationView(FlaskView):
                 "result": "ok",
                 "message": "CTE detected",
                 "code": 0,
-                "data": cte_list,
+                "CTEs": cte_list,
             },
             200,
         )
@@ -358,7 +354,10 @@ def epcis_from_json_file(file: FileStorage) -> "list[epc.EPCISEvent]":
         print("for json_Event in json_event_list")
         event = event_types[json_event["isA"]]()
         print("event object created from event_types")
-        ex_json.map_from_epcis(event, json_event)
+        try:
+            ex_json.map_from_epcis(event, json_event)
+        except Exception as e:
+            print(e)
         print("event mapped to object")
         event_list.append(event)
         print("event appended")
