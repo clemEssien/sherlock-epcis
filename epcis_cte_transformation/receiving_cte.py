@@ -1,5 +1,5 @@
 # Author: Kevin Zong
-# Last Modified: June 27th, 2021
+# Last Modified: August 9th, 2021
 # Class representing Receiving CTE/KDE data
 
 from abc import ABC, abstractclassmethod, abstractmethod
@@ -34,10 +34,10 @@ class ReceivingCTE:
             Reference Record Number : str
             Transporter Name : str
             Entry Number : str
-            Traceability Lot Code : List
-            Quantity Received : List
-            Unit of Measure : List
-            Traceability Product : List
+            Traceability Lot Code : List[str]
+            Quantity Received : List[str]
+            Unit of Measure : List[str]
+            Traceability Product : List[str]
             Lot Code Generator Location : str
             Point of Contact Name : str
             Point of Contact Phone : str
@@ -45,6 +45,23 @@ class ReceivingCTE:
             Receiver Location Identifier : str
             Immediate Previous Source Location Identifier : str
             Receipt Time : datetime
+
+            ---First Receiver---
+            Traceability Lot Code : List[str]
+            Location of Originator : str
+            Point of Contact Name : str
+            Point of Contact Phone : str
+            Point of Contact Email : str
+            Date and Time of Harvesting : datetime
+            Location of Food Cooling : str
+            Date and time of Food Cooling : datetime
+            Location of Food Packing : str
+            Date and time of Food Packing : datetime
+
+            ---First Receiver from a Fishing Vessel---
+            Traceability Lot Code : List[str]
+            Harvest Date for the Trip during which seafood was caught: datetime
+            Location(s) for the Trip during which seafood was caught: str
     """
 
     def __init__(self):
@@ -61,7 +78,14 @@ class ReceivingCTE:
         self._point_of_contact_email = ""
         self._receiver_location_identifier = ""
         self._previous_source = ""
-        self._receipt_time: datetime.datetime(1,1,1)
+        self._receipt_time = datetime.datetime(1,1,1)
+        self._harvest_date = datetime.datetime(1,1,1)
+        self._cooling_location = ""
+        self._cooling_date = datetime.datetime(1,1,1)
+        self._packing_location = ""
+        self._packing_date = datetime.datetime(1,1,1)
+        self._catch_location = []
+
         
     def new_from_data(cls, data: dict):
         pass
@@ -113,35 +137,35 @@ class ReceivingCTE:
         self._entry_number = value
 
     @property
-    def traceability_lot_code(self) -> str:
+    def traceability_lot_code(self) -> List:
         return self._traceability_lot_code
 
     @traceability_lot_code.setter
-    def traceability_lot_code(self, value: str):
+    def traceability_lot_code(self, value: List):
         self._traceability_lot_code = value
 
     @property
-    def quantity_received(self) -> str:
+    def quantity_received(self) -> List:
         return self._quantity_received
 
     @quantity_received.setter
-    def quantity_received(self, value: str):
+    def quantity_received(self, value: List):
         self._quantity_received = value
 
     @property
-    def unit_of_measure(self) -> str:
+    def unit_of_measure(self) -> List:
         return self._unit_of_measure
 
     @unit_of_measure.setter
-    def unit_of_measure(self, value: str):
+    def unit_of_measure(self, value: List):
         self._unit_of_measure = value
 
     @property
-    def traceability_product(self) -> str:
+    def traceability_product(self) -> List:
         return self._traceability_product
 
-    @traceability_lot_code.setter
-    def traceability_product(self, value: str):
+    @traceability_product.setter
+    def traceability_product(self, value: List):
         self._traceability_product = value
 
     @property
@@ -193,20 +217,60 @@ class ReceivingCTE:
         self._previous_source = value  
 
     @property
-    def receipt_time(self) -> str:
+    def receipt_time(self) -> datetime.datetime:
         return self._receipt_time
 
     @receipt_time.setter
-    def receipt_time(self, value: str):
+    def receipt_time(self, value: datetime.datetime):
         self._receipt_time = value
 
     @property
-    def receipt_timezone_offset(self) -> str:
-        return self._receipt_timezone_offset
+    def harvest_date(self) -> datetime.datetime:
+        return self._harvest_date
 
-    @receipt_timezone_offset.setter
-    def receipt_timezone_offset(self, value: str):
-        self._receipt_timezone_offset = value    
+    @harvest_date.setter
+    def harvest_date(self, value: datetime.datetime):
+        self._harvest_date = value   
+
+    @property
+    def cooling_location(self) -> str:
+        return self._cooling_location
+
+    @cooling_location.setter
+    def cooling_location(self, value: str):
+        self._cooling_location = value
+
+    @property
+    def cooling_date(self) -> datetime.datetime:
+        return self._cooling_date
+
+    @cooling_date.setter
+    def cooling_date(self, value: datetime.datetime):
+        self._cooling_date = value
+
+    @property
+    def packing_location(self) -> str:
+        return self._packing_location
+
+    @packing_location.setter
+    def packing_location(self, value: str):
+        self._packing_location = value
+
+    @property
+    def packing_date(self) -> datetime.datetime:
+        return self._packing_date
+
+    @packing_date.setter
+    def packing_date(self, value: datetime.datetime):
+        self._packing_date = value   
+
+    @property
+    def catch_location(self) -> List:
+        return self._catch_location
+
+    @catch_location.setter
+    def catch_location(self, value: List):
+        self._catch_location = value
         
     def output_json(self) -> str:
         pass
