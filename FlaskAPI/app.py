@@ -1,19 +1,27 @@
-from flask import Flask, jsonify, request
+import os, sys
+
+print(os.getcwd())
+import json
+from flask import Flask, jsonify, request, make_response
 import uuid
 from flask_classful import FlaskView, route
 from flask_mongoengine import MongoEngine
 import mongoengine as me
-from models.user import User
+
+from FlaskAPI.models.user import User
+
 from services import user_services, mongodb_connector
 from init_app import create_app
 from neo4j import GraphDatabase
+from werkzeug.datastructures import FileStorage
+from werkzeug.utils import secure_filename
 
 from routes.user import UserView
 
 from dotenv import load_dotenv
-import os, sys
 import xml.etree.ElementTree as ET
 import json
+
 
 load_dotenv()
 currentdir = os.path.dirname(os.path.realpath(__file__))
@@ -22,14 +30,20 @@ sys.path.append(parentdir)
 import JSONDeserialization.epcis_event as epc
 import JSONDeserialization.extract_gis_from_json as ex_json
 import XMLDeserialization.extract_gis_from_xml as ex_xml
+from epcis_cte_transformation.cte_detector import CTEDetector
 
 # Temporary sandbox database, probably expired
-USER = os.getenv('DB_USER')
-PASS = os.getenv('DB_PASS')
-URI = os.getenv('DB_URI')
+USER = os.getenv("DB_USER")
+PASS = os.getenv("DB_PASS")
+URI = os.getenv("DB_URI")
 driver = GraphDatabase.driver(uri=URI, auth=(USER, PASS))
 
 app = create_app()
+
+UPLOAD_FOLDER = "./FlaskAPI/uploads"
+ALLOWED_EXTENSIONS = {"json", "xml"}
+
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 event_types = {
     "ObjectEvent": epc.ObjectEvent,
@@ -39,57 +53,89 @@ event_types = {
     "TransformationEvent": epc.TransformationEvent,
 }
 
+
 import os
-from flask import  flash, redirect, url_for, send_from_directory, make_response
+from flask import flash, redirect, url_for, send_from_directory, make_response
 from werkzeug.utils import secure_filename
 import json
 
-UPLOAD_FOLDER = '/var/src/uploads'
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'json', 'csv', 'xlsx', 'xml'}
+UPLOAD_FOLDER = "/var/src/uploads"
+ALLOWED_EXTENSIONS = {
+    "txt",
+    "pdf",
+    "png",
+    "jpg",
+    "jpeg",
+    "gif",
+    "json",
+    "csv",
+    "xlsx",
+    "xml",
+}
 
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
+
 
 class Ocr(FlaskView):
     route_base = "/api/ocr"
 
     def allowed_file(self, filename):
-        return '.' in filename and \
-               filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-               
+        return (
+            "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+        )
+
     @route("/download_file/<name>", methods=["GET"])
     def download_file(self, name: str):
-        if (os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], name))):
+        if os.path.exists(os.path.join(app.config["UPLOAD_FOLDER"], name)):
             return send_from_directory(
-                app.config['UPLOAD_FOLDER'], name, as_attachment=True
-            )        
+                app.config["UPLOAD_FOLDER"], name, as_attachment=True
+            )
         else:
-            return make_response(json.dumps({ "result": "fail", "message": "File Not Found" }), 404)
-        
+            return make_response(
+                json.dumps({"result": "fail", "message": "File Not Found"}), 404
+            )
+
     @route("/upload_file", methods=["GET", "POST"])
     def upload_file(self):
 
         DOWNLOAD_URL = request.host_url + "api/ocr/download_file/"
 
-        if request.method == 'POST':
+        if request.method == "POST":
             # check if the post request has the file part
-            if 'file' not in request.files:
-                return make_response(json.dumps({ "result": "fail", "message": "No file included" }), 400)
-            file = request.files['file']
+            if "file" not in request.files:
+                return make_response(
+                    json.dumps({"result": "fail", "message": "No file included"}), 400
+                )
+            file = request.files["file"]
             # If the user does not select a file, the browser submits an
             # empty file without a filename.
-            if file.filename == '':
-                return make_response(json.dumps({ "result": "fail", "message": "No selected file" }), 400)
+            if file.filename == "":
+                return make_response(
+                    json.dumps({"result": "fail", "message": "No selected file"}), 400
+                )
             if file and self.allowed_file(file.filename):
                 filename = secure_filename(file.filename)
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                
-                return make_response(json.dumps({ "result": "ok", "message": "File uploaded successfully.", "url": DOWNLOAD_URL + filename}), 200)
-        
-        return make_response(json.dumps({ "result": "fail", "message": "Invalid method" }), 400)
-    
+                file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+
+                return make_response(
+                    json.dumps(
+                        {
+                            "result": "ok",
+                            "message": "File uploaded successfully.",
+                            "url": DOWNLOAD_URL + filename,
+                        }
+                    ),
+                    200,
+                )
+
+        return make_response(
+            json.dumps({"result": "fail", "message": "Invalid method"}), 400
+        )
+
+
 class EventView(FlaskView):
     route_base = "/api/events"
 
@@ -112,9 +158,9 @@ class EventView(FlaskView):
                 results = session.run(q).data()
             return {"events": results}, 200
         except Exception as e:
-            return {"error": "Error getting events"}, 400 
+            return {"error": "Error getting events"}, 400
 
-    @route("/delete", methods=["DELETE"]) # TEMPORARY 
+    @route("/delete", methods=["DELETE"])  # TEMPORARY
     def delete(self):
         """
         Deletes all EPCIS event data
@@ -133,123 +179,218 @@ class EventView(FlaskView):
                 session.run(q).data()
             return {"success": True}
         except Exception as e:
-            return {"error": "Error deleting events"}, 400 
+            return {"error": "Error deleting events"}, 400
 
-class JSONView(FlaskView):
-    route_base = "/api/json"
+
+class TransformationView(FlaskView):
+    route_base = "/api/transformation"
 
     @route("/", methods=["POST"])
     def post(self):
         """
-        POST an JSON EPCIS event to add to db
+        POST an EPCIS event file to add events to graph database
+        and return the appropriate FDA CTE
 
-        Content Type: application/json
+        """
+        # Validate User
 
-        Request Body:
-            {
-                isA: str, *event type
-                eventTime: str,
-                eventTimeZoneOffset: str,
-                epcList: str[],
-                action: str,
-                bizStep: str,
-                disposition: str,
-                readPoint: {id: str},
-                bizTransactionList: [
+        # Get Uploaded File
+        if "file" not in request.files:
+            return make_response(
+                {
+                    "result": "fail",
+                    "message": "Request does not contain a file",
+                    "code": 0,
+                    "data": {},
+                },
+                400,
+            )
+        file = request.files["file"]
+        if file.filename == "":
+            return make_response(
+                {
+                    "result": "fail",
+                    "message": "No file selected",
+                    "code": 0,
+                    "data": {},
+                },
+                400,
+            )
+        file_ext = file.filename.rsplit(".", 1)[1].lower()
+        if file and file_ext in ALLOWED_EXTENSIONS:
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+        # Create event objects and populate them
+        if file_ext == "json":
+            try:
+                event_list = epcis_from_json_file(file)
+            except:
+                return make_response(
                     {
-                        type: str,
-                        bizTransaction: str,
-                    }
-                ],
-            }
+                        "result": "fail",
+                        "message": "Couldn't extract EPCIS events from JSON File",
+                        "code": 0,
+                        "data": {},
+                    },
+                    400,
+                )
+        elif file_ext == "xml":
+            try:
+                event_list = epcis_from_xml_file(file)
+            except:
+                return make_response(
+                    {
+                        "result": "fail",
+                        "message": "Couldn't extract EPCIS events from XML File",
+                        "code": 0,
+                        "data": {},
+                    },
+                    400,
+                )
+        else:
+            return make_response(
+                {
+                    "result": "fail",
+                    "message": "Invalid file type",
+                    "code": 0,
+                    "data": {},
+                },
+                400,
+            )
+        cte_list = []
+        for event in event_list:
 
-        Error Codes:
-            400: Bad request
+            # Detect CTE from EPCIS event
+            cd = CTEDetector()
+            try:
+                cd.import_yaml_file("epcis_cte_transformation/cte_detect_config.yaml")
+            except Exception as e:
+                return make_response(
+                    {
+                        "result": "fail",
+                        "message": "Invalid CTE detetion configuration file",
+                        "code": 0,
+                        "data": {},
+                    },
+                    500,
+                )
+            try:
+                cte_type = cd.detect_cte(event)
+            except Exception as e:
+                return make_response(
+                    {
+                        "result": "fail",
+                        "message": "Could not detect CTE from EPCIS event",
+                        "code": 0,
+                        "data": {},
+                    },
+                    500,
+                )
+            # Transform EPCIS event to FDA CTE
+            if cte_type == "creation":
+                from epcis_cte_transformation.creation_cte import CreationCTE
 
-        On Success (200):
+                cte = CreationCTE.new_from_epcis(CreationCTE, event)
+            elif cte_type == "growing":
+                # from epcis_cte_transformation.growing_cte import GrowingCTE
+                # cte = GrowingCTE.new_from_epcis(GrowingCTE, event)
+                pass
+            elif cte_type == "transformation":
+                from epcis_cte_transformation.transformation_cte import (
+                    TransformationCTE,
+                )
+
+                cte = TransformationCTE.new_from_epcis(TransformationCTE, event)
+            elif cte_type == "shipping":
+                from epcis_cte_transformation.shipping_cte import ShippingCTE
+
+                cte = ShippingCTE.new_from_epcis(ShippingCTE, event)
+            elif cte_type == "receiving":
+                from epcis_cte_transformation.receiving_cte import ReceivingCTE
+
+                cte = ShippingCTE.new_from_epcis(ShippingCTE, event)
+            else:
+                # invalid cte type
+                raise ValueError("CTE is an invalid type")
+
+            # Store data in Neo4j database
+
+            cte_list.append(cte)
+        # Return CTEs to user
+        return make_response(
             {
-                success: true
-            }
+                "result": "ok",
+                "message": "CTE detected",
+                "code": 0,
+                "data": cte_list,
+            },
+            200,
+        )
 
-        """
-        epcis_json = json.loads(request.get_data())
-        event = event_types[epcis_json["isA"]]()
-        ex_json.map_from_epcis(event, epcis_json)
-        q = "create (:Event{eventTime: $eventTime, eventTimeZoneOffset: $eventTimeZoneOffset})"
-        qmap = {
-            "eventTime": str(event.event_time),
-            "eventTimeZoneOffset": str(event.event_timezone_offset),
-        }
-        try:
-            with driver.session() as session:
-                session.run(q, qmap)
-            return {"success": True}
-        except Exception as e:
-            return {"error": "Error adding events"}, 400
+    @route("/cte", methods=["POST"])
+    def finish_cte(self):
+        # Edit CTE in database
 
-class XMLView(FlaskView):
-    route_base = "/api/xml"
+        # Format CTE as desired document type
 
-    @route("/", methods=["POST"])
-    def post(self):
-        """
-        Posts XML EPCIS events to add to db
+        # Return CTE document
+        pass
 
-        Content Type: application/xml
 
-        Request Body: 
-            xml data of epcis
+def epcis_from_json_file(file: FileStorage) -> "list[epc.EPCISEvent]":
+    """Function to return a list of EPCISEvent objects from a JSON file"""
+    with open(
+        os.path.join(app.config["UPLOAD_FOLDER"], secure_filename(file.filename))
+    ) as f:
+        json_dict = json.load(f)
 
-        Error Codes:
-            400: Bad request
+    # document follows proposed EPCIS2.0 JSON bindings
+    if json_dict["isA"].lower() == "epcisdocument":
+        json_event_list = json_dict["epcisBody"]["eventList"]
+    # document does not follow proposed EPCIS2.0 JSON bindings
+    else:
+        pass
 
-        On Success (200):
-            {
-                success: true
-                events: EPCISEvent[]
-            }
-        """
-        epcis_xml = str(request.get_data(), "utf-8") 
-        
-        root = ET.fromstring(epcis_xml)
+    # populate EPCISEvent object from JSON events
+    event_list = []
+    for json_event in json_event_list:
+        event = event_types[json_event["isA"]]()
+        ex_json.map_from_epcis(event, json_event)
+        event_list.append(event)
 
-        if root.tag != "{urn:epcglobal:epcis:xsd:1}EPCISDocument":
-            return {"error": "Not EPCISDocument"}, 400
+    return event_list
 
-        events = []
-        for child in root:
-            for event_list in child:
-                for event in event_list:
-                    d = ex_xml.map_xml_to_dict(event)
-                    try:
-                        xml_doc = d[event.tag]
-                        event = event_types[event.tag]()
-                    except Exception:
-                        event_from_xml = ex_xml.find_event_from_xml(event, event_types)
-                        event = event_types[event_from_xml]
-                    xml_dict = ex_xml.map_to_epcis_dict(xml_doc)
-                    ex_xml.map_from_epcis(event, xml_dict)
-                    q = "create (:Event{eventTime: $eventTime, eventTimeZoneOffset: $eventTimeZoneOffset})"
-                    qmap = {
-                        "eventTime": str(event.event_time),
-                        "eventTimeZoneOffset": str(event.event_timezone_offset),
-                    }
-                    try:
-                        with driver.session() as session:
-                            session.run(q, qmap)
-                    except Exception as e:
-                        return {"error": "Error adding events"}, 400
-                    events.append({     #Event object not json serializable
-                        "eventTime": str(event._event_time),
-                        "eventTimeZoneOffset": str(event._event_timezone_offset),
-                    })
 
-        return {"success": True, "events": events}, 200
+def epcis_from_xml_file(file: FileStorage) -> "list[epc.EPCISEvent]":
+    """Function to return list of EPCISEvent objects from an XML file"""
+    try:
+        tree = ET.parse(
+            os.path.join(app.config["UPLOAD_FOLDER"], secure_filename(file.filename))
+        )
+    except:
+        raise ValueError("Couldn't parse XML file")
+    root = tree.getroot()
+    if "epcis" not in root.tag.lower():
+        raise ValueError("XML File is not an EPCIS document")
+    events = []
+    for child in root:
+        for event_list in child:
+            for event in event_list:
+                d = ex_xml.map_xml_to_dict(event)
+                try:
+                    xml_doc = d[event.tag]
+                    event = event_types[event.tag]()
+                except Exception:
+                    event_from_xml = ex_xml.find_event_from_xml(event, event_types)
+                    event = event_types[event_from_xml]
+                xml_dict = ex_xml.map_to_epcis_dict(xml_doc)
+                ex_xml.map_from_epcis(event, xml_dict)
+                events.append(event)
+    return events
 
-UserView.register(app)   
+
 EventView.register(app)
-JSONView.register(app)
-XMLView.register(app)
+TransformationView.register(app)
 Ocr.register(app)
 
 if __name__ == "__main__":

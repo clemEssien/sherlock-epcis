@@ -55,7 +55,8 @@ class ShippingCTE(CTEBase):
 
     def new_from_data(cls, data: dict):
         pass
-
+    
+    @classmethod
     def new_from_epcis(cls, event: EPCISEvent):
         # your code here
         output = cls()
@@ -131,6 +132,7 @@ class ShippingCTE(CTEBase):
 
         return output
 
+    @classmethod
     def new_from_json(cls, json_data: str):
         """
         Create a new CTE from JSON data
