@@ -21,7 +21,7 @@ from JSONDeserialization.epcis_event import (
     TransactionEvent,
     TransformationEvent,
 )
-from cte import CTEBase
+from epcis_cte_transformation.cte import CTEBase
 import json
 import datetime
 

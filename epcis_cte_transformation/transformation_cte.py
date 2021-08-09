@@ -20,7 +20,7 @@ from JSONDeserialization.epcis_event import (
     TransformationEvent,
 )
 
-from cte import CTEBase
+from epcis_cte_transformation.cte import CTEBase
 
 from openpyxl import Workbook, load_workbook
 from tools.serializer import JSONValueProvider, jsonid, map_from_json, map_to_json

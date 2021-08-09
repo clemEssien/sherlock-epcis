@@ -137,8 +137,8 @@ def map_from_epcis(epcis_event_obj,epcis_json):
     epcis_json_keys = epcis_json.keys()
     schema_values = schema_doc["attr_key_mapping"].values()
     ext_keys = (set(epcis_json_keys) - set(schema_values))
-    ext_dict = {}
+    ext_list = []
     for k in ext_keys:
-        ext_dict[k] = epcis_json[k]
-    setattr(epcis_event_obj, 'extensions', ext_dict)
+        ext_list.append(epcis_json[k])
+    setattr(epcis_event_obj, 'extensions', ext_list)
     return epcis_event_obj

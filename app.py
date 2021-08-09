@@ -17,15 +17,15 @@ from flask_mongoengine import MongoEngine
 import mongoengine as me
 from pymongo.common import EVENTS_QUEUE_FREQUENCY
 
-from .models.user import User
+from FlaskAPI.models.user import User
 
-from services import user_services, mongodb_connector
-from init_app import create_app
+from FlaskAPI.services import user_services, mongodb_connector
+from FlaskAPI.init_app import create_app
 from neo4j import GraphDatabase
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
 
-from routes.user import UserView
+from FlaskAPI.routes.user import UserView
 
 from dotenv import load_dotenv
 import xml.etree.ElementTree as ET
@@ -285,35 +285,35 @@ class TransformationView(FlaskView):
                     500,
                 )
             # Transform EPCIS event to FDA CTE
-            if cte_type == "creation":
-                from epcis_cte_transformation.creation_cte import CreationCTE
+            # if cte_type == "creation":
+            #     from epcis_cte_transformation.creation_cte import CreationCTE
 
-                cte = CreationCTE.new_from_epcis(CreationCTE, event)
-            elif cte_type == "growing":
-                # from epcis_cte_transformation.growing_cte import GrowingCTE
-                # cte = GrowingCTE.new_from_epcis(GrowingCTE, event)
-                pass
-            elif cte_type == "transformation":
-                from epcis_cte_transformation.transformation_cte import (
-                    TransformationCTE,
-                )
+            #     cte = CreationCTE.new_from_epcis(CreationCTE, event)
+            # elif cte_type == "growing":
+            #     # from epcis_cte_transformation.growing_cte import GrowingCTE
+            #     # cte = GrowingCTE.new_from_epcis(GrowingCTE, event)
+            #     pass
+            # elif cte_type == "transformation":
+            #     from epcis_cte_transformation.transformation_cte import (
+            #         TransformationCTE,
+            #     )
 
-                cte = TransformationCTE.new_from_epcis(TransformationCTE, event)
-            elif cte_type == "shipping":
-                from epcis_cte_transformation.shipping_cte import ShippingCTE
+            #     cte = TransformationCTE.new_from_epcis(TransformationCTE, event)
+            # elif cte_type == "shipping":
+            #     from epcis_cte_transformation.shipping_cte import ShippingCTE
 
-                cte = ShippingCTE.new_from_epcis(ShippingCTE, event)
-            elif cte_type == "receiving":
-                from epcis_cte_transformation.receiving_cte import ReceivingCTE
+            #     cte = ShippingCTE.new_from_epcis(ShippingCTE, event)
+            # elif cte_type == "receiving":
+            #     from epcis_cte_transformation.receiving_cte import ReceivingCTE
 
-                cte = ShippingCTE.new_from_epcis(ShippingCTE, event)
-            else:
-                # invalid cte type
-                raise ValueError("CTE is an invalid type")
+            #     cte = ShippingCTE.new_from_epcis(ShippingCTE, event)
+            # else:
+            #     # invalid cte type
+            #     raise ValueError("CTE is an invalid type")
 
             # Store data in Neo4j database
 
-            cte_list.append(cte)
+            # cte_list.append(cte)
         # Return CTEs to user
         return make_response(
             {
