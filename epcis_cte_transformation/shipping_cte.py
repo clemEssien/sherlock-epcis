@@ -5,6 +5,8 @@ import os, sys
 import datetime
 import json
 
+from tools.serializer import jsonid
+
 dir_path = os.path.dirname(os.path.realpath(__file__))
 parent_dir_path = os.path.abspath(os.path.join(dir_path, os.pardir))
 sys.path.insert(0, parent_dir_path)
@@ -156,8 +158,22 @@ class ShippingCTE(CTEBase):
 
     def save_to_excel(self):
         pass
-
+ 
+    #  transporterName: "",
+    #     importEntryNumber: "",
+    #     lotCode: "OL001",
+    #     quantity: "100",
+    #     traceabilityPid: "9991002100014",
+    #     locationId: "",
+    #     lotCodePocName: "",
+    #     lotCodePocPhone: "",
+    #     lotCodePocEmail: "",
+    #     immediateRecipientLocationId: "9991000100023",
+    #     shippedLocationId: "9991002100014",
+    #     shipmentDateTime: "2021-07-15T00:00:00+02:00",
+ 
     @property
+    @jsonid("lotCode")
     def traceability_lot_code(self) -> str:
         return self._traceability_lot_code
 
@@ -166,6 +182,7 @@ class ShippingCTE(CTEBase):
         self._traceability_lot_code = value
 
     @property
+    @jsonid("importEntryNumber")
     def entry_number(self) -> str:
         return self._entry_number
 
@@ -174,6 +191,7 @@ class ShippingCTE(CTEBase):
         self._entry_number = value
 
     @property
+    @jsonid("quantity")
     def quantity(self) -> List:
         return self._quantity
 
@@ -182,6 +200,7 @@ class ShippingCTE(CTEBase):
         self._quantity = value
 
     @property
+    @jsonid("unit")
     def unit_of_measure(self) -> List:
         return self._unit_of_measure
 
@@ -190,6 +209,7 @@ class ShippingCTE(CTEBase):
         self._unit_of_measure = value
 
     @property
+    @jsonid("traceability_product")
     def traceability_product(self) -> List:
         return self._traceability_product
 
@@ -198,6 +218,7 @@ class ShippingCTE(CTEBase):
         self._traceability_product = value
 
     @property
+    @jsonid("location_of_traceability_lot_code_generator")
     def location_of_traceability_lot_code_generator(self) -> str:
         return self._location_of_traceability_lot_code_generator
 
@@ -206,6 +227,7 @@ class ShippingCTE(CTEBase):
         self._location_of_traceability_lot_code_generator = value
 
     @property
+    @jsonid("location_of_recipient")
     def location_of_recipient(self) -> str:
         return self._location_of_recipient
 
@@ -214,6 +236,7 @@ class ShippingCTE(CTEBase):
         self._location_of_recipient = value
 
     @property
+    @jsonid("location_of_source_of_shipment")
     def location_of_source_of_shipment(self) -> str:
         return self._location_of_source_of_shipment
 
