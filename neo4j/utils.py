@@ -1,6 +1,5 @@
 import json
 import datetime
-from re import A
 from dateutil import tz, parser
 import os
 import sys
