@@ -1,6 +1,5 @@
 import os, sys
 
-print(os.getcwd())
 import json
 from flask import Flask, jsonify, request, make_response
 import uuid
@@ -8,7 +7,7 @@ from flask_classful import FlaskView, route
 from flask_mongoengine import MongoEngine
 import mongoengine as me
 
-from FlaskAPI.models.user import User
+from .models.user import User
 
 from services import user_services, mongodb_connector
 from init_app import create_app
