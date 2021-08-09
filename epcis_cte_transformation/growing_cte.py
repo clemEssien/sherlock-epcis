@@ -26,9 +26,9 @@ import json
 import datetime
 
 
-class ReceivingCTE:
+class GrowingCTE:
     """
-    Provides a class for the Receiving CTE and defines its KDEs
+    Provides a class for the Growing CTE and defines its KDEs
 
     KDEs:
 
@@ -72,10 +72,11 @@ class ReceivingCTE:
         self._sprout_traceability_lot_code = ""
         self._seed_lot_code_production_dates = []
 
-
+    @classmethod 
     def new_from_data(cls, data: dict):
         pass
 
+    @classmethod 
     def new_from_epcis(cls, event: EPCISEvent):
         output = cls()
 
@@ -88,16 +89,20 @@ class ReceivingCTE:
         
         return output
 
+    @classmethod 
     def new_from_json(cls, json_data: str):
         data = json.loads(json_data)
         return cls.new_from_data(data)
 
+    @classmethod 
     def new_from_excel(cls, excel_data: str):
         pass
 
+    @classmethod 
     def save_to_excel(self):
         pass
 
+    @classmethod 
     def new_from_csv(cls, csv_lines: "list[str]"):
         pass
 
@@ -237,6 +242,7 @@ class ReceivingCTE:
     def seed_lot_code_production_dates(self, value: List):
         self._seed_lot_code_production_dates = value          
 
+    @classmethod 
     def output_xlsx(self) -> str:
         """
         Create an excel spreadsheet and output the contents to an XML string
@@ -247,6 +253,7 @@ class ReceivingCTE:
         v = "foobar"
         return v
 
+    @classmethod 
     def save_as_xlsx(self, filename: str):
         pass
         # code here
