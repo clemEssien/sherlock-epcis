@@ -15,6 +15,7 @@ import uuid
 from flask_classful import FlaskView, route
 from flask_mongoengine import MongoEngine
 import mongoengine as me
+from pymongo.common import EVENTS_QUEUE_FREQUENCY
 
 from .models.user import User
 
@@ -356,6 +357,7 @@ def epcis_from_json_file(file: FileStorage) -> "list[epc.EPCISEvent]":
             ex_json.map_from_epcis(event, json_event)
         except Exception as e:
             print("map_from_epcis error", e)
+            raise Exception("Could not map event dictionary to EPCISEvent object")
         event_list.append(event)
 
     return event_list
