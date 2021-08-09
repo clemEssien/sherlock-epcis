@@ -10,6 +10,7 @@ flask-mongoengine==1.0.0
 idna==2.10
 mypy-extensions==0.4.3
 neo4j==4.3.1
+openpyxl==3.0.7
 pathspec==0.8.1
 pytest==6.2.4
 python-dateutil==2.8.1
