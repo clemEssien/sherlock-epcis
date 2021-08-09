@@ -21,6 +21,14 @@ from transformation_cte import TransformationCTE
 # packagingStyle: "Palette" //Receiving, Transformation, Creation, Shipping (unit_of_measure)
 # },
     
+data = {
+    "productId": {
+        "types": [ GrowingCTE ],
+        "key": "traceability_lot_code"
+    }
+}
+
+    
 class FTLFood:
     
     @classmethod
