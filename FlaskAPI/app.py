@@ -347,20 +347,16 @@ def epcis_from_json_file(file: FileStorage) -> "list[epc.EPCISEvent]":
     else:
         pass
     # populate EPCISEvent object from JSON events
-    for e in json_event_list:
-        print("event:", e)
     event_list = []
     for json_event in json_event_list:
-        print("for json_Event in json_event_list")
         event = event_types[json_event["isA"]]()
-        print("event object created from event_types")
+        print("json_event: ", json_event)
+        print("json_event type:", type(json_event))
         try:
             ex_json.map_from_epcis(event, json_event)
         except Exception as e:
-            print(e)
-        print("event mapped to object")
+            print("map_from_epcis error", e)
         event_list.append(event)
-        print("event appended")
 
     return event_list
 
