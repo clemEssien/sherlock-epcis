@@ -52,7 +52,6 @@ class CTEBase(ABC):
         pass
 
     @abstractmethod
-<<<<<<< HEAD
     def output_json(self):
         pass
 
@@ -63,7 +62,5 @@ class CTEBase(ABC):
     @abstractmethod
     def save_as_xlsx(self, filename: str):
         pass
-=======
     def export_to_json(self):
         pass
->>>>>>> TNT-116-Receiving-CTE-Class
