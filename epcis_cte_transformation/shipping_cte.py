@@ -100,7 +100,23 @@ class ShippingCTE(CTEBase):
         return output
 
     def new_from_json(cls, json_data: str):
-        pass
+        """
+        Create a new CTE from JSON data
+        """
+        output = cls()
+        types = {
+            output.traceability_lot_code: list,
+            output.entry_number: str,
+            output.quantity: list,
+            output.unit_of_measure: list,
+            output.traceability_product: list,
+            output.location_of_traceability_lot_code_generator: str,
+            output.location_of_recipient: str,
+            output.location_of_source_of_shipment: str,
+        }
+
+        map_from_json(json_data, output, types)
+        return output
 
     def new_from_csv(cls, csv_lines: "list[str]"):
         pass
@@ -175,22 +191,20 @@ class ShippingCTE(CTEBase):
     def location_of_source_of_shipment(self, value: str):
         self._location_of_source_of_shipment = value
 
+    def output_json(self):
+        """
+        Returnns serialized JSON data
+        """
+        data = map_to_json(self)
+        return json.dumps(data)
+
     def output_xlsx(self) -> str:
         """
         Create an excel spreadsheet and output the contents to an XML string
-        KDEs:
-            Traceability Lot Code : List
-            Entry Number : str
-            Quantity : List
-            Unit of Measure : List
-            Traceability Product : List
-            Location of Traceability Lot Code Generator : str
-            Location of Recipient : str
-            Location of Source of Shipment : str
         """
         workbook = Workbook()
         sheet = workbook.active
-        filename = "shipping_cte"
+        filename = "shipping_cte.xlsx"
 
         kde_ids = [
             "Traceability Lot Code",
@@ -225,12 +239,24 @@ class ShippingCTE(CTEBase):
         for i in range(1, 9):
             cell = sheet.cell(row=2, column=i)
             cell.value = kde_values[i - 1]
+
+        sheet.row_dimensions[1].height = 30
+        sheet.row_dimensions[2].height = 30
+        sheet.column_dimensions["A"].width = 40
+        sheet.column_dimensions["B"].width = 40
+        sheet.column_dimensions["C"].width = 40
+        sheet.column_dimensions["D"].width = 40
+        sheet.column_dimensions["E"].width = 40
+        sheet.column_dimensions["F"].width = 40
+        sheet.column_dimensions["G"].width = 40
+        sheet.column_dimensions["H"].width = 40
         # /var/src/documents/<companyid>/<userid>/<cte types>/<name/id>_<timestamp>.xlsx
         # Unknown: companyID, userID, CTETypes, name/id
         # workbook.save('/var/src/documents/' + filename + " " + datetime.datetime.now + '.xlsx')
-        workbook.save(filename + ".xlsx")
+        workbook.save(filename)
         return filename
 
     def save_as_xlsx(self, filename: str):
-        pass
-        # code here
+        # will filename include .xlsx extentsion?
+        workbook = load_workbook(filename)
+        workbook.save(filename)

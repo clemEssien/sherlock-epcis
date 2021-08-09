@@ -93,8 +93,23 @@ class TransformationCTE(CTEBase):
         return output
 
     def new_from_json(cls, json_data: str):
-        data = json.loads(json_data)
-        return cls.new_from_data(data)
+        """
+        Create a new CTE from JSON data
+        """
+        # data = json.loads(json_data)
+        # return cls.new_from_data(data)
+        output = cls()
+        types = {
+            output.traceability_product: list,
+            output.quantity_of_input: list,
+            output.quantity_of_output: list,
+            output.location_of_transformation: str,
+            output.new_traceability_product: list,
+            output.unit_of_measure: list,
+        }
+
+        map_from_json(json_data, output, types)
+        return output
 
     def new_from_excel(cls, excel_data: str):
         pass
@@ -154,7 +169,11 @@ class TransformationCTE(CTEBase):
         self._unit_of_measure = value
 
     def output_json(self) -> str:
-        pass
+        """
+        Returnns serialized JSON data
+        """
+        data = map_to_json(self)
+        return json.dumps(data)
 
     def output_xlsx(self) -> str:
         """
@@ -163,7 +182,7 @@ class TransformationCTE(CTEBase):
 
         workbook = Workbook()
         sheet = workbook.active
-        filename = "transformation_cte"
+        filename = "transformation_cte.xlsx"
 
         kde_ids = [
             "Traceability Product",
@@ -194,12 +213,22 @@ class TransformationCTE(CTEBase):
         for i in range(1, 7):
             cell = sheet.cell(row=2, column=i)
             cell.value = kde_values[i - 1]
+
+        sheet.row_dimensions[1].height = 30
+        sheet.row_dimensions[2].height = 30
+        sheet.column_dimensions["A"].width = 40
+        sheet.column_dimensions["B"].width = 40
+        sheet.column_dimensions["C"].width = 40
+        sheet.column_dimensions["D"].width = 40
+        sheet.column_dimensions["E"].width = 40
+        sheet.column_dimensions["F"].width = 40
         # /var/src/documents/<companyid>/<userid>/<cte types>/<name/id>_<timestamp>.xlsx
         # Unknown: companyID, userID, CTETypes, name/id
         # workbook.save('/var/src/documents/' + filename + " " + datetime.datetime.now + '.xlsx')
-        workbook.save(filename + ".xlsx")
+        workbook.save(filename)
         return filename
 
     def save_as_xlsx(self, filename: str):
-        pass
-        # code here
+        # will filename include .xlsx extentsion?
+        workbook = load_workbook(filename)
+        workbook.save(filename)
