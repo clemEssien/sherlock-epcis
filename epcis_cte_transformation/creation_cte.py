@@ -52,42 +52,73 @@ class CreationCTE(CTEBase):
         """
         Create a new CTE from an EPCIS event
         """
+
         output = cls()
         if isinstance(event, ObjectEvent):
-            output.creation_completion_date = event.event_time_local
-            output.location_where_food_was_created = event.read_point.value
+            try:
+                output.creation_completion_date = event.event_time_local
+            except ValueError:
+                output.creation_completion_date = ""
+            try:
+                output.location_where_food_was_created = event.read_point.value
+            except ValueError:
+                output.location_where_food_was_created = ""
             for epc in event.epc_list:
                 output.traceability_product.append(epc.value)
             for qe in event.quantity_list:
                 output.quantity.append(str(qe.quantity))
                 output.unit_of_measure.append(qe.uom)
         elif isinstance(event, AggregationEvent):
-            output.creation_completion_date = event.event_time_local
-            output.location_where_food_was_created = event.read_point.value
+            try:
+                output.creation_completion_date = event.event_time_local
+            except ValueError:
+                output.creation_completion_date = ""
+            try:
+                output.location_where_food_was_created = event.read_point.value
+            except ValueError:
+                output.location_where_food_was_created = ""
             for epc in event.child_epc_list:
                 output.traceability_product.append(epc.value)
             for qe in event.child_quantity_list:
                 output.quantity.append(qe.quantity)
                 output.unit_of_measure.append(qe.uom)
         elif isinstance(event, TransactionEvent):
-            output.creation_completion_date = event.event_time_local
-            output.location_where_food_was_created = event.read_point.value
+            try:
+                output.creation_completion_date = event.event_time_local
+            except ValueError:
+                output.creation_completion_date = ""
+            try:
+                output.location_where_food_was_created = event.read_point.value
+            except ValueError:
+                output.location_where_food_was_created = ""
             for epc in event.epc_list:
                 output.traceability_product.append(epc.value)
             for qe in event.quantity_list:
                 output.quantity.append(qe.quantity)
                 output.unit_of_measure.append(qe.uom)
         elif isinstance(event, TransformationEvent):
-            output.creation_completion_date = event.event_time_local
-            output.location_where_food_was_created = event.read_point.value
+            try:
+                output.creation_completion_date = event.event_time_local
+            except ValueError:
+                output.creation_completion_date = ""
+            try:
+                output.location_where_food_was_created = event.read_point.value
+            except ValueError:
+                output.location_where_food_was_created = ""
             for epc in event.input_epc_list:
                 output.traceability_product.append(epc.value)
             for qe in event.input_quantity_list:
                 output.quantity.append(qe.quantity)
                 output.unit_of_measure.append(qe.uom)
         elif isinstance(event, CommonEvent):
-            output.creation_completion_date = event.event_time_local
-            output.location_where_food_was_created = event.read_point.value
+            try:
+                output.creation_completion_date = event.event_time_local
+            except ValueError:
+                output.creation_completion_date = ""
+            try:
+                output.location_where_food_was_created = event.read_point.value
+            except ValueError:
+                output.location_where_food_was_created = ""
         return output
 
     def new_from_json(cls, json_data: str):
@@ -169,7 +200,7 @@ class CreationCTE(CTEBase):
 
         workbook = Workbook()
         sheet = workbook.active
-        filename = "creation_cte"
+        filename = "creation_cte.xlsx"
         kde_ids = [
             "Traceability Product",
             "Creation Completion Date",
@@ -194,11 +225,21 @@ class CreationCTE(CTEBase):
         for i in range(1, 6):
             cell = sheet.cell(row=2, column=i)
             cell.value = kde_values[i - 1]
+
+        sheet.row_dimensions[1].height = 30
+        sheet.row_dimensions[2].height = 30
+        sheet.column_dimensions["A"].width = 40
+        sheet.column_dimensions["B"].width = 40
+        sheet.column_dimensions["C"].width = 40
+        sheet.column_dimensions["D"].width = 40
+        sheet.column_dimensions["E"].width = 40
         # /var/src/documents/<companyid>/<userid>/<cte types>/<name/id>_<timestamp>.xlsx
         # Unknown: companyID, userID, CTETypes, name/id
         # workbook.save('/var/src/documents/' + filename + " " + datetime.datetime.now + '.xlsx')
-        workbook.save(filename + ".xlsx")
+        workbook.save(filename)
         return filename
 
     def save_as_xlsx(self, filename: str):
-        pass
+        # will filename include .xlsx extentsion?
+        workbook = load_workbook(filename)
+        workbook.save(filename)
