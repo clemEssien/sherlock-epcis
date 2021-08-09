@@ -72,10 +72,11 @@ class GrowingCTE:
         self._sprout_traceability_lot_code = ""
         self._seed_lot_code_production_dates = []
 
-
+    @classmethod
     def new_from_data(cls, data: dict):
         pass
 
+    @classmethod
     def new_from_epcis(cls, event: EPCISEvent):
         output = cls()
 

@@ -87,9 +87,11 @@ class ReceivingCTE:
         self._catch_location = []
 
         
+    @classmethod
     def new_from_data(cls, data: dict):
         pass
 
+    @classmethod
     def new_from_epcis(cls, event: EPCISEvent):
         output = cls()
 
@@ -99,16 +101,20 @@ class ReceivingCTE:
 
         return output
 
+    @classmethod
     def new_from_json(cls, json_data: str):
         data = json.loads(json_data)
         return cls.new_from_data(data)
 
+    @classmethod
     def new_from_excel(cls, excel_data: str):
         pass
 
+    @classmethod
     def save_to_excel(self):
         pass
 
+    @classmethod
     def new_from_csv(cls, csv_lines: "list[str]"):
         pass
 
