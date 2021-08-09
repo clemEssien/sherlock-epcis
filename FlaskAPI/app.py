@@ -1,3 +1,6 @@
+import os, sys
+
+print(os.getcwd())
 import json
 from flask import Flask, jsonify, request, make_response
 import uuid
@@ -5,7 +8,8 @@ from flask_classful import FlaskView, route
 from flask_mongoengine import MongoEngine
 import mongoengine as me
 
-from models.user import User
+from FlaskAPI.models.user import User
+
 from services import user_services, mongodb_connector
 from init_app import create_app
 from neo4j import GraphDatabase
@@ -15,9 +19,9 @@ from werkzeug.utils import secure_filename
 from routes.user import UserView
 
 from dotenv import load_dotenv
-import os, sys
 import xml.etree.ElementTree as ET
 import json
+
 
 load_dotenv()
 currentdir = os.path.dirname(os.path.realpath(__file__))
