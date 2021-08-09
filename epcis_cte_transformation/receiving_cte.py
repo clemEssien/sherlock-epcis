@@ -86,10 +86,11 @@ class ReceivingCTE:
         self._packing_date = datetime.datetime(1,1,1)
         self._catch_location = []
 
-        
+    @classmethod    
     def new_from_data(cls, data: dict):
         pass
 
+    @classmethod 
     def new_from_epcis(cls, event: EPCISEvent):
         output = cls()
 
@@ -99,16 +100,20 @@ class ReceivingCTE:
 
         return output
 
+    @classmethod 
     def new_from_json(cls, json_data: str):
         data = json.loads(json_data)
         return cls.new_from_data(data)
 
+    @classmethod 
     def new_from_excel(cls, excel_data: str):
         pass
 
+    @classmethod 
     def save_to_excel(self):
         pass
 
+    @classmethod 
     def new_from_csv(cls, csv_lines: "list[str]"):
         pass
 
@@ -271,10 +276,12 @@ class ReceivingCTE:
     @catch_location.setter
     def catch_location(self, value: List):
         self._catch_location = value
-        
+
+    @classmethod     
     def output_json(self) -> str:
         pass
     
+    @classmethod 
     def output_xlsx(self) -> str:
         """
         Create an excel spreadsheet and output the contents to an XML string
@@ -285,6 +292,7 @@ class ReceivingCTE:
         v = "foobar"
         return v
 
+    @classmethod 
     def save_as_xlsx(self, filename: str):
         pass
         # code here
