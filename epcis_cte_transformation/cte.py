@@ -67,12 +67,12 @@ class CTEBase(ABC):
         pass
 
 def split_on(input: dict, key: str) -> "list[dict]":
-    x = len(input[key])
+    arrlen = len(input[key])
     output = []
 
-    for i in range(0, x):
+    for idx in range(0, arrlen):
         newobj = input.copy()
-        newobj[key] = input[key][i]
+        newobj[key] = input[key][idx]
         output.append(newobj)
         
     return output
