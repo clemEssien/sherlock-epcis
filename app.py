@@ -64,16 +64,14 @@ CORS(
     app,
     allow_headers=["Content-Type", "Authorization"],
     origins=[
-        "localhost:3000",
-        "localhost:3001",
-        "127.0.0.1:3000",
-        "127.0.0.1:3001",
-        "portal.sapfonte.net",
-        "portal-dev.sapfonte.net",
-        "portal.sapfonte.net:443",
-        "portal-dev.sapfonte.net:443",
-        "http://traceability.sapfonte.net",
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3001",
+        "https://traceability.sapfonte.net",
         "https://traceability-dev.sapfonte.net",
+        "http://traceability.sapfonte.net",
+        "http://traceability-dev.sapfonte.net",
     ],
 )
 
