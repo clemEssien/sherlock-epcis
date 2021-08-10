@@ -7,6 +7,8 @@ from flask_login import login_user, logout_user, login_required, current_user, L
 from dotenv import load_dotenv
 import os, sys
 import json
+import secrets
+from datetime import datetime
 
 load_dotenv()
 currentdir = os.path.dirname(os.path.realpath(__file__))
@@ -86,6 +88,8 @@ class UserView(FlaskView):
         if not user or not check_password_hash(user.passwordHash, password):
             return {"error": "Invalid credentials"}, 400 
 
+        token = secrets.token_urlsafe(2048)
+        user_connector.update(user, authToken=token, lastSignIn=datetime.now())
         login_user(user)
 
         return {"success": True}

@@ -5,6 +5,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import login_user, logout_user, login_required, current_user, LoginManager
 from init_db import db
 from models.user import User
+import base64 
 
 from dotenv import load_dotenv
 import os, sys
@@ -40,5 +41,27 @@ def create_app():
     def refresh():
         login_user(current_user)
         return {"success": True}, 200
+    
+    @login_manager.request_loader
+    def load_user_from_request(request):
+
+        api_key = request.args.get('api_key')
+        if api_key:
+            user = User.objects.get(apiKey=api_key)
+            if user:
+                return user
+
+        api_key = request.headers.get('Authorization')
+        if api_key:
+            api_key = api_key.replace('Basic ', '', 1)
+            try:
+                api_key = base64.b64decode(api_key)
+            except TypeError:
+                pass
+            user = User.objects.get(authToken=api_key)
+            if user:
+                return user
+
+        return None
 
     return app
