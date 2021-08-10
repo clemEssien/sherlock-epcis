@@ -47,7 +47,7 @@ def create_app():
 
         api_key = request.args.get('api_key')
         if api_key:
-            user = User.objects.get(apiKey=api_key)
+            user = User.objects.get(authToken=api_key)
             if user:
                 return user
 
