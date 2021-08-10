@@ -49,6 +49,7 @@ import JSONDeserialization.epcis_event as epc
 import JSONDeserialization.extract_gis_from_json as ex_json
 import XMLDeserialization.extract_gis_from_xml as ex_xml
 from epcis_cte_transformation.cte_detector import CTEDetector
+from flask_cors import CORS
 
 # Temporary sandbox database, probably expired
 USER = os.getenv("DB_USER")
@@ -57,6 +58,24 @@ URI = os.getenv("DB_URI")
 driver = GraphDatabase.driver(uri=URI, auth=(USER, PASS))
 
 app = create_app()
+
+
+CORS(
+    app,
+    allow_headers=["Content-Type", "Authorization"],
+    origins=[
+        "localhost:3000",
+        "localhost:3001",
+        "127.0.0.1:3000",
+        "127.0.0.1:3001",
+        "portal.sapfonte.net",
+        "portal-dev.sapfonte.net",
+        "portal.sapfonte.net:443",
+        "portal-dev.sapfonte.net:443",
+        "http://traceability.sapfonte.net",
+        "https://traceability-dev.sapfonte.net",
+    ],
+)
 
 event_types = {
     "ObjectEvent": epc.ObjectEvent,
