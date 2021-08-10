@@ -283,7 +283,11 @@ class TransformationView(FlaskView):
                 },
                 400,
             )
+
         cte_list = []
+        ftl_list = []
+        loc_list = []
+        
         for event in event_list:
 
             # Detect CTE from EPCIS event
@@ -342,6 +346,8 @@ class TransformationView(FlaskView):
                 return "CTE is an invalid type", 400
 
             # Store data in Neo4j database
+            output_types = {}
+
             if cte:
                 data = map_to_json(cte)
                 data["cteType"] = cte_type
@@ -352,13 +358,21 @@ class TransformationView(FlaskView):
                 # data['funky'] = [ "item1", "item2", "item3" ]
                 # data['alienation'] = [ "lambda", "delta" ]
                 split = split_results(data)
-               
-                newdata = {}
-                newdata["ctelist"] = split
-                newdata['ftlFood'] = map_to_json(ftl)
-                newdata['locationMaster'] = map_to_json(location)
+                for item in split: cte_list.append(item)
 
-                cte_list.append(newdata)
+                split = split_results(map_to_json(ftl))
+                for item in split: ftl_list.append(item)
+
+                split = split_results(map_to_json(location))
+                for item in split: loc_list.append(item)
+                
+                for cte in cte_list:
+                    ctetype = cte["cteType"]
+
+                    if not ctetype in output_types.keys():
+                        output_types[ctetype] = [ cte ]
+                    else:
+                        output_types[ctetype].append(cte)
                 
 
         # Return CTEs to user
@@ -367,7 +381,9 @@ class TransformationView(FlaskView):
                 "result": "ok",
                 "message": "CTE detected",
                 "code": 0,
-                "CTEs": cte_list,
+                "CTEs": output_types,
+                "FTLs": ftl_list,
+                "Locations": loc_list
             },
             200,
         )
