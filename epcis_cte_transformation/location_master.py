@@ -1,6 +1,13 @@
 from tools.serializer import jsonid, map_from_json, map_to_json
 import json
 
+from epcis_cte_transformation.cte import CTEBase
+from epcis_cte_transformation.creation_cte import CreationCTE
+from epcis_cte_transformation.growing_cte import GrowingCTE
+from epcis_cte_transformation.receiving_cte import ReceivingCTE
+from epcis_cte_transformation.shipping_cte import ShippingCTE
+from epcis_cte_transformation.transformation_cte import TransformationCTE
+
 # export const locationMasterOliveRows = [
 # {
 # "locationId": "9991002100014", //Receiving (receiver_location_identifier), Creation(location_where_food_was_created), Shipping(location_of_source_of_shipment), Transformation(location_of_transformation), Growing (growing_location)
@@ -13,17 +20,80 @@ import json
 # "zip": "10000" //Not Found
 # },
 # ];
+
+    
+loc_map = {
+    "locationId": [
+        {
+            "types": [ ReceivingCTE ],
+            "key": "receiverLocationIdentifier"
+        },
+        {
+            "types": [ CreationCTE ],
+            "key": "locationWhereFoodWasCreated"
+        },
+        {
+            "types": [ ShippingCTE ],
+            "key": "locationOfSourceOfShipment"
+        },
+        {
+            "types": [ TransformationCTE ],
+            "key": "locationOfTransformation"
+        },
+        {
+            "types": [ GrowingCTE ],
+            "key": "growingLocation"
+        },
+    ],
+    "phone": [
+        {
+            "types": [ ReceivingCTE ],
+            "key": "pointOfContactPhone"
+        }
+    ]
+}
+
+def get_map_from_type(key, type):
+    if not key in loc_map:
+        return None
+    map = loc_map[key]
+    if not map:
+        return None
+    for cte in map:
+        for cte_type in cte["types"]:
+            if type == cte_type:
+                return cte["key"]
+    
+    return None
+    
+
 class LocationMaster:
+      
+    @classmethod
+    def new_from_cte(cls, cte):
+        result = cls()
+        search = type(cte)
+        
+        data1 = map_to_json(cte)
+        data2 = map_to_json(result)
+        
+        for key in data2.keys():
+            newkey = get_map_from_type(key, search)
+            if newkey and newkey in data1:
+                data2[key] = data1[newkey]
+
+        map_from_json(data2, result)
+        return result
     
     def __init__(self) -> None:
-        self._location_id: str = None
-        self._business_name: str = None
-        self._physical_location_name: str = None
-        self._phone: str = None
-        self._address: str = None
-        self._city: str = None
-        self._state: str = None
-        self._zip: str = None
+        self._location_id: str = ""
+        self._business_name: str = ""
+        self._physical_location_name: str = ""
+        self._phone: str = ""
+        self._address: str = ""
+        self._city: str = ""
+        self._state: str = ""
+        self._zip: str = ""
         
     @property
     @jsonid("locationId")

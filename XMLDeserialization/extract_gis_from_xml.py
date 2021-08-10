@@ -31,7 +31,6 @@ def map_xml_to_dict(parent):
 
     return xml_dict
 
-
 def read_uri(uri):
     """ method returns URI string from a URI"""
     if type(uri) == list:
@@ -128,8 +127,8 @@ def map_from_epcis(epcis_event_obj,epcis_json):
         try:
             instvar = getattr(epcis_event_obj, attr)
             value = epcis_json[schema_doc['attr_key_mapping'][attr]]
-            formated_value = attr_type_check(instvar, value, attr)
-            setattr(epcis_event_obj, attr, formated_value)
+            formatted_value = attr_type_check(instvar, value, attr)
+            setattr(epcis_event_obj, attr, formatted_value)
 
         except Exception:
             pass

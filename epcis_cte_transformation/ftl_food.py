@@ -60,12 +60,15 @@ ftl_map = {
 }
 
 def get_map_from_type(key, type):
+    if not key in ftl_map:
+        return None
     map = ftl_map[key]
     if not map:
         return None
-    for cte_type in map["types"]:
-        if type == cte_type:
-            return map["key"]
+    for cte in map:
+        for cte_type in cte["types"]:
+            if type == cte_type:
+                return cte["key"]
     
     return None
     
@@ -81,9 +84,10 @@ class FTLFood:
         
         for key in data2.keys():
             newkey = get_map_from_type(key, search)
-            if newkey:
-                data1[newkey] = data2[key]
+            if newkey and newkey in data1:
+                data2[key] = data1[newkey]
 
+        map_from_json(data2, result)
         return result
     
     def __init__(self, json = None):
@@ -98,16 +102,16 @@ class FTLFood:
             else:
                 raise TypeError
         
-        self._id: str = None
-        self._product_id: str = None
-        self._category_code: str = None
-        self._category_name: str = None
-        self._brand_name: str = None
-        self._commodity: str = None
-        self._variety: str = None
-        self._product_name: str = None
-        self._packaging_size: str = None
-        self._packaging_style: str = None
+        self._id: str = ""
+        self._product_id: str = ""
+        self._category_code: str = ""
+        self._category_name: str = ""
+        self._brand_name: str = ""
+        self._commodity: str = ""
+        self._variety: str = ""
+        self._product_name: str = ""
+        self._packaging_size: str = ""
+        self._packaging_style: str = ""
 
         if json_dict:
             map_from_json(json_dict, self)

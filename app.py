@@ -1,3 +1,4 @@
+from epcis_cte_transformation.location_master import LocationMaster
 import os, sys
 
 import json
@@ -328,7 +329,11 @@ class TransformationView(FlaskView):
                 data["cteType"] = cte_type
                 
                 ftl = FTLFood.new_from_cte(cte)
+                location = LocationMaster.new_from_cte(cte)
+                
                 data['ftlFood'] = map_to_json(ftl)
+                data['locationMaster'] = map_to_json(location)
+                
                 cte_list.append(data)
                 
 
