@@ -84,15 +84,15 @@ def split_results(input: dict) -> "list[dict]":
         if isinstance(input[key], list):
             arrlist.append(key)
     
-    output = []
-    work = [ input ]
+    work = []
+    output = [ input ]
 
     for key in arrlist:
-        for item in work:
+        for item in output:
             splitres = split_on(item, key)
-            for r in splitres: output.append(r)
+            for r in splitres: work.append(r)
             
-        work = output
-        output = []
+        output = work
+        work = []
             
-    return work
+    return output
