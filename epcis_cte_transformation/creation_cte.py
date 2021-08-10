@@ -248,6 +248,6 @@ class CreationCTE(CTEBase):
         return filename
 
     def save_as_xlsx(self, filename: str):
-        # will filename include .xlsx extentsion?
+        # will filename include .xlsx extension?
         workbook = load_workbook(filename)
         workbook.save(filename)
