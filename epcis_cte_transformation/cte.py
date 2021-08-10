@@ -1,6 +1,7 @@
 from abc import ABC, abstractclassmethod, abstractmethod
 from typing import Type
 import os, sys
+from urllib.parse import SplitResultBytes
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 parent_dir_path = os.path.abspath(os.path.join(dir_path, os.pardir))
@@ -64,3 +65,34 @@ class CTEBase(ABC):
         pass
     def export_to_json(self):
         pass
+
+def split_on(input: dict, key: str) -> "list[dict]":
+    x = len(input[key])
+    output = []
+
+    for i in range(0, x):
+        newobj = input.copy()
+        newobj[key] = input[key][i]
+        output.append(newobj)
+        
+    return output
+
+def split_results(input: dict) -> "list[dict]":
+    arrlist = []
+    
+    for key in input.keys():
+        if isinstance(input[key], list):
+            arrlist.append(key)
+    
+    output = []
+    work = [ input ]
+
+    for key in arrlist:
+        for item in work:
+            splitres = split_on(item, key)
+            for r in splitres: output.append(r)
+            
+        work = output
+        output = []
+            
+    return work

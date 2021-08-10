@@ -1,3 +1,4 @@
+from epcis_cte_transformation.cte import split_results
 from epcis_cte_transformation.location_master import LocationMaster
 import os, sys
 
@@ -347,11 +348,17 @@ class TransformationView(FlaskView):
                 
                 ftl = FTLFood.new_from_cte(cte)
                 location = LocationMaster.new_from_cte(cte)
-                
-                data['ftlFood'] = map_to_json(ftl)
-                data['locationMaster'] = map_to_json(location)
-                
-                cte_list.append(data)
+
+                # data['funky'] = [ "item1", "item2", "item3" ]
+                # data['alienation'] = [ "lambda", "delta" ]
+                split = split_results(data)
+               
+                newdata = {}
+                newdata["ctelist"] = split
+                newdata['ftlFood'] = map_to_json(ftl)
+                newdata['locationMaster'] = map_to_json(location)
+
+                cte_list.append(newdata)
                 
 
         # Return CTEs to user
