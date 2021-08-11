@@ -83,8 +83,8 @@ class UserView(FlaskView):
             user = user_connector.get_one(email=email)
         except db.DoesNotExist:
             return {"error": "User not found"}, 400
-        except:
-            return {"error": "Server error"}, 400
+        except Exception as e:
+            return {"error": "Server error", "exception": str(e)}, 400
         
         if not user or not check_password_hash(user.passwordHash, password):
             return {"error": "Invalid credentials"}, 400 
@@ -93,8 +93,19 @@ class UserView(FlaskView):
         user_connector.update(user, authToken=token, lastSignIn=datetime.now())
         login_user(user)
 
-        return {"success": True}
+        return { "success": True, "authToken": token, "user": user}, 200
 
+    @route("/fromauth", methods=["POST"])
+    @login_required
+    def fromauth(self):
+        tok = request.headers["Authorization"]
+        tok = tok.replace("Bearer ", "").replace("Bearer: ", "").replace("Bearer:", "")
+        
+        user = user_connector.get_one(authToken=tok)
+        
+        return {"result": "ok", "success": True, "user": user}, 200
+        
+        
     @route("/signout", methods=["POST"])
     @login_required
     def signout(self):
