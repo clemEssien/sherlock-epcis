@@ -35,6 +35,7 @@ from tools.serializer import map_to_json
 # from epcis_cte_transformation.transformation_cte import TransformationCTE
 
 from FlaskAPI.routes.user import UserView
+from FlaskAPI.routes.admin import AdminView
 
 from dotenv import load_dotenv
 import xml.etree.ElementTree as ET
@@ -433,7 +434,7 @@ def epcis_from_xml_file(file: FileStorage) -> "list[epc.EPCISEvent]":
                 events.append(event)
     return events
 
-
+UserView.register(app)
 EventView.register(app)
 TransformationView.register(app)
 Ocr.register(app)

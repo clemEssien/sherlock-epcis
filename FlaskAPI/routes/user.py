@@ -100,57 +100,6 @@ class UserView(FlaskView):
         logout_user()
         return {"success": True}
 
-    @route("/changePassword", methods=["POST"])
-    def change_password(self):
-        """
-        Changes the password for a given user
-
-        Request Body:
-            {
-                email: str,
-                oldPassword: str,
-                newPassword: str,
-                confirmNewPassword: str,
-            }
-
-        Error Codes:
-            400: User not found
-            400: Incorrect password
-            400: New passwords do not match
-            400: Server error
-
-        On Success (200):
-            {
-                success: true
-            }
-        """
-        bodyJson = json.loads(request.get_data())
-
-        # check the body for the minimum required variables for this call:
-        for key in ["email", "newPassword", "confirmNewPassword", "oldPassword"]:
-            if not (key in bodyJson):
-                return {"error": "Bad Data"}, 401
-
-        newPassword = bodyJson["newPassword"]
-        confirmNewPassword = bodyJson["confirmNewPassword"]
-        email = bodyJson["email"]
-        oldPassword = bodyJson["oldPassword"]
-
-        try:
-            user = user_connector.get_one(email=email)
-        except db.DoesNotExist:
-            return {"error": "User not found"}, 400
-        except:
-            return {"error": "Server error"}, 400
-
-        if (not check_password_hash(user.passwordHash, oldPassword)):
-            return {"error": "Incorrect password"}, 400 
-        if (newPassword != confirmNewPassword):
-            return {"error": "New passwords do not match"}, 400 
-
-        user_connector.update(user, passwordHash=generate_password_hash(newPassword))
-        return {"success": True}
-
     @route("/changeEmail", methods=["POST"])
     @login_required
     def change_email(self):
@@ -229,3 +178,115 @@ class UserView(FlaskView):
         Returns the user that is currently logged in
         """
         return jsonify(current_user)
+
+    # ADMIN (required role)
+    
+
+    @route("/invite", methods=["POST"])
+    def send_invite(self):
+        """
+        Sends an invitation to a new user
+
+        Request Body:
+            {
+                email: str
+            }
+        """
+        pass
+
+    @route("/updateRoles", methods=["POST"])
+    def update_roles(self):
+        """
+        Updates the role of a user
+
+        Request Body:
+            {
+                email: str
+                roles: str[]
+            }
+        """
+        pass
+
+    @route("/updateCompany", methods=["POST"])
+    def update_company(self):
+        """
+        Updates the information of a company 
+
+        Request Body:
+            {
+                companyId: str (something else?)
+                name: str
+                address: str
+            }
+        """
+        pass
+
+    @route("/removeUser", methods=["POST"])
+    def remove_user(self):
+        """
+        Removes user from company
+
+        Request Body:
+            {
+                email: str
+            }
+        """
+        pass
+
+    @route("/reportHistory", methods=["GET"])
+    def get_report_history(self):
+        """
+        Gets report history of company(?)
+        """
+
+    @route("/changePassword", methods=["POST"])
+    def change_password(self):
+        """
+        Changes the password for a given user
+
+        Request Body:
+            {
+                email: str,
+                oldPassword: str,
+                newPassword: str,
+                confirmNewPassword: str,
+            }
+
+        Error Codes:
+            400: User not found
+            400: Incorrect password
+            400: New passwords do not match
+            400: Server error
+
+        On Success (200):
+            {
+                success: true
+            }
+        """
+        bodyJson = json.loads(request.get_data())
+
+        # check the body for the minimum required variables for this call:
+        for key in ["email", "newPassword", "confirmNewPassword", "oldPassword"]:
+            if not (key in bodyJson):
+                return {"error": "Bad Data"}, 401
+
+        newPassword = bodyJson["newPassword"]
+        confirmNewPassword = bodyJson["confirmNewPassword"]
+        email = bodyJson["email"]
+        oldPassword = bodyJson["oldPassword"]
+
+        try:
+            user = user_connector.get_one(email=email)
+        except db.DoesNotExist:
+            return {"error": "User not found"}, 400
+        except:
+            return {"error": "Server error"}, 400
+
+        if (not check_password_hash(user.passwordHash, oldPassword)):
+            return {"error": "Incorrect password"}, 400 
+        if (newPassword != confirmNewPassword):
+            return {"error": "New passwords do not match"}, 400 
+
+        user_connector.update(user, passwordHash=generate_password_hash(newPassword))
+        return {"success": True}
+
