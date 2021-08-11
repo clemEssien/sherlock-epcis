@@ -183,6 +183,8 @@ class UserView(FlaskView):
     # ADMIN (required role)
     
     @route("/invite", methods=["POST"])
+    @login_required
+    @role_required("Admin")
     def send_invite(self):
         """
         Sends an invitation to a new user
@@ -195,6 +197,8 @@ class UserView(FlaskView):
         pass
 
     @route("/updateRoles", methods=["POST"])
+    @login_required
+    @role_required("Admin")
     def update_roles(self):
         """
         Updates the role of a user
@@ -208,6 +212,8 @@ class UserView(FlaskView):
         pass
 
     @route("/updateCompany", methods=["POST"])
+    @login_required
+    @role_required("Admin")
     def update_company(self):
         """
         Updates the information of a company 
@@ -222,6 +228,8 @@ class UserView(FlaskView):
         pass
 
     @route("/removeUser", methods=["POST"])
+    @login_required
+    @role_required("Admin")
     def remove_user(self):
         """
         Removes user from company
@@ -234,6 +242,8 @@ class UserView(FlaskView):
         pass
 
     @route("/reportHistory", methods=["GET"])
+    @login_required
+    @role_required("Admin")
     def get_report_history(self):
         """
         Gets report history of company(?)
@@ -242,7 +252,7 @@ class UserView(FlaskView):
 
     @route("/changePassword", methods=["POST"])
     @login_required
-    @role_required("User")
+    @role_required("User", "Admin") #user should be able to change their own pass(?)
     def change_password(self):
         """
         Changes the password for a given user
