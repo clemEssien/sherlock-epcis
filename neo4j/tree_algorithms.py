@@ -7,21 +7,26 @@ import db_connect as db_con
 from dotenv import load_dotenv
 load_dotenv()
 
-def simple_paths(Source_node, Destination_node, relationship):
+def simple_paths(source_event_id, source_event_name,  destination_event_id, destinatione_event_name, relationship):
     '''
-    method returns simple paths between two nodes
+    method returns simple paths between two Events
+    The source/destination_event_name refers to the type of event
+    For example, an ObjectEvent instance would have 'ObjectEvent' as it's event_name 
     Args:
-        
+        source_event_id : uuid
+        source_event_name: str
+        destination_event_id: uuid
+        destination_event_name: str
+        relationship: str
     '''
     cipher_ql = """
-                MATCH (from:$source_name {id :$source_id}), (to:$destination_name{id: $destination_id})
+                MATCH (from: """+source_event_name + """ {event_id :$source_event_id}), (to: """+ destinatione_event_name + """ {event_id: $destination_event_id})
                 CALL apoc.algo.allSimplePaths(from, to, $relationship, 1)
                 YIELD path
                 RETURN path 
     """
-    result = connectdb().query(cipher_ql,{"source_name":Source_node.__class__.__name__,
-    "destination_name":Destination_node.__class__.__name__,"source_id":Source_node.id,
-    "destination_id": Destination_node.id, "relationship":relationship+">" })
+    result = connectdb().query(cipher_ql,{"source_event_id": str(source_event_id),
+    "destination_event_id": str(destination_event_id), "relationship":relationship+">" })
 
     return result
 
