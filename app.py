@@ -1,3 +1,4 @@
+from pymongo.uri_parser import parse_ipv6_literal_host
 from epcis_cte_transformation.cte import split_results
 from epcis_cte_transformation.location_master import LocationMaster
 import os, sys
@@ -49,6 +50,7 @@ sys.path.append(parentdir)
 import JSONDeserialization.epcis_event as epc
 import JSONDeserialization.extract_gis_from_json as ex_json
 import XMLDeserialization.extract_gis_from_xml as ex_xml
+from XMLDeserialization.DeserializeXMLRecursive import parse_xml
 from epcis_cte_transformation.cte_detector import CTEDetector
 from flask_cors import CORS
 
@@ -85,6 +87,7 @@ event_types = {
 }
 
 UPLOAD_FOLDER = "/var/src/uploads"
+
 ALLOWED_EXTENSIONS = {
     "txt",
     "pdf",
@@ -104,6 +107,7 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 from epcis_cte_transformation.ftl_food import FTLFood
+
 
 class Ocr(FlaskView):
     route_base = "/api/ocr"
@@ -287,7 +291,7 @@ class TransformationView(FlaskView):
         cte_list = []
         ftl_list = []
         loc_list = []
-        
+
         for event in event_list:
 
             # Detect CTE from EPCIS event
@@ -351,29 +355,31 @@ class TransformationView(FlaskView):
             if cte:
                 data = map_to_json(cte)
                 data["cteType"] = cte_type
-                
+
                 ftl = FTLFood.new_from_cte(cte)
                 location = LocationMaster.new_from_cte(cte)
 
                 # data['funky'] = [ "item1", "item2", "item3" ]
                 # data['alienation'] = [ "lambda", "delta" ]
                 split = split_results(data)
-                for item in split: cte_list.append(item)
+                for item in split:
+                    cte_list.append(item)
 
                 split = split_results(map_to_json(ftl))
-                for item in split: ftl_list.append(item)
+                for item in split:
+                    ftl_list.append(item)
 
                 split = split_results(map_to_json(location))
-                for item in split: loc_list.append(item)
-                
+                for item in split:
+                    loc_list.append(item)
+
                 for cte in cte_list:
                     ctetype = cte["cteType"]
 
                     if not ctetype in output_types.keys():
-                        output_types[ctetype] = [ cte ]
+                        output_types[ctetype] = [cte]
                     else:
                         output_types[ctetype].append(cte)
-                
 
         # Return CTEs to user
         return make_response(
@@ -383,7 +389,7 @@ class TransformationView(FlaskView):
                 "code": 0,
                 "CTEs": output_types,
                 "FTLs": ftl_list,
-                "Locations": loc_list
+                "Locations": loc_list,
             },
             200,
         )
@@ -414,12 +420,10 @@ def epcis_from_json_file(file: FileStorage) -> "list[epc.EPCISEvent]":
     event_list = []
     for json_event in json_event_list:
         event = event_types[json_event["isA"]]()
-        print("json_event: ", json_event)
-        print("json_event type:", type(json_event))
         try:
             ex_json.map_from_epcis(event, json_event)
         except Exception as e:
-            print("map_from_epcis error", e)
+            print("map_from_epcis error:", e)
         event_list.append(event)
 
     return event_list
@@ -427,34 +431,18 @@ def epcis_from_json_file(file: FileStorage) -> "list[epc.EPCISEvent]":
 
 def epcis_from_xml_file(file: FileStorage) -> "list[epc.EPCISEvent]":
     """Function to return list of EPCISEvent objects from an XML file"""
-    try:
-        tree = ET.parse(
-            os.path.join(app.config["UPLOAD_FOLDER"], secure_filename(file.filename))
-        )
-
-    except:
-        raise ValueError("Couldn't parse XML file")
-    root = tree.getroot()
-    if "epcis" not in root.tag.lower():
-        raise ValueError("XML File is not an EPCIS document")
-    events = []
-    for child in root:
-        for event_list in child:
-            for event in event_list:
-                d = ex_xml.map_xml_to_dict(event)
-                try:
-                    xml_doc = d[event.tag]
-                    event = event_types[event.tag]()
-                except Exception:
-                    event_from_xml = ex_xml.find_event_from_xml(event, event_types)
-                    event = event_types[event_from_xml]
-                xml_dict = ex_xml.map_to_epcis_dict(xml_doc)
-                try:
-                    ex_xml.map_from_epcis(event, xml_dict)
-                except Exception as e:
-                    print("map_from_epcis error:", e)
-                events.append(event)
-    return events
+    event_dicts = parse_xml(
+        os.path.join(app.config["UPLOAD_FOLDER"], secure_filename(file.filename))
+    )
+    event_list = []
+    for event_dict in event_dicts:
+        event = event_types[event_dict["isA"]]()
+        try:
+            ex_json.map_from_epcis(event, event_dict)
+        except Exception as e:
+            print("map_from_epcis error:", e)
+        event_list.append(event)
+    return event_list
 
 
 EventView.register(app)
