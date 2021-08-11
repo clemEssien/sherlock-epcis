@@ -25,6 +25,8 @@ from epcis_cte_transformation.cte import CTEBase
 import json
 import datetime
 from tools.serializer import jsonid
+from openpyxl import Workbook, load_workbook
+from tools.serializer import JSONValueProvider, jsonid, map_from_json, map_to_json
 
 class GrowingCTE:
     """
@@ -260,6 +262,11 @@ class GrowingCTE:
     @seed_lot_code_production_dates.setter
     def seed_lot_code_production_dates(self, value: List):
         self._seed_lot_code_production_dates = value          
+
+    @classmethod
+    def output_json(self) -> str:
+        data = map_to_json(self)
+        return json.dumps(data)
 
     @classmethod 
     def output_xlsx(self) -> str:
