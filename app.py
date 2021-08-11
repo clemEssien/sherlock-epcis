@@ -86,8 +86,8 @@ event_types = {
     "TransformationEvent": epc.TransformationEvent,
 }
 
-# UPLOAD_FOLDER = "/var/src/uploads"
-UPLOAD_FOLDER = "./uploads"
+UPLOAD_FOLDER = "/var/src/uploads"
+
 ALLOWED_EXTENSIONS = {
     "txt",
     "pdf",
