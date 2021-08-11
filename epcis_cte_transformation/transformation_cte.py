@@ -166,7 +166,6 @@ class TransformationCTE(CTEBase):
     def new_from_csv(cls, csv_lines: "list[str]"):
         pass
 
-
     @property
     @jsonid("traceabilityProduct")
     def traceability_product(self) -> str:
@@ -175,8 +174,6 @@ class TransformationCTE(CTEBase):
     @traceability_product.setter
     def traceability_product(self, value: str) -> None:
         self._traceability_product = value
-
-
 
     @property
     @jsonid("inputQuantity")
@@ -187,8 +184,6 @@ class TransformationCTE(CTEBase):
     def quantity_of_input(self, value: str) -> None:
         self._quantity_of_input = value
 
-
-
     @property
     @jsonid("outputQuantity")
     def quantity_of_output(self) -> str:
@@ -197,8 +192,6 @@ class TransformationCTE(CTEBase):
     @quantity_of_output.setter
     def quantity_of_output(self, value: str) -> None:
         self._quantity_of_output = value
-
-
 
     @property
     @jsonid("transformationLocation")
@@ -209,8 +202,6 @@ class TransformationCTE(CTEBase):
     def location_of_transformation(self, value: str) -> None:
         self._location_of_transformation = value
 
-
-
     @property
     @jsonid("newTraceabilityProduct")
     def new_traceability_product(self) -> str:
@@ -219,8 +210,6 @@ class TransformationCTE(CTEBase):
     @new_traceability_product.setter
     def new_traceability_product(self, value: str) -> None:
         self._new_traceability_product = value
-
-
 
     @property
     @jsonid("unit")
@@ -231,7 +220,6 @@ class TransformationCTE(CTEBase):
     def unit_of_measure(self, value: str) -> None:
         self._unit_of_measure = value
 
-<<<<<<< HEAD
     @property
     @jsonid("newTraceabilityLotCode")
     def new_traceability_lot_code(self) -> str:
@@ -249,8 +237,6 @@ class TransformationCTE(CTEBase):
     @date_completed.setter
     def date_completed(self, value: datetime.datetime):
         self._date_completed = value
-=======
->>>>>>> TNT-2_End-To-End
 
     def output_json(self) -> str:
         """
