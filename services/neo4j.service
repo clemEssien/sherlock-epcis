@@ -1,0 +1,11 @@
+[Unit]
+Description=Neo4j Graph Database
+After=network.target
+
+[Service]
+User=root
+Group=root
+ExecStart=/usr/bin/neo4j start
+
+[Install]
+WantedBy=multi-user.target
