@@ -24,6 +24,7 @@ obj_event._epc_list = ["urn:epc:id:sgtin:0614141.107346.2017","urn:epc:id:sgtin:
 obj_event._action = "OBSERVE"
 obj_event._event_time = "2005-07-11T11:30:47-04:00"
 obj_event._event_timezone_offset = "-04:00"
+obj_event._extensions = [{"foo": "bar"}, {"bucky": "beaver"}]
 
 agg_event._event_id = uuid.UUID("a2624953-f2e6-4369-8e71-9ee1a19d81d5")
 agg_event._read_point = "urn:epc:id:sgln:0614141.00777.0"

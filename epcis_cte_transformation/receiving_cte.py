@@ -21,10 +21,10 @@ from JSONDeserialization.epcis_event import (
     TransactionEvent,
     TransformationEvent,
 )
-from cte import CTEBase
+from epcis_cte_transformation.cte import CTEBase
 import json
 import datetime
-
+from tools.serializer import jsonid
 
 class ReceivingCTE:
     """
@@ -86,10 +86,11 @@ class ReceivingCTE:
         self._packing_date = datetime.datetime(1,1,1)
         self._catch_location = []
 
-        
+    @classmethod    
     def new_from_data(cls, data: dict):
         pass
 
+    @classmethod 
     def new_from_epcis(cls, event: EPCISEvent):
         output = cls()
 
@@ -99,20 +100,25 @@ class ReceivingCTE:
 
         return output
 
+    @classmethod 
     def new_from_json(cls, json_data: str):
         data = json.loads(json_data)
         return cls.new_from_data(data)
 
+    @classmethod 
     def new_from_excel(cls, excel_data: str):
         pass
 
+    @classmethod 
     def save_to_excel(self):
         pass
 
+    @classmethod 
     def new_from_csv(cls, csv_lines: "list[str]"):
         pass
 
     @property
+    @jsonid("referenceRecordNumber")
     def reference_record_number(self) -> str:
         return self._reference_record_number
 
@@ -121,6 +127,7 @@ class ReceivingCTE:
         self._reference_record_number = value    
         
     @property
+    @jsonid("transporterName")
     def transporter_name(self) -> str:
         return self._transporter_name
 
@@ -129,6 +136,7 @@ class ReceivingCTE:
         self._transporter_name = value    
         
     @property
+    @jsonid("entryNumber")
     def entry_number(self) -> str:
         return self._entry_number
 
@@ -137,6 +145,7 @@ class ReceivingCTE:
         self._entry_number = value
 
     @property
+    @jsonid("traceabilityLotCode")
     def traceability_lot_code(self) -> List:
         return self._traceability_lot_code
 
@@ -145,6 +154,7 @@ class ReceivingCTE:
         self._traceability_lot_code = value
 
     @property
+    @jsonid("quantityReceived")
     def quantity_received(self) -> List:
         return self._quantity_received
 
@@ -153,6 +163,7 @@ class ReceivingCTE:
         self._quantity_received = value
 
     @property
+    @jsonid("unit")
     def unit_of_measure(self) -> List:
         return self._unit_of_measure
 
@@ -161,6 +172,7 @@ class ReceivingCTE:
         self._unit_of_measure = value
 
     @property
+    @jsonid("traceabilityProduct")
     def traceability_product(self) -> List:
         return self._traceability_product
 
@@ -169,6 +181,7 @@ class ReceivingCTE:
         self._traceability_product = value
 
     @property
+    @jsonid("lotCodeGeneratorLocation")
     def lot_code_generator_location(self) -> str:
         return self._lot_code_generator_location
 
@@ -177,6 +190,7 @@ class ReceivingCTE:
         self._lot_code_generator_location = value
     
     @property
+    @jsonid("pointOfContactName")
     def point_of_contact_name(self) -> str:
         return self._point_of_contact_name
 
@@ -185,6 +199,7 @@ class ReceivingCTE:
         self._point_of_contact_name = value
 
     @property
+    @jsonid("pointOfContactPhone")
     def point_of_contact_phone(self) -> str:
         return self._point_of_contact_phone
 
@@ -193,6 +208,7 @@ class ReceivingCTE:
         self._point_of_contact_phone = value
 
     @property
+    @jsonid("pointOfContactEmail")
     def point_of_contact_email(self) -> str:
         return self._point_of_contact_email
 
@@ -201,6 +217,7 @@ class ReceivingCTE:
         self._point_of_contact_email = value   
 
     @property
+    @jsonid("receiverLocationIdentifier")
     def receiver_location_identifier(self) -> str:
         return self._receiver_location_identifier
 
@@ -209,6 +226,7 @@ class ReceivingCTE:
         self._receiver_location_identifier = value
 
     @property
+    @jsonid("previousSource")
     def previous_source(self) -> str:
         return self._previous_source
 
@@ -217,6 +235,7 @@ class ReceivingCTE:
         self._previous_source = value  
 
     @property
+    @jsonid("receiptTime")
     def receipt_time(self) -> datetime.datetime:
         return self._receipt_time
 
@@ -225,6 +244,7 @@ class ReceivingCTE:
         self._receipt_time = value
 
     @property
+    @jsonid("harvestDate")
     def harvest_date(self) -> datetime.datetime:
         return self._harvest_date
 
@@ -233,6 +253,7 @@ class ReceivingCTE:
         self._harvest_date = value   
 
     @property
+    @jsonid("coolingLocation")
     def cooling_location(self) -> str:
         return self._cooling_location
 
@@ -241,6 +262,7 @@ class ReceivingCTE:
         self._cooling_location = value
 
     @property
+    @jsonid("coolingDate")
     def cooling_date(self) -> datetime.datetime:
         return self._cooling_date
 
@@ -249,6 +271,7 @@ class ReceivingCTE:
         self._cooling_date = value
 
     @property
+    @jsonid("packingLocation")
     def packing_location(self) -> str:
         return self._packing_location
 
@@ -257,6 +280,7 @@ class ReceivingCTE:
         self._packing_location = value
 
     @property
+    @jsonid("packingDate")
     def packing_date(self) -> datetime.datetime:
         return self._packing_date
 
@@ -265,16 +289,19 @@ class ReceivingCTE:
         self._packing_date = value   
 
     @property
+    @jsonid("catchLocation")
     def catch_location(self) -> List:
         return self._catch_location
 
     @catch_location.setter
     def catch_location(self, value: List):
         self._catch_location = value
-        
+
+    @classmethod     
     def output_json(self) -> str:
         pass
     
+    @classmethod 
     def output_xlsx(self) -> str:
         """
         Create an excel spreadsheet and output the contents to an XML string
@@ -285,6 +312,7 @@ class ReceivingCTE:
         v = "foobar"
         return v
 
+    @classmethod 
     def save_as_xlsx(self, filename: str):
         pass
         # code here

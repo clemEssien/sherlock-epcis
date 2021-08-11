@@ -20,8 +20,7 @@ from dotenv import load_dotenv
 from app import (
     UserView,
     EventView,
-    JSONView,
-    XMLView
+    TransformationView
 )
 
 # FIXTURES
@@ -31,8 +30,7 @@ def client():
 
     UserView.register(app)
     EventView.register(app)
-    JSONView.register(app)
-    XMLView.register(app)
+    TransformationView.register(app)
 
     client = app.test_client()
     return client

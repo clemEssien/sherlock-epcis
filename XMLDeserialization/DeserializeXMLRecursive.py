@@ -7,7 +7,10 @@ import xml.etree.ElementTree as ET
 
 
 def main():
-    parse_xml("./data/GS1StandardExample4.xml")
+    event_list = parse_xml("./data/FetaFactory.xml")
+    for event in event_list:
+        print(event)
+
 
 def parse_tag(node):
     nodeDict = {}
@@ -63,6 +66,7 @@ def parse_tag(node):
             nodeDict[node.tag] = node.text
     return nodeDict
 
+
 def parse_xml(filename):
     tree = ET.parse(filename)
     root = tree.getroot()
@@ -90,11 +94,8 @@ def parse_xml(filename):
                 myDict.update(parse_tag(event))
                 tempDict = myDict.copy()
                 eventDicts.append(tempDict)
-    print(eventDicts)
-    pp = pprint.PrettyPrinter(indent=2)
-    for event in eventDicts:
-        pp.pprint(event)
-        print()
+    return eventDicts
+
 
 if __name__ == "__main__":
     main()

@@ -20,7 +20,7 @@ from JSONDeserialization.epcis_event import (
     TransformationEvent,
 )
 
-from cte import CTEBase
+from epcis_cte_transformation.cte import CTEBase
 
 from openpyxl import Workbook, load_workbook
 from tools.serializer import JSONValueProvider, jsonid, map_from_json, map_to_json
@@ -166,41 +166,50 @@ class TransformationCTE(CTEBase):
     def new_from_csv(cls, csv_lines: "list[str]"):
         pass
 
+
     @property
     @jsonid("traceabilityProduct")
     def traceability_product(self) -> str:
         return self._traceability_product
 
     @traceability_product.setter
-    def traceability_product(self, value: str):
+    def traceability_product(self, value: str) -> None:
         self._traceability_product = value
 
+
+
     @property
-    @jsonid("quantityOfInput")
+    @jsonid("inputQuantity")
     def quantity_of_input(self) -> str:
         return self._quantity_of_input
 
     @quantity_of_input.setter
-    def quantity_of_input(self, value: str):
+    def quantity_of_input(self, value: str) -> None:
         self._quantity_of_input = value
 
+
+
     @property
-    @jsonid("quantityOfOutput")
-    def quantity_of_output(self) -> List:
+    @jsonid("outputQuantity")
+    def quantity_of_output(self) -> str:
         return self._quantity_of_output
 
     @quantity_of_output.setter
-    def quantity_of_output(self, value: str):
+    def quantity_of_output(self, value: str) -> None:
         self._quantity_of_output = value
 
+
+
     @property
-    @jsonid("locationOfTransformation")
+    @jsonid("transformationLocation")
     def location_of_transformation(self) -> str:
         return self._location_of_transformation
 
     @location_of_transformation.setter
-    def location_of_transformation(self, value: str):
+    def location_of_transformation(self, value: str) -> None:
         self._location_of_transformation = value
+
+
 
     @property
     @jsonid("newTraceabilityProduct")
@@ -208,8 +217,10 @@ class TransformationCTE(CTEBase):
         return self._new_traceability_product
 
     @new_traceability_product.setter
-    def new_traceability_product(self, value: str):
+    def new_traceability_product(self, value: str) -> None:
         self._new_traceability_product = value
+
+
 
     @property
     @jsonid("unit")
@@ -217,9 +228,10 @@ class TransformationCTE(CTEBase):
         return self._unit_of_measure
 
     @unit_of_measure.setter
-    def unit_of_measure(self, value: str):
+    def unit_of_measure(self, value: str) -> None:
         self._unit_of_measure = value
 
+<<<<<<< HEAD
     @property
     @jsonid("newTraceabilityLotCode")
     def new_traceability_lot_code(self) -> str:
@@ -237,6 +249,8 @@ class TransformationCTE(CTEBase):
     @date_completed.setter
     def date_completed(self, value: datetime.datetime):
         self._date_completed = value
+=======
+>>>>>>> TNT-2_End-To-End
 
     def output_json(self) -> str:
         """

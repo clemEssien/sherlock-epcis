@@ -1,6 +1,6 @@
 from abc import ABC, abstractclassmethod, abstractmethod
-from typing import List, ValuesView
-from cte import CTEBase
+from typing import List
+from epcis_cte_transformation.cte import CTEBase
 import os, sys
 import datetime
 import json
@@ -67,7 +67,6 @@ class ShippingCTE(CTEBase):
     @classmethod
     def new_from_data(cls, data: dict):
         pass
-
     @classmethod
     def new_from_epcis(cls, event: EPCISEvent):
         output = cls()
