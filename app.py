@@ -442,33 +442,6 @@ def epcis_from_xml_file(file: FileStorage) -> "list[epc.EPCISEvent]":
         except Exception as e:
             print("map_from_epcis error:", e)
         event_list.append(event)
-    # try:
-    #     tree = ET.parse(
-    #         os.path.join(app.config["UPLOAD_FOLDER"], secure_filename(file.filename))
-    #     )
-
-    # except:
-    #     raise ValueError("Couldn't parse XML file")
-    # root = tree.getroot()
-    # if "epcis" not in root.tag.lower():
-    #     raise ValueError("XML File is not an EPCIS document")
-    # events = []
-    # for child in root:
-    #     for event_list in child:
-    #         for event in event_list:
-    #             d = ex_xml.map_xml_to_dict(event)
-    #             try:
-    #                 xml_doc = d[event.tag]
-    #                 event = event_types[event.tag]()
-    #             except Exception:
-    #                 event_from_xml = ex_xml.find_event_from_xml(event, event_types)
-    #                 event = event_types[event_from_xml]
-    #             xml_dict = ex_xml.map_to_epcis_dict(xml_doc)
-    #             try:
-    #                 ex_xml.map_from_epcis(event, xml_dict)
-    #             except Exception as e:
-    #                 print("map_from_epcis error:", e)
-    #             events.append(event)
     return event_list
 
 
