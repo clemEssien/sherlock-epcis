@@ -1,19 +1,23 @@
 import hmac
 import hashlib
+from functools import wraps
+from flask_login import current_user
 
 def authenticate_user():    #TODO
     pass
 
 
+def role_required(*roles):
+    """
+    Decorator for role based authorization, takes in roles as args
+    """
 
+    def decorator(func):
+        @wraps(func)
+        def authorized(*args, **kargs):
+            if current_user.role in roles:
+                return func(*args, **kargs)
+            return {"error": "Current user is not authorized"}
 
-## Don't use this ##
-## use  werkzeug.security instead ##
-
-# def create_hash(key: str, message: str) -> str:
-#     key_bytes = key.encode()
-#     message_bytes = message.encode()
-#     return hmac.new(key_bytes, msg=message_bytes, digestmod=hashlib.sha256).hexdigest().upper()
-
-## Don't use this ##
-## use  werkzeug.security instead ##
+        return authorized
+    return decorator

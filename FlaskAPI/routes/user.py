@@ -1,3 +1,4 @@
+from FlaskAPI.services.user_services import role_required
 from flask import Flask, jsonify, request
 import uuid
 from flask_classful import FlaskView, route
@@ -15,7 +16,7 @@ currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 from models.user import User
-from services import mongodb_connector
+from services import mongodb_connector, user_services
 from init_db import db
 
 user_connector = mongodb_connector.MongoDBConnector(User)
@@ -181,7 +182,6 @@ class UserView(FlaskView):
 
     # ADMIN (required role)
     
-
     @route("/invite", methods=["POST"])
     def send_invite(self):
         """
@@ -238,8 +238,11 @@ class UserView(FlaskView):
         """
         Gets report history of company(?)
         """
+        pass
 
     @route("/changePassword", methods=["POST"])
+    @login_required
+    @role_required("User")
     def change_password(self):
         """
         Changes the password for a given user

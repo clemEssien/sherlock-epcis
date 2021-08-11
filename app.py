@@ -35,7 +35,6 @@ from tools.serializer import map_to_json
 # from epcis_cte_transformation.transformation_cte import TransformationCTE
 
 from FlaskAPI.routes.user import UserView
-from FlaskAPI.routes.admin import AdminView
 
 from dotenv import load_dotenv
 import xml.etree.ElementTree as ET
