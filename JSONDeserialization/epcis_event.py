@@ -24,7 +24,7 @@ class URI:
         self._uri_str: str = uri_str
         self._split_uri: "list[str]" = []
         self._is_split: bool = False
-        if re.search("[a-z]+:[a-z]+:[a-z]+:[a-z]+:[a-z0-9.*]+", self._uri_str):
+        if re.search("[a-z]+:[a-z]+:[a-z]+:[a-z]+:\S+", self._uri_str):
             self._split_uri = self.uri_str.split(":")
             self._is_split = True
 
