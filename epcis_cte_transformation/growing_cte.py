@@ -81,8 +81,10 @@ class GrowingCTE:
         output = cls()
 
         if(issubclass(type(event), CommonEvent)):
-            output.growing_location = event.business_location.value
-
+            try:
+                output.growing_location = event.business_location.value
+            except ValueError:
+                output.growing_location = ""
         if isinstance(event, ObjectEvent):
             for epc in event.epc_list:
                 output.traceability_lot_code.append(epc.value)

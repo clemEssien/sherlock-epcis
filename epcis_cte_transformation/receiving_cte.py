@@ -78,6 +78,7 @@ class ReceivingCTE:
         self._point_of_contact_email = ""
         self._receiver_location_identifier = ""
         self._previous_source = ""
+
         self._receipt_time = datetime.datetime(1,1,1)
         self._harvest_date = datetime.datetime(1,1,1)
         self._cooling_location = ""
@@ -93,11 +94,49 @@ class ReceivingCTE:
     @classmethod 
     def new_from_epcis(cls, event: EPCISEvent):
         output = cls()
-
-        output.receipt_time = event.event_time_local
-        
-        
-
+        try:
+            output.receipt_time = event.event_time_local
+        except ValueError:
+            output.receipt_time = "" 
+        if(issubclass(type(event), CommonEvent)):
+            try:
+                for source in event.source_list:
+                    output.previous_source = source.value
+            except ValueError:
+                    output.previous_source = ""
+            try:
+                for destination in event.destination_list:
+                    output.receiver_location_identifier = destination.value
+            except ValueError:
+                output.receiver_location_identifier = ""
+        if isinstance(event, ObjectEvent):
+            for qe in event.quantity_list:
+                output.quantity_received.append(qe.quantity)
+                output.unit_of_measure.append(qe.uom)
+                output.traceability_lot_code.append(qe.epc_class.value)
+            for epc in event.epc_list:
+                output.traceability_product.append(epc.value)
+        elif isinstance(event, AggregationEvent):
+            for qe in event.child_quantity_list:
+                output.quantity.append(qe.quantity)
+                output.unit_of_measure.append(qe.uom)
+                output.traceability_lot_code.append(qe.epc_class.value)
+            for epc in event.child_epc_list:
+                output.traceability_product.append(epc.value)
+        elif isinstance(event, TransactionEvent):
+            for qe in event.quantity_list:
+                output.quantity.append(qe.quantity)
+                output.unit_of_measure.append(qe.uom)
+                output.traceability_lot_code.append(qe.epc_class.value)
+            for epc in event.epc_list:
+                output.traceability_product.append(epc.value)
+        elif isinstance(event, TransformationEvent):
+            for qe in event.input_quantity_list:
+                output.quantity.append(qe.quantity)
+                output.unit_of_measure.append(qe.uom)
+                output.traceability_lot_code.append(qe.epc_class.value)
+            for epc in event.input_epc_list:
+                output.traceability_product.append(epc.value)
         return output
 
     @classmethod 
