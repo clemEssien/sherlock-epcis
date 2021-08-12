@@ -221,7 +221,7 @@ class UserView(FlaskView):
         user_connector.update(current_user, email=newEmail)
         return {"success": True}
 
-    @route("/getUser", methods=["GET"])
+    @route("/getUser", methods=["POST", "GET"])
     def get_user(self):
         """
         Gets a single user based off of id
