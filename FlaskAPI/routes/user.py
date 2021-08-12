@@ -285,7 +285,7 @@ class UserView(FlaskView):
         if not "Authorization" in request.headers:
             return {"success": False}, 401
         
-        token = self.get_token(request.headers["Authorization"])
+        token = clean_token(request.headers["Authorization"])
         bodyJson = json.loads(request.get_data())
 
         if "userId" in bodyJson:
@@ -300,6 +300,55 @@ class UserView(FlaskView):
                 user = user_connector.get_one(authToken=token)
             except:
                 return {"error": "User not found"}, 400
+            
+        
+        return jsonify(user)
+
+    @route("/setUser", methods=["POST"])
+    def set_user(self):
+        """
+        Gets a single user based off of id
+
+        Request Body:
+            {
+                userId: str,
+            }
+
+        Error Codes:
+            400: User not found
+
+        On Success (200):
+            {
+                ... (user object)
+            }
+        """
+        
+        if not "Authorization" in request.headers:
+            return {"success": False}, 401
+        
+        token = clean_token(request.headers["Authorization"])
+        bodyJson = json.loads(request.get_data())
+        details = bodyJson["details"]                
+
+        if "userId" in bodyJson:
+            userId = bodyJson["userId"]            
+
+            try:
+                user = user_connector.get_one(userId=userId)
+                user_connector.update(user, details)
+
+            except:
+                return {"error": "User not found"}, 400
+        else:
+            try:
+                user = user_connector.get_one(authToken=token)
+                if "firstName" in details:
+                    user_connector.update(user, firstName=details["firstName"])
+                if "lastName" in details:
+                    user_connector.update(user, lastName=details["lastName"])
+                    
+            except Exception as e:
+                return {"error": "Database Error", "message": str(e), "success": False}, 400
             
         
         return jsonify(user)
