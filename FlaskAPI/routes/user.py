@@ -302,7 +302,7 @@ class UserView(FlaskView):
                 return {"error": "User not found"}, 400
             
         
-        return jsonify(user)
+        return { "success": True, "user": user }
 
     @route("/setUser", methods=["POST"])
     def set_user(self):
@@ -323,13 +323,14 @@ class UserView(FlaskView):
             }
         """
         
-        if not "Authorization" in request.headers:
+        if not "Authorization" in request["headers"]:
             return {"success": False}, 401
         
         token = clean_token(request.headers["Authorization"])
         bodyJson = json.loads(request.get_data())
         details = bodyJson["details"]                
-
+        user = None
+        
         if "userId" in bodyJson:
             userId = bodyJson["userId"]            
 
@@ -351,7 +352,7 @@ class UserView(FlaskView):
                 return {"error": "Database Error", "message": str(e), "success": False}, 400
             
         
-        return jsonify(user)
+        return { "success": True }
 
     @route("/profile", methods=["GET"])
     @login_required
