@@ -294,7 +294,11 @@ class UserView(FlaskView):
 
             try:
                 user = user_connector.get_one(userId=userId)
-                user_connector.update(user, details)
+                if "firstName" in details:
+                    user_connector.update(user, firstName=details["firstName"])
+                if "lastName" in details:
+                    user_connector.update(user, lastName=details["lastName"])
+                user = user_connector.get_one(userId=userId)
 
             except:
                 return {"error": "User not found"}, 400
@@ -305,6 +309,7 @@ class UserView(FlaskView):
                     user_connector.update(user, firstName=details["firstName"])
                 if "lastName" in details:
                     user_connector.update(user, lastName=details["lastName"])
+                user = user_connector.get_one(authToken=token)
                     
             except Exception as e:
                 return {"error": "Database Error", "message": str(e), "success": False}, 400
