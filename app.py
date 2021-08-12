@@ -448,6 +448,7 @@ def epcis_from_xml_file(file: FileStorage) -> "list[epc.EPCISEvent]":
 EventView.register(app)
 TransformationView.register(app)
 Ocr.register(app)
+UserView.register(app)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0")
