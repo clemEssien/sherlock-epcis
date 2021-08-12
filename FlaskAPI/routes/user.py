@@ -1,4 +1,3 @@
-from FlaskAPI.services.user_services import role_required
 from flask import Flask, jsonify, request
 import uuid
 from flask_classful import FlaskView, route
@@ -47,6 +46,8 @@ class UserView(FlaskView):
         password = bodyJson["password"]
         confirmPassword = bodyJson["confirmPassword"]
 
+        if user_services.email_used(email):
+            return {"error": "Email already used"}, 400 
         if password != confirmPassword:
             return {"error": "Passwords do not match"}, 400 
 
@@ -146,6 +147,8 @@ class UserView(FlaskView):
 
         if (newEmail != confirmNewEmail):
             return {"error": "Emails do not match"}, 400 
+        if user_services.email_used(newEmail):
+            return {"error": "Email already used"}, 400 
 
         user_connector.update(current_user, email=newEmail)
         return {"success": True}
@@ -195,7 +198,7 @@ class UserView(FlaskView):
     
     @route("/invite", methods=["POST"])
     @login_required
-    @role_required("Admin")
+    @user_services.role_required("Admin")
     def send_invite(self):
         """
         Sends an invitation to a new user
@@ -209,7 +212,7 @@ class UserView(FlaskView):
 
     @route("/updateRoles", methods=["POST"])
     @login_required
-    @role_required("Admin")
+    @user_services.role_required("Admin")
     def update_roles(self):
         """
         Updates the role of a user
@@ -224,7 +227,7 @@ class UserView(FlaskView):
 
     @route("/updateCompany", methods=["POST"])
     @login_required
-    @role_required("Admin")
+    @user_services.role_required("Admin")
     def update_company(self):
         """
         Updates the information of a company 
@@ -240,7 +243,7 @@ class UserView(FlaskView):
 
     @route("/removeUser", methods=["POST"])
     @login_required
-    @role_required("Admin")
+    @user_services.role_required("Admin")
     def remove_user(self):
         """
         Removes user from company
@@ -254,7 +257,7 @@ class UserView(FlaskView):
 
     @route("/reportHistory", methods=["GET"])
     @login_required
-    @role_required("Admin")
+    @user_services.role_required("Admin")
     def get_report_history(self):
         """
         Gets report history of company(?)
@@ -263,7 +266,7 @@ class UserView(FlaskView):
 
     @route("/changePassword", methods=["POST"])
     @login_required
-    @role_required("User", "Admin") #user should be able to change their own pass(?)
+    @user_services.role_required("User", "Admin") #user should be able to change their own pass(?)
     def change_password(self):
         """
         Changes the password for a given user

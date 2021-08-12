@@ -61,6 +61,19 @@ BASE = "http://127.0.0.1:5000"
 # TESTS
 
 @pytest.mark.usefixtures("clean")
+def test_create_user_fail(client):
+    body = {
+        "password": "123",
+        "confirmPassword": "123",
+        "email": "email",
+    }
+
+    response = client.post(BASE + "/api/users/create", data=json.dumps(body))
+
+    assert response.status_code == 400
+    assert response.json["error"] == "Email already used"
+
+@pytest.mark.usefixtures("clean")
 def test_signin(client):
     body = {
         "password": "123",
@@ -120,6 +133,13 @@ def test_create(client, user_connector):
 
 @pytest.mark.usefixtures("clean")
 def test_change_password_wrong_pass(client):
+    body_signin = {
+        "password": "123",
+        "email": "email",
+    }
+
+    client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+
     body = {
         "email": "email",
         "oldPassword": "456",
@@ -134,6 +154,13 @@ def test_change_password_wrong_pass(client):
 
 @pytest.mark.usefixtures("clean")
 def test_change_password_not_found(client):
+    body_signin = {
+        "password": "123",
+        "email": "email",
+    }
+
+    client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+
     body = {
         "email": "bademail",
         "oldPassword": "456",
@@ -148,6 +175,13 @@ def test_change_password_not_found(client):
 
 @pytest.mark.usefixtures("clean")
 def test_change_password_mismatch(client):
+    body_signin = {
+        "password": "123",
+        "email": "email",
+    }
+
+    client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+
     body = {
         "email": "email",
         "oldPassword": "123",
@@ -162,6 +196,13 @@ def test_change_password_mismatch(client):
 
 @pytest.mark.usefixtures("clean")
 def test_change_password_success(client, user_connector):
+    body_signin = {
+        "password": "123",
+        "email": "email",
+    }
+
+    client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+
     body = {
         "email": "email",
         "oldPassword": "123",
