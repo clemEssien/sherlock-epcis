@@ -353,7 +353,7 @@ def test_remove_user(client, user_connector):
         "email"
     }
 
-    response = client.post(BASE + "/api/users/removeUser")
+    response = client.post(BASE + "/api/users/removeUser", data=json.dumps(body))
 
     user = user_connector.get_one(email="email")
 
