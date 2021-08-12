@@ -1,3 +1,4 @@
+from FlaskAPI.services.user_services import validate_body
 from FlaskAPI.models import company
 from flask import Flask, jsonify, request
 import uuid
@@ -41,9 +42,7 @@ class UserView(FlaskView):
         userId = str(uuid.uuid4())
         bodyJson=json.loads(request.get_data())
 
-        for key in ["email", "password", "confirmPassword"]:
-            if not (key in bodyJson):
-                return {"error": "Bad Data"}, 401
+        user_services.validate_body(bodyJson, "password", "confirmPassword")
 
         email = bodyJson["email"]
         password = bodyJson["password"]
@@ -76,9 +75,7 @@ class UserView(FlaskView):
         """
         bodyJson = json.loads(request.get_data())
 
-        for key in ["password", "email"]:
-            if not (key in bodyJson):
-                return {"error": "Bad Data"}, 401
+        user_services.validate_body(bodyJson, "password", "email")
 
         email = bodyJson["email"]
         password = bodyJson["password"]
@@ -141,9 +138,7 @@ class UserView(FlaskView):
         """
         bodyJson = json.loads(request.get_data())
 
-        for key in ["newEmail", "confirmNewEmail"]:
-            if not (key in bodyJson):
-                return {"error": "Bad Data"}, 401
+        user_services.validate_body(bodyJson, "newEmail", "confirmNewEmail")
 
         newEmail = bodyJson["newEmail"]
         confirmNewEmail = bodyJson["confirmNewEmail"]
@@ -176,9 +171,7 @@ class UserView(FlaskView):
         """
         bodyJson = json.loads(request.get_data())
 
-        for key in ["userId"]:
-            if not (key in bodyJson):
-                return {"error": "Bad Data"}, 401
+        user_services.validate_body(bodyJson, "userId")
 
         userId = bodyJson["userId"]
         
@@ -228,9 +221,7 @@ class UserView(FlaskView):
         """
         bodyJson = json.loads(request.get_data())
 
-        for key in ["email", "roles"]:
-            if not (key in bodyJson):
-                return {"error": "Bad Data"}, 401
+        user_services.validate_body(bodyJson, "email", "roles")
 
         email = bodyJson["email"]
         roles = bodyJson["roles"]
@@ -262,9 +253,7 @@ class UserView(FlaskView):
         """
         bodyJson = json.loads(request.get_data())
 
-        for key in ["name", "address"]:
-            if not (key in bodyJson):
-                return {"error": "Bad Data"}, 401
+        user_services.validate_body(bodyJson, "name", "address")
 
         name = bodyJson["name"]
         address = bodyJson["address"]
@@ -294,9 +283,7 @@ class UserView(FlaskView):
         """
         bodyJson = json.loads(request.get_data())
 
-        for key in ["email"]:
-            if not (key in bodyJson):
-                return {"error": "Bad Data"}, 401
+        user_services.validate_body(bodyJson, "email")
 
         email = bodyJson["email"]
 
@@ -348,10 +335,7 @@ class UserView(FlaskView):
         """
         bodyJson = json.loads(request.get_data())
 
-        # check the body for the minimum required variables for this call:
-        for key in ["email", "newPassword", "confirmNewPassword", "oldPassword"]:
-            if not (key in bodyJson):
-                return {"error": "Bad Data"}, 401
+        user_services.validate_body(bodyJson, "email", "newPassword", "confirmNewPassword", "oldPassword")
 
         newPassword = bodyJson["newPassword"]
         confirmNewPassword = bodyJson["confirmNewPassword"]

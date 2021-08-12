@@ -14,6 +14,11 @@ def email_used(email: str) -> bool:
         return False
     return True
 
+def validate_body(body, *args):
+    for key in args:
+        if not key in body:
+            return {"error": "Bad Data"}, 401
+
 def role_required(*roles):
     """
     Decorator for role based authorization, takes in roles as args

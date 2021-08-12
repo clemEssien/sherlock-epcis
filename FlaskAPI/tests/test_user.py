@@ -350,7 +350,7 @@ def test_remove_user(client, user_connector):
     client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
 
     body = {
-        "email"
+        "email": "email"
     }
 
     response = client.post(BASE + "/api/users/removeUser", data=json.dumps(body))
