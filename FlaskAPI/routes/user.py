@@ -281,7 +281,7 @@ class UserView(FlaskView):
             }
         """
         
-        if not "Authorization" in request["headers"]:
+        if not "Authorization" in request.headers:
             return {"success": False}, 401
         
         token = clean_token(request.headers["Authorization"])
