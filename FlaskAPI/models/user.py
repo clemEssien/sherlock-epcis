@@ -12,6 +12,7 @@ class User(UserMixin, db.Document):
     lastName = db.StringField()
     email = db.StringField()
     role = db.StringField() #User, Admin, Superuser
+    supplyChainRoles = db.ListField(db.StringField())
     passwordHash = db.StringField()
     companyId = db.StringField()
     lastSignIn = db.DateTimeField()

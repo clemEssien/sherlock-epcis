@@ -24,7 +24,7 @@ def role_required(*roles):
         def authorized(*args, **kargs):
             if current_user.role in roles:
                 return func(*args, **kargs)
-            return {"error": "Current user is not authorized"}
+            return {"error": "Current user is not authorized"}, 401
 
         return authorized
     return decorator

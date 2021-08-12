@@ -1,3 +1,4 @@
+from FlaskAPI.models import company
 from flask import Flask, jsonify, request
 import uuid
 from flask_classful import FlaskView, route
@@ -15,10 +16,12 @@ currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 from models.user import User
+from models.company import Company
 from services import mongodb_connector, user_services
 from init_db import db
 
 user_connector = mongodb_connector.MongoDBConnector(User)
+company_connector = mongodb_connector.MongoDBConnector(Company)
 
 class UserView(FlaskView):
     route_base = "/api/users"
@@ -223,7 +226,26 @@ class UserView(FlaskView):
                 roles: str[]
             }
         """
-        pass
+        bodyJson = json.loads(request.get_data())
+
+        for key in ["email", "roles"]:
+            if not (key in bodyJson):
+                return {"error": "Bad Data"}, 401
+
+        email = bodyJson["email"]
+        roles = bodyJson["roles"]
+
+        try:
+            user = user_connector.get_one(email=email)
+        except db.DoesNotExist:
+            return {"error": "User not found"}, 400
+        except Exception as e:
+            return {"error": "Server error", "exception": str(e)}, 400 # very bad
+
+        user_connector.update(user, supplyChainRoles=roles)
+
+        return {"success": True}, 200
+
 
     @route("/updateCompany", methods=["POST"])
     @login_required
@@ -234,12 +256,29 @@ class UserView(FlaskView):
 
         Request Body:
             {
-                companyId: str (something else?)
                 name: str
                 address: str
             }
         """
-        pass
+        bodyJson = json.loads(request.get_data())
+
+        for key in ["name", "address"]:
+            if not (key in bodyJson):
+                return {"error": "Bad Data"}, 401
+
+        name = bodyJson["name"]
+        address = bodyJson["address"]
+
+        try:
+            company = company_connector.get_one(companyId=current_user.companyId)
+        except db.DoesNotExist:
+            return {"error": "Company not found"}, 400
+        except Exception as e:
+            return {"error": "Server error", "exception": str(e)}, 400
+
+        company_connector.update(company, name=name, address=address)
+
+        return {"success": True}
 
     @route("/removeUser", methods=["POST"])
     @login_required
@@ -253,7 +292,24 @@ class UserView(FlaskView):
                 email: str
             }
         """
-        pass
+        bodyJson = json.loads(request.get_data())
+
+        for key in ["email"]:
+            if not (key in bodyJson):
+                return {"error": "Bad Data"}, 401
+
+        email = bodyJson["email"]
+
+        try:
+            user = user_connector.get_one(email=email)
+        except db.DoesNotExist:
+            return {"error": "User not found"}, 400
+        except Exception as e:
+            return {"error": "Server error", "exception": str(e)}, 400
+
+        user_connector.update(user, companyId="")
+
+        return {"success": True}, 200
 
     @route("/reportHistory", methods=["GET"])
     @login_required

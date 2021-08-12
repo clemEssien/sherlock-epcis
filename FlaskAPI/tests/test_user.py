@@ -11,6 +11,7 @@ import pytest
 import json
 from init_app import create_app
 from models.user import User
+from models.company import Company
 from services import mongodb_connector, user_services
 
 from flask_mongoengine import MongoEngine
@@ -39,12 +40,17 @@ def client():
 def user_connector():
     return mongodb_connector.MongoDBConnector(User)
 
+@pytest.fixture(scope="module")
+def company_connector():
+    return mongodb_connector.MongoDBConnector(Company)
+
 @pytest.fixture
-def clean(user_connector):
+def clean(user_connector, company_connector):
     if current_user and current_user.is_authenticated:
         logout_user(current_user)
 
     user_connector.delete_all()
+    company_connector.delete_all()
 
     user_connector.create_one(
         userId = "1",
@@ -52,9 +58,28 @@ def clean(user_connector):
         lastName = "last",
         email = "email",
         role = "User",
-        passwordHash = generate_password_hash("123"), #hash for "123"
+        passwordHash = generate_password_hash("123"),
         companyId = "456"
     )
+
+@pytest.fixture
+def create_admin(user_connector, company_connector):
+    user_connector.create_one(
+        userId = "2",
+        firstName = "ad",
+        lastName = "min",
+        email = "admin@gmail.com",
+        role = "Admin",
+        passwordHash = generate_password_hash("456"),
+        companyId = "abc123"
+    )
+
+    company_connector.create_one(
+        companyId = "abc123",
+        name = "TestCompany",
+        address = "test address"
+    )
+
 
 BASE = "http://127.0.0.1:5000"
 
@@ -250,3 +275,88 @@ def test_get_user(client):
 
     assert response.status_code == 200
     assert check_password_hash(response.json["passwordHash"], "123")
+
+
+@pytest.mark.usefixtures("clean", "create_admin")
+def test_update_roles_fail(client):
+    body_signin = {
+        "password": "123",
+        "email": "email",
+    }
+
+    client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+
+    body = {
+        "email": "email",
+        "roles": ["Originator", "Consumer"]
+    }
+
+    response = client.post(BASE + "/api/users/updateRoles", data=json.dumps(body))
+
+    assert response.status_code == 401
+    assert response.json["error"] == "Current user is not authorized"
+
+@pytest.mark.usefixtures("clean", "create_admin")
+def test_update_roles(client, user_connector):
+    body_signin = {
+        "password": "456",
+        "email": "admin@gmail.com",
+    }
+
+    client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+
+    body = {
+        "email": "email",
+        "roles": ["Originator", "Consumer"]
+    }
+
+    response = client.post(BASE + "/api/users/updateRoles", data=json.dumps(body))
+
+    user = user_connector.get_one(email="email")
+
+    assert "Originator" in user.supplyChainRoles and "Consumer" in user.supplyChainRoles
+    assert response.status_code == 200
+    assert response.json["success"] == True
+
+@pytest.mark.usefixtures("clean", "create_admin")
+def test_update_company(client, company_connector):
+    body_signin = {
+        "password": "456",
+        "email": "admin@gmail.com",
+    }
+
+    client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+
+    body = {
+        "name": "TestCompany2",
+        "address": "other address"
+    }
+
+    response = client.post(BASE + "/api/users/updateCompany", data=json.dumps(body))
+
+    company = company_connector.get_one(companyId="abc123")
+
+    assert company.name == "TestCompany2" and company.address == "other address"
+    assert response.status_code == 200
+    assert response.json["success"] == True
+
+@pytest.mark.usefixtures("clean", "create_admin")
+def test_remove_user(client, user_connector):
+    body_signin = {
+        "password": "456",
+        "email": "admin@gmail.com",
+    }
+
+    client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+
+    body = {
+        "email"
+    }
+
+    response = client.post(BASE + "/api/users/removeUser")
+
+    user = user_connector.get_one(email="email")
+
+    assert user.companyId == "" #user is removed from company 456
+    assert response.status_code == 200
+    assert response.json["success"] == True
