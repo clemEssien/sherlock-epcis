@@ -1,3 +1,4 @@
+from FlaskAPI.services.mongodb_connector import MongoDBConnector
 from flask import Flask, jsonify, request
 import uuid
 from flask_classful import FlaskView, route
@@ -18,7 +19,78 @@ from models.user import User
 from services import mongodb_connector
 from init_db import db
 
-user_connector = mongodb_connector.MongoDBConnector(User)
+auth_expiration = 8
+
+user_connector: MongoDBConnector = mongodb_connector.MongoDBConnector(User)
+
+def clean_token(string: str):
+    return string.replace("Bearer ", "").replace("Bearer: ", "").replace("Bearer:", "")
+
+def get_token_by_email(email: str):
+    """
+    Retrieves a valid sign-in token by email address.
+
+    If the current session is no longer valid, the tokens are cleared and None is returned.
+    """
+    user: User = user_connector.get_one(email=email)
+    if user:
+        d1: datetime = user.lastSignIn
+        d2 = datetime.now()
+        dd = d2 - d1
+        if (dd.total_seconds > (auth_expiration * 60 * 60)):
+            user_connector.update(user, authToken="", refreshToken="")
+            return None
+        else:
+            return user.authToken
+    else:
+        return None
+
+def get_token_by_userid(user_id: str):
+    """
+    Retrieves a valid sign-in token by userid.
+
+    If the current session is no longer valid, the tokens are cleared and None is returned.
+    """
+    user: User = user_connector.get_one(userId=user_id)
+    if user:
+        d1: datetime = user.lastSignIn
+        d2 = datetime.now()
+        dd = d2 - d1
+        if (dd.total_seconds > (auth_expiration * 60 * 60)):
+            user_connector.update(user, authToken="", refreshToken="")
+            return None
+        else:
+            return user.authToken
+    else:
+        return None
+
+def exchange_token(refresh_token: str):
+    """
+    Use the refresh token to exchange the current auth token for a new one and update the sign-in time stamp.
+    
+    If the current session is no longer valid, the tokens are cleared and None is returned.
+    """
+    user: User = user_connector.get_one(refreskToken=refresh_token)
+
+    if user:
+        d1: datetime = user.lastSignIn
+        d2 = datetime.now()
+        dd = d2 - d1
+        
+        if (dd.total_seconds > (auth_expiration * 60 * 60)):
+            user_connector.update(user, authToken="", refreshToken="")
+            return None
+        else:
+            token = secrets.token_urlsafe(2048)
+            refreshtoken = secrets.token_urlsafe(2048)
+            user_connector.update(user, authToken=token, refreshToken=refreshtoken, lastSignIn = datetime.now())
+            
+            return (token, refreshtoken)
+    else:
+        return None
+
+
+
 
 class UserView(FlaskView):
     route_base = "/api/users"
@@ -89,10 +161,12 @@ class UserView(FlaskView):
             return {"error": "Invalid credentials"}, 400 
 
         token = secrets.token_urlsafe(2048)
-        user_connector.update(user, authToken=token, lastSignIn=datetime.now())
+        refreshtoken = secrets.token_urlsafe(2048)
+
+        user_connector.update(user, authToken=token, refreshToken=refreshtoken, lastSignIn=datetime.now())
         login_user(user)
 
-        return {"success": True}
+        return {"success": True, "user": user, "authToken": token }
 
     @route("/signout", methods=["POST"])
     @login_required
@@ -207,19 +281,27 @@ class UserView(FlaskView):
                 ... (user object)
             }
         """
+        
+        if not "Authorization" in request.headers:
+            return {"success": False}, 401
+        
+        token = self.get_token(request.headers["Authorization"])
         bodyJson = json.loads(request.get_data())
 
-        for key in ["userId"]:
-            if not (key in bodyJson):
-                return {"error": "Bad Data"}, 401
-
-        userId = bodyJson["userId"]
+        if "userId" in bodyJson:
+            userId = bodyJson["userId"]
         
-        try:
-            user = user_connector.get_one(userId=userId)
-        except:
-            return {"error": "User not found"}, 400
-
+            try:
+                user = user_connector.get_one(userId=userId)
+            except:
+                return {"error": "User not found"}, 400
+        else:
+            try:
+                user = user_connector.get_one(authToken=token)
+            except:
+                return {"error": "User not found"}, 400
+            
+        
         return jsonify(user)
 
     @route("/profile", methods=["GET"])
