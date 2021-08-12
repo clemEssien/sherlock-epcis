@@ -448,7 +448,6 @@ UserView.register(app)
 EventView.register(app)
 TransformationView.register(app)
 Ocr.register(app)
-UserView.register(app)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0")

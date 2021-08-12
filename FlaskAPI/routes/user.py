@@ -164,7 +164,7 @@ class UserView(FlaskView):
         user_connector.update(user, authToken=token, refreshToken=refreshtoken, lastSignIn=datetime.now())
         login_user(user)
 
-        return {"success": True, "user": user, "authToken": token }
+        return {"success": True, "user": user, "authToken": token, "refreshToken": refreshtoken }
 
     @route("/fromauth", methods=["POST"])
     @login_required
@@ -221,7 +221,7 @@ class UserView(FlaskView):
         user_connector.update(current_user, email=newEmail)
         return {"success": True}
 
-    @route("/getUser", methods=["POST"])
+    @route("/getUser", methods=["GET"])
     def get_user(self):
         """
         Gets a single user based off of id

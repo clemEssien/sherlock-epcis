@@ -267,11 +267,20 @@ def test_change_email(client, user_connector):
 
 @pytest.mark.usefixtures("clean")
 def test_get_user(client):
+    body_signin = {
+        "password": "123",
+        "email": "email",
+    }
+
+    client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+
     body = {
         "userId": "1"
     }
 
     response = client.get(BASE + "/api/users/getUser", data=json.dumps(body))
+
+    print(response.json)
 
     assert response.status_code == 200
     assert check_password_hash(response.json["passwordHash"], "123")
