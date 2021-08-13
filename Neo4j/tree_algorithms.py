@@ -3,7 +3,6 @@ import sys
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
-print("DB: ", parentdir)
 from Neo4j import db_connect as db_con
 from dotenv import load_dotenv
 load_dotenv()
