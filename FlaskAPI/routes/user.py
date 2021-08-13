@@ -19,11 +19,12 @@ parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 from models.user import User
 from models.company import Company
-from services import mongodb_connector, user_services
+from services import mongodb_connector, mail_connector, user_services
 from init_db import db
 
 user_connector: MongoDBConnector = mongodb_connector.MongoDBConnector(User)
 company_connector = mongodb_connector.MongoDBConnector(Company)
+mail_client = mail_connector.MailConnector()
 
 class UserView(FlaskView):
     route_base = "/api/users"

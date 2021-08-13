@@ -4,6 +4,7 @@ from flask_mongoengine import MongoEngine
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import login_user, logout_user, login_required, current_user, LoginManager
 from init_db import db
+from init_mail import mail
 from models.user import User
 import base64 
 
@@ -21,8 +22,15 @@ def create_app():
     app.config['MONGODB_SETTINGS'] = {
         "host": os.getenv('MONGODB_HOST')
     }
+    app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+    app.config['MAIL_PORT'] = 465
+    app.config['MAIL_USE_SSL'] = True
+    app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+    app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+
     app.secret_key = 'some key'
     db.init_app(app)
+    mail.init_app(app)
     login_manager = LoginManager()
     login_manager.init_app(app)
 
