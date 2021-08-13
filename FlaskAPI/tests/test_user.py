@@ -163,7 +163,11 @@ def test_change_password_wrong_pass(client):
         "email": "email",
     }
 
-    client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+    response_signin = client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+
+    header = {
+        "Authorization": "Bearer " + response_signin.json["refreshToken"]
+    }
 
     body = {
         "email": "email",
@@ -172,7 +176,7 @@ def test_change_password_wrong_pass(client):
         "confirmNewPassword": "abc"
     }
 
-    response = client.post(BASE + "/api/users/changePassword", data=json.dumps(body))
+    response = client.post(BASE + "/api/users/changePassword", data=json.dumps(body), headers=header)
 
     assert response.status_code == 400
     assert response.json["error"] == "Incorrect password"
@@ -184,7 +188,11 @@ def test_change_password_not_found(client):
         "email": "email",
     }
 
-    client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+    response_signin = client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+
+    header = {
+        "Authorization": "Bearer " + response_signin.json["refreshToken"]
+    }
 
     body = {
         "email": "bademail",
@@ -193,7 +201,7 @@ def test_change_password_not_found(client):
         "confirmNewPassword": "abc"
     }
 
-    response = client.post(BASE + "/api/users/changePassword", data=json.dumps(body))
+    response = client.post(BASE + "/api/users/changePassword", data=json.dumps(body), headers=header)
 
     assert response.status_code == 400
     assert response.json["error"] == "User not found"
@@ -205,7 +213,11 @@ def test_change_password_mismatch(client):
         "email": "email",
     }
 
-    client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+    response_signin = client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+
+    header = {
+        "Authorization": "Bearer " + response_signin.json["refreshToken"]
+    }
 
     body = {
         "email": "email",
@@ -214,7 +226,7 @@ def test_change_password_mismatch(client):
         "confirmNewPassword": "def"
     }
 
-    response = client.post(BASE + "/api/users/changePassword", data=json.dumps(body))
+    response = client.post(BASE + "/api/users/changePassword", data=json.dumps(body), headers=header)
 
     assert response.status_code == 400
     assert response.json["error"] == "New passwords do not match"
@@ -226,7 +238,11 @@ def test_change_password_success(client, user_connector):
         "email": "email",
     }
 
-    client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+    response_signin = client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+
+    header = {
+        "Authorization": "Bearer " + response_signin.json["refreshToken"]
+    }
 
     body = {
         "email": "email",
@@ -235,7 +251,7 @@ def test_change_password_success(client, user_connector):
         "confirmNewPassword": "456"
     }
 
-    response = client.post(BASE + "/api/users/changePassword", data=json.dumps(body))
+    response = client.post(BASE + "/api/users/changePassword", data=json.dumps(body), headers=header)
 
     user = user_connector.get_one(email="email")
 
@@ -250,14 +266,18 @@ def test_change_email(client, user_connector):
         "email": "email",
     }
 
-    client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+    response_signin = client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+
+    header = {
+        "Authorization": "Bearer " + response_signin.json["refreshToken"]
+    }
 
     body = {
         "newEmail": "new@gmail.com",
         "confirmNewEmail": "new@gmail.com"
     }
 
-    response = client.post(BASE + "/api/users/changeEmail", data=json.dumps(body))
+    response = client.post(BASE + "/api/users/changeEmail", data=json.dumps(body), headers=header)
 
     user = user_connector.get_one(userId="1")
 
@@ -272,18 +292,20 @@ def test_get_user(client):
         "email": "email",
     }
 
-    client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+    response_signin = client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+
+    header = {
+        "Authorization": "Bearer " + response_signin.json["refreshToken"]
+    }
 
     body = {
         "userId": "1"
     }
 
-    response = client.get(BASE + "/api/users/getUser", data=json.dumps(body))
-
-    print(response.json)
+    response = client.get(BASE + "/api/users/getUser", data=json.dumps(body), headers=header)
 
     assert response.status_code == 200
-    assert check_password_hash(response.json["passwordHash"], "123")
+    assert check_password_hash(response.json["user"]["passwordHash"], "123")
 
 
 @pytest.mark.usefixtures("clean", "create_admin")
@@ -293,14 +315,18 @@ def test_update_roles_fail(client):
         "email": "email",
     }
 
-    client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+    response_signin = client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+
+    header = {
+        "Authorization": "Bearer " + response_signin.json["refreshToken"]
+    }
 
     body = {
         "email": "email",
         "roles": ["Originator", "Consumer"]
     }
 
-    response = client.post(BASE + "/api/users/updateRoles", data=json.dumps(body))
+    response = client.post(BASE + "/api/users/updateRoles", data=json.dumps(body), headers=header)
 
     assert response.status_code == 401
     assert response.json["error"] == "Current user is not authorized"
@@ -312,14 +338,18 @@ def test_update_roles(client, user_connector):
         "email": "admin@gmail.com",
     }
 
-    client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+    response_signin = client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+
+    header = {
+        "Authorization": "Bearer " + response_signin.json["refreshToken"]
+    }
 
     body = {
         "email": "email",
         "roles": ["Originator", "Consumer"]
     }
 
-    response = client.post(BASE + "/api/users/updateRoles", data=json.dumps(body))
+    response = client.post(BASE + "/api/users/updateRoles", data=json.dumps(body), headers=header)
 
     user = user_connector.get_one(email="email")
 
@@ -334,14 +364,18 @@ def test_update_company(client, company_connector):
         "email": "admin@gmail.com",
     }
 
-    client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+    response_signin = client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+
+    header = {
+        "Authorization": "Bearer " + response_signin.json["refreshToken"]
+    }
 
     body = {
         "name": "TestCompany2",
         "address": "other address"
     }
 
-    response = client.post(BASE + "/api/users/updateCompany", data=json.dumps(body))
+    response = client.post(BASE + "/api/users/updateCompany", data=json.dumps(body), headers=header)
 
     company = company_connector.get_one(companyId="abc123")
 
@@ -356,13 +390,17 @@ def test_remove_user(client, user_connector):
         "email": "admin@gmail.com",
     }
 
-    client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+    response_signin = client.post(BASE + "/api/users/signin", data=json.dumps(body_signin))
+
+    header = {
+        "Authorization": "Bearer " + response_signin.json["refreshToken"]
+    }
 
     body = {
         "email": "email"
     }
 
-    response = client.post(BASE + "/api/users/removeUser", data=json.dumps(body))
+    response = client.post(BASE + "/api/users/removeUser", data=json.dumps(body), headers=header)
 
     user = user_connector.get_one(email="email")
 
