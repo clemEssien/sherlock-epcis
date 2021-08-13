@@ -102,6 +102,7 @@ class ReceivingCTE:
             output.receipt_time = "" 
         if(issubclass(type(event), CommonEvent)):
             try:
+                #print("Previous Source: " + event.source_list[0].get("source").value)
                 for sour in event.source_list:
                     output.previous_source = sour.get("source").value
             except ValueError:
@@ -271,7 +272,7 @@ class ReceivingCTE:
         return self._previous_source
 
     @previous_source.setter
-    def previous_sorce(self, value: str):
+    def previous_source(self, value: str):
         self._previous_source = value  
 
     @property
