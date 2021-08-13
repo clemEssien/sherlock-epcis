@@ -1,3 +1,4 @@
+from FlaskAPI.routes.graph import Tree
 from pymongo.uri_parser import parse_ipv6_literal_host
 from epcis_cte_transformation.cte import split_results
 from epcis_cte_transformation.location_master import LocationMaster
@@ -71,10 +72,10 @@ CORS(
         "http://localhost:3001",
         "http://127.0.0.1:3000",
         "http://127.0.0.1:3001",
-        "https://traceability.sapfonte.net",
-        "https://traceability-dev.sapfonte.net",
-        "http://traceability.sapfonte.net",
-        "http://traceability-dev.sapfonte.net",
+        # "https://traceability.sapfonte.net",
+        # "https://traceability-dev.sapfonte.net",
+        # "http://traceability.sapfonte.net",
+        # "http://traceability-dev.sapfonte.net",
     ],
 )
 
@@ -86,7 +87,7 @@ event_types = {
     "TransformationEvent": epc.TransformationEvent,
 }
 
-UPLOAD_FOLDER = "/var/src/uploads"
+# UPLOAD_FOLDER = "/var/src/uploads"
 
 ALLOWED_EXTENSIONS = {
     "txt",
@@ -101,10 +102,10 @@ ALLOWED_EXTENSIONS = {
     "xml",
 }
 
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+# app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
+# if not os.path.exists(UPLOAD_FOLDER):
+#     os.makedirs(UPLOAD_FOLDER)
 
 from epcis_cte_transformation.ftl_food import FTLFood
 
@@ -447,6 +448,7 @@ def epcis_from_xml_file(file: FileStorage) -> "list[epc.EPCISEvent]":
 
 EventView.register(app)
 TransformationView.register(app)
+Tree.register(app)
 Ocr.register(app)
 
 if __name__ == "__main__":
