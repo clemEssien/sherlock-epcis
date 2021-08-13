@@ -15,7 +15,7 @@ from JSONDeserialization.epcis_event import (
     TransactionEvent,
     TransformationEvent,
 )
-from creation_cte import CreationCTE
+from receiving_cte import ReceivingCTE
 
 event = ObjectEvent()
 # only need event time
@@ -27,9 +27,17 @@ event.epc_list = [
     URI("urn:epc:id:sgtin:4012345.011122.25"),
     URI("urn:epc:id:sgtin:4012345.011122.25"),
 ]
+event.source_list = [{ "type": URI("urn:epcglobal:cbv:sdt:possessing_party"), "source": URI("urn:epc:id:sgln:4012345.00001.0")}]
+event.destination_list = [{ "type": URI("urn:epcglobal:cbv:sdt:owning_party"), "destination": URI("urn:epc:id:sgln:0614141.00001.0")}]
 event.quantity_list = [
     QuantityElement(URI("urn:epc:class:lgtin:4012345.012345.998877"), 200, "KGM"),
     QuantityElement(URI("urn:epc:class:lgtin:4012345.012345.998877"), 200, "KGM"),
 ]
-cte = CreationCTE.new_from_epcis(CreationCTE, event)
-filename = cte.output_xlsx()
+cte = ReceivingCTE.new_from_epcis(event)
+print(cte.receipt_time)
+print(cte.quantity_received)
+print(cte.receiver_location_identifier)
+print(cte.unit_of_measure)
+print(cte.traceability_lot_code)
+print(cte.traceability_product)
+#filename = cte.output_xlsx()
