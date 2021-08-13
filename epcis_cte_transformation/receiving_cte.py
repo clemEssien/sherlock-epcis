@@ -107,8 +107,7 @@ class ReceivingCTE:
             except ValueError:
                     output.previous_source = ""
             try:
-                for dest in event.destination_list:
-                    output.receiver_location_identifier = dest.get("destination").value
+                output.receiver_location_identifier = event.read_point.value
             except ValueError:
                 output.receiver_location_identifier = ""
         if isinstance(event, ObjectEvent):
