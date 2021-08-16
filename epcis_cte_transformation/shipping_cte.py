@@ -1,5 +1,7 @@
 from abc import ABC, abstractclassmethod, abstractmethod
 from typing import List
+
+from openpyxl.worksheet.worksheet import Worksheet
 from epcis_cte_transformation.cte import CTEBase
 import os, sys
 import datetime
@@ -335,7 +337,7 @@ class ShippingCTE(CTEBase):
         data = map_to_json(self)
         return json.dumps(data)
 
-    def output_xlsx(self, sheet, row) -> str:
+    def output_xlsx(self, sheet: Worksheet, row) -> str:
         """
         Create an excel spreadsheet and output the contents to an XML string
         """
