@@ -57,7 +57,7 @@ class CTEBase(ABC):
         pass
 
     @abstractmethod
-    def output_xlsx(self) -> str:
+    def output_xlsx(self, sheet, row) -> str:
         pass
 
     @abstractmethod

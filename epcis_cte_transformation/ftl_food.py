@@ -8,6 +8,10 @@ from epcis_cte_transformation.receiving_cte import ReceivingCTE
 from epcis_cte_transformation.shipping_cte import ShippingCTE
 from epcis_cte_transformation.transformation_cte import TransformationCTE
 
+
+from openpyxl import Workbook, load_workbook
+from openpyxl.worksheet.worksheet import Worksheet
+
 # export const ftlFoodsOliveRows = [
 # {
 # id: 1, //
@@ -207,3 +211,5 @@ class FTLFood:
         self._packaging_style = value
 
 
+    def output_xlsx(self, sheet, row):
+        pass
