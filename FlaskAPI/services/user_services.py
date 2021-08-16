@@ -12,6 +12,9 @@ user_connector = MongoDBConnector(User)
 def authorize_user(header) -> bool: # checks header for Authorization
     if not "Authorization" in header:
         return {"success": False}, 401
+    token = clean_token(header["Authorization"])
+    if not current_user.authToken == token:
+        return {"error": "User authorized with incorrect token"}, 401
 
 def email_used(email: str) -> bool:
     try:
