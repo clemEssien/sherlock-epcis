@@ -1,0 +1,12 @@
+
+elif isinstace(item, CreationCTE):
+    cls = CreationCTE
+elif isinstace(item, GrowingCTE):
+    cls = GrowingCTE
+elif isinstace(item, ReceivingCTE):
+    cls = ReceivingCTE
+elif isinstace(item, ShippingCTE):
+    cls = ShippingCTE
+elif isinstace(item, TransformationCTE):
+    cls = TransformationCTE
+

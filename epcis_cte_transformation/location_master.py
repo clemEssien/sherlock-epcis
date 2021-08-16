@@ -8,6 +8,9 @@ from epcis_cte_transformation.receiving_cte import ReceivingCTE
 from epcis_cte_transformation.shipping_cte import ShippingCTE
 from epcis_cte_transformation.transformation_cte import TransformationCTE
 
+from openpyxl import Workbook, load_workbook
+from openpyxl.worksheet.worksheet import Worksheet
+
 # export const locationMasterOliveRows = [
 # {
 # "locationId": "9991002100014", //Receiving (receiver_location_identifier), Creation(location_where_food_was_created), Shipping(location_of_source_of_shipment), Transformation(location_of_transformation), Growing (growing_location)
@@ -166,3 +169,6 @@ class LocationMaster:
     @zip.setter
     def zip(self, value: str) -> None:
         self._zip = value
+
+    def output_xlsx(self, sheet, row):
+        pass
