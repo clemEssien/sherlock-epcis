@@ -29,13 +29,6 @@ from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
 from tools.serializer import map_to_json
 
-# from epcis_cte_transformation.cte import CTEBase
-# from epcis_cte_transformation.creation_cte import CreationCTE
-# from epcis_cte_transformation.growing_cte import GrowingCTE
-# from epcis_cte_transformation.receiving_cte import ReceivingCTE
-# from epcis_cte_transformation.shipping_cte import ShippingCTE
-# from epcis_cte_transformation.transformation_cte import TransformationCTE
-
 from FlaskAPI.routes.user import UserView
 
 from dotenv import load_dotenv
