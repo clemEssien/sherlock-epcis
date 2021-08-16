@@ -87,7 +87,6 @@ event_types = {
 }
 
 UPLOAD_FOLDER = "/var/src/uploads"
-
 ALLOWED_EXTENSIONS = {
     "txt",
     "pdf",
@@ -411,11 +410,11 @@ def epcis_from_json_file(file: FileStorage) -> "list[epc.EPCISEvent]":
     ) as f:
         json_dict = json.load(f)
     # document follows proposed EPCIS2.0 JSON bindings
-    if json_dict["isA"].lower() == "epcisdocument":
+    try:
         json_event_list = json_dict["epcisBody"]["eventList"]
     # document does not follow proposed EPCIS2.0 JSON bindings
-    else:
-        pass
+    except:
+        raise ValueError("File does not follow proposed EPCIS2.0 JSON bindings")
     # populate EPCISEvent object from JSON events
     event_list = []
     for json_event in json_event_list:
