@@ -1,3 +1,4 @@
+from FlaskAPI.routes.graph import Tree
 from pymongo.uri_parser import parse_ipv6_literal_host
 from epcis_cte_transformation.cte import split_results
 from epcis_cte_transformation.location_master import LocationMaster
@@ -447,6 +448,7 @@ def epcis_from_xml_file(file: FileStorage) -> "list[epc.EPCISEvent]":
 
 EventView.register(app)
 TransformationView.register(app)
+Tree.register(app)
 Ocr.register(app)
 UserView.register(app)
 
