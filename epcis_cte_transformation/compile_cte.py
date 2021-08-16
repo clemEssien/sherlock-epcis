@@ -22,9 +22,7 @@ from openpyxl.worksheet.worksheet import Worksheet
 
 def create_filename():
     fn = "/var/src/uploads/" + str(datetime.now().isoformat("T").replace("+00:00", "") + "Z") + ".xlsx"
-    
     return fn
-    pass
 
 def compile_ctes(ctelist: "list[CTEBase]"):
     names = {
