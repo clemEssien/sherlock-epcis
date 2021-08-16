@@ -2,6 +2,9 @@
 from tools.serializer import jsonid, map_from_json, map_to_json
 import json
 
+from epcis_cte_transformation.ftl_food import FTLFood
+from epcis_cte_transformation.location_master import LocationMaster
+
 from epcis_cte_transformation.cte import CTEBase
 from epcis_cte_transformation.creation_cte import CreationCTE
 from epcis_cte_transformation.growing_cte import GrowingCTE
@@ -32,7 +35,9 @@ def compile_ctes(ctelist: "list[CTEBase]"):
             "receiving_first": "Receiving KDEs (If first receiver except for seafood)",
             "receiving_first_seafood": "Receiving KDEs (If first receiver of seafood)",
             "transformation": "Transformation KDEs",
-            "creation": "Creation KDEs"
+            "creation": "Creation KDEs",
+            "ftlfoods": "FTL Foods",
+            "location": "Location Master"
         }
 
     filename = create_filename()    
@@ -40,14 +45,17 @@ def compile_ctes(ctelist: "list[CTEBase]"):
     
     workbook = Workbook()
     sheet = workbook.active    
-    sheets["ftl_foods"] = sheet
+    sheets["ftlfoods"] = sheet
     
     sheet = workbook.create_sheet("Location Master")
+    sheets["location"] = sheet
     
     workbook.sheetnames[0] = "FTL Foods"
     workbook.sheetnames[1] = "Location Master"
 
     counts: "dict[str, int]" = {}
+    
+    
     
     for item in ctelist:
                 
@@ -63,6 +71,10 @@ def compile_ctes(ctelist: "list[CTEBase]"):
             cls = "shipping"
         elif isinstance(item, TransformationCTE):
             cls = "transformation"
+        elif isinstance(item, LocationMaster):
+            cls = "location"
+        elif isinstance(item, FTLFood):
+            cls = "ftlfoods"
 
         if not cls in counts:
             counts[cls] = 1
