@@ -21,7 +21,7 @@ from JSONDeserialization.epcis_event import (
 )
 
 from epcis_cte_transformation.cte import CTEBase
-
+from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl import Workbook, load_workbook
 from tools.serializer import JSONValueProvider, jsonid, map_from_json, map_to_json
 
@@ -245,14 +245,10 @@ class TransformationCTE(CTEBase):
         data = map_to_json(self)
         return json.dumps(data)
 
-    def output_xlsx(self) -> str:
+    def output_xlsx(self, sheet: Worksheet, row) -> str:
         """
         Create an excel spreadsheet
         """
-
-        workbook = Workbook()
-        sheet = workbook.active
-        filename = "transformation_cte.xlsx"
 
         kde_ids = [
             "Traceability Product",
@@ -276,12 +272,13 @@ class TransformationCTE(CTEBase):
             uom_str,
         ]
 
-        for i in range(1, 7):
-            cell = sheet.cell(row=1, column=i)
-            cell.value = kde_ids[i - 1]
+        if row == 1:
+            for i in range(1, 7):
+                cell = sheet.cell(row=row, column=i)
+                cell.value = kde_ids[i - 1]
 
         for i in range(1, 7):
-            cell = sheet.cell(row=2, column=i)
+            cell = sheet.cell(row=row + 1, column=i)
             cell.value = kde_values[i - 1]
 
         sheet.row_dimensions[1].height = 30
@@ -292,11 +289,6 @@ class TransformationCTE(CTEBase):
         sheet.column_dimensions["D"].width = 40
         sheet.column_dimensions["E"].width = 40
         sheet.column_dimensions["F"].width = 40
-        # /var/src/documents/<companyid>/<userid>/<cte types>/<name/id>_<timestamp>.xlsx
-        # Unknown: companyID, userID, CTETypes, name/id
-        # workbook.save('/var/src/documents/' + filename + " " + datetime.datetime.now + '.xlsx')
-        workbook.save(filename)
-        return filename
 
     def save_as_xlsx(self, filename: str):
         # will filename include .xlsx extension?
