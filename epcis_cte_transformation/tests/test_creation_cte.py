@@ -1,4 +1,3 @@
-from epcis_cte_transformation.cte import CTEBase
 import os, sys
 import datetime
 import json

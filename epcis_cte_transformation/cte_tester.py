@@ -1,19 +1,21 @@
+import pytest
+import yaml
+import json
+
 import os, sys
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
-parent_dir_path = os.path.abspath(os.path.join(dir_path, os.pardir))
-sys.path.insert(0, parent_dir_path)
+currentdir = os.path.dirname(os.path.realpath(__file__))
+parentdir = os.path.dirname(currentdir)
+sys.path.append(parentdir)
 
 from JSONDeserialization.epcis_event import (
-    QuantityElement,
-    QuantityEvent,
-    URI,
-    CommonEvent,
-    AggregationEvent,
-    EPCISEvent,
     ObjectEvent,
     TransactionEvent,
     TransformationEvent,
+    QuantityEvent,
+    AggregationEvent,
+    URI,
+    QuantityElement,
 )
 from creation_cte import CreationCTE
 
