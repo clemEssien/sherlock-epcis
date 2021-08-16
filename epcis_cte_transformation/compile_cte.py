@@ -46,16 +46,12 @@ def compile_ctes(ctelist: "list[CTEBase]"):
     workbook = Workbook()
     sheet = workbook.active    
     sheets["ftlfoods"] = sheet
+    sheet.title = "FTL Foods"
     
     sheet = workbook.create_sheet("Location Master")
     sheets["location"] = sheet
     
-    workbook.sheetnames[0] = "FTL Foods"
-    workbook.sheetnames[1] = "Location Master"
-
     counts: "dict[str, int]" = {}
-    
-    
     
     for item in ctelist:
                 
