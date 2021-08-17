@@ -437,7 +437,11 @@ class TransformationView(FlaskView):
                 cte_list.append(cte_obj)
 
         filename = compile_ctes(cte_list)
-        return {"filename": filename}
+        (dir, name) = os.path.split(filename)
+        # return send_from_directory(
+        #         filename, name, as_attachment=True
+        #     )
+        return {"filename": name}
 
 
 def epcis_from_json_file(file: FileStorage) -> "list[epc.EPCISEvent]":
