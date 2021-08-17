@@ -23,6 +23,14 @@ from pymongo.common import EVENTS_QUEUE_FREQUENCY
 
 from FlaskAPI.models.user import User
 
+from epcis_cte_transformation.growing_cte import GrowingCTE
+from epcis_cte_transformation.receiving_cte import ReceivingCTE
+from epcis_cte_transformation.shipping_cte import ShippingCTE
+from epcis_cte_transformation.transformation_cte import TransformationCTE
+from epcis_cte_transformation.creation_cte import CreationCTE
+from epcis_cte_transformation.compile_cte import compile_ctes
+from tools.serializer import map_from_json
+
 from FlaskAPI.services import user_services, mongodb_connector
 from FlaskAPI.init_app import create_app
 from neo4j import GraphDatabase
@@ -397,12 +405,39 @@ class TransformationView(FlaskView):
 
     @route("/cte", methods=["POST"])
     def finish_cte(self):
+        """
         # Edit CTE in database
 
         # Format CTE as desired document type
 
         # Return CTE document
-        pass
+
+        Body:
+            {
+                shipping: ...
+                growing: ...
+                ...
+            }
+        """
+        key_to_cte_class = {
+            "creation": CreationCTE,
+            "growing": GrowingCTE,
+            "shipping": ShippingCTE,
+            "receiving": ReceivingCTE,
+            "transformation": TransformationCTE
+        }
+        bodyJson = json.loads(request.get_data())
+
+        cte_list = []
+        for cte_type in bodyJson:
+            cte_class = key_to_cte_class[cte_type]
+            for cte in bodyJson[cte_type]:
+                cte_obj = cte_class()
+                map_from_json(cte, cte_obj)
+                cte_list.append(cte_obj)
+
+        filename = compile_ctes(cte_list)
+        return {"filename": filename}
 
 
 def epcis_from_json_file(file: FileStorage) -> "list[epc.EPCISEvent]":
