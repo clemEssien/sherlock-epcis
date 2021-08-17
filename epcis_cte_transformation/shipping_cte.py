@@ -1,5 +1,7 @@
 from abc import ABC, abstractclassmethod, abstractmethod
 from typing import List
+
+from openpyxl.worksheet.worksheet import Worksheet
 from epcis_cte_transformation.cte import CTEBase
 import os, sys
 import datetime
@@ -67,6 +69,7 @@ class ShippingCTE(CTEBase):
     @classmethod
     def new_from_data(cls, data: dict):
         pass
+
     @classmethod
     def new_from_epcis(cls, event: EPCISEvent):
         output = cls()
@@ -335,13 +338,10 @@ class ShippingCTE(CTEBase):
         data = map_to_json(self)
         return json.dumps(data)
 
-    def output_xlsx(self) -> str:
+    def output_xlsx(self, sheet: Worksheet, row) -> str:
         """
         Create an excel spreadsheet and output the contents to an XML string
         """
-        workbook = Workbook()
-        sheet = workbook.active
-        filename = "shipping_cte.xlsx"
 
         kde_ids = [
             "Traceability Lot Code",
@@ -379,12 +379,14 @@ class ShippingCTE(CTEBase):
             self.lot_code_poc_email,
             str(self.shipment_datetime),
         ]
-        for i in range(1, 14):
-            cell = sheet.cell(row=1, column=i)
-            cell.value = kde_ids[i - 1]
+
+        if row == 1:
+            for i in range(1, 14):
+                cell = sheet.cell(row=row, column=i)
+                cell.value = kde_ids[i - 1]
 
         for i in range(1, 14):
-            cell = sheet.cell(row=2, column=i)
+            cell = sheet.cell(row=row + 1, column=i)
             cell.value = kde_values[i - 1]
 
         sheet.row_dimensions[1].height = 30
@@ -402,13 +404,8 @@ class ShippingCTE(CTEBase):
         sheet.column_dimensions["K"].width = 40
         sheet.column_dimensions["L"].width = 40
         sheet.column_dimensions["M"].width = 40
-        # /var/src/documents/<companyid>/<userid>/<cte types>/<name/id>_<timestamp>.xlsx
-        # Unknown: companyID, userID, CTETypes, name/id
-        # workbook.save('/var/src/documents/' + filename + " " + datetime.datetime.now + '.xlsx')
-        workbook.save(filename)
-        return filename
 
     def save_as_xlsx(self, filename: str):
-        # will filename include .xlsx extentsion?
+        # will filename include .xlsx extension?
         workbook = load_workbook(filename)
         workbook.save(filename)
