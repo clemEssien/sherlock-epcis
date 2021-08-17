@@ -369,13 +369,12 @@ class ReceivingCTE:
 
         quantity_uom_str = self.quantity_received[0] + " " + self.unit_of_measure[0]
 
-
         kde_values = [
             self.reference_record_number,
             self.transporter_name,
             self.entry_number,
             self.traceability_lot_code,
-            self.quantity_uom_str,
+            quantity_uom_str,
             self.traceability_product,
             self.point_of_contact_name,
             self.point_of_contact_phone,
