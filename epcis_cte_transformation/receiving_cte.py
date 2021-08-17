@@ -24,8 +24,10 @@ from JSONDeserialization.epcis_event import (
 from epcis_cte_transformation.cte import CTEBase
 import json
 import datetime
+from datetime import datetime
 from tools.serializer import jsonid
-#from openpyxl import Workbook, load_workbook
+from openpyxl.worksheet.worksheet import Worksheet
+from openpyxl import Workbook, load_workbook
 from tools.serializer import JSONValueProvider, jsonid, map_from_json, map_to_json
 
 class ReceivingCTE:
@@ -104,7 +106,7 @@ class ReceivingCTE:
             try:
                 #print("Previous Source: " + event.source_list[0].get("source").value)
                 for sour in event.source_list:
-                    output.previous_source = sour.get("source").value
+                    output.previous_source = source.get("source").value
             except ValueError:
                     output.previous_source = ""
             try:
@@ -344,15 +346,69 @@ class ReceivingCTE:
         return json.dumps(data)
     
     @classmethod 
-    def output_xlsx(self) -> str:
+    def output_xlsx(self, sheet: Worksheet, row) -> str:
         """
         Create an excel spreadsheet and output the contents to an XML string
         """
 
-        # code here
+        kde_ids = [
+            "Reference Record Type and Number",
+            "Transporter Name",
+            "Import Entry Number",
+            "Traceability Lot Code",
+            "Quantity and Unit of Measure",
+            "Traceability Product Identifier",
+            "Traceability Lot Code Generator Location Identifier",
+            "Traceability Lot Code Generator Point of Contact Name",
+            "Traceability Lot Code Generator Point of Contact Phone",
+            "Traceability Lot Code Generator Point of Contact Email",
+            "Location Identifier for where food was received",
+            "Location Identifier for the immediate previous source",
+            "Receipt Date and Time",
+        ]
 
-        v = "foobar"
-        return v
+        quantity_uom_str = self.quantity_received[0] + " " + self.unit_of_measure[0]
+
+
+        kde_values = [
+            self.reference_record_number,
+            self.transporter_name,
+            self.entry_number,
+            self.traceability_lot_code,
+            self.quantity_uom_str,
+            self.traceability_product,
+            self.point_of_contact_name,
+            self.point_of_contact_phone,
+            self.point_of_contact_email,
+            self.receiver_location_identifier,
+            self.previous_source,
+            self.receipt_time.strftime("%m/%d/%Y, %H:%M:%S")
+        ]
+        if row == 1:
+            for i in range(1, 14):
+                cell = sheet.cell(row=row, column=i)
+                cell.value = kde_ids[i - 1]
+
+        for i in range(1, 14):
+            cell = sheet.cell(row=row + 1, column=i)
+            cell.value = kde_values[i - 1]
+
+        sheet.row_dimensions[1].height = 30
+        sheet.row_dimensions[2].height = 30
+        sheet.column_dimensions["A"].width = 40
+        sheet.column_dimensions["B"].width = 40
+        sheet.column_dimensions["C"].width = 40
+        sheet.column_dimensions["D"].width = 40
+        sheet.column_dimensions["E"].width = 40
+        sheet.column_dimensions["F"].width = 40
+        sheet.column_dimensions["G"].width = 40
+        sheet.column_dimensions["H"].width = 40
+        sheet.column_dimensions["I"].width = 40
+        sheet.column_dimensions["J"].width = 40
+        sheet.column_dimensions["K"].width = 40
+        sheet.column_dimensions["L"].width = 40
+        sheet.column_dimensions["M"].width = 40
+        
 
     @classmethod 
     def save_as_xlsx(self, filename: str):

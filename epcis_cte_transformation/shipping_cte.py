@@ -69,6 +69,7 @@ class ShippingCTE(CTEBase):
     @classmethod
     def new_from_data(cls, data: dict):
         pass
+
     @classmethod
     def new_from_epcis(cls, event: EPCISEvent):
         output = cls()
@@ -378,15 +379,14 @@ class ShippingCTE(CTEBase):
             self.lot_code_poc_email,
             str(self.shipment_datetime),
         ]
-        
-        
+
         if row == 1:
             for i in range(1, 14):
                 cell = sheet.cell(row=row, column=i)
                 cell.value = kde_ids[i - 1]
 
         for i in range(1, 14):
-            cell = sheet.cell(row=row+1, column=i)
+            cell = sheet.cell(row=row + 1, column=i)
             cell.value = kde_values[i - 1]
 
         sheet.row_dimensions[1].height = 30
@@ -404,11 +404,8 @@ class ShippingCTE(CTEBase):
         sheet.column_dimensions["K"].width = 40
         sheet.column_dimensions["L"].width = 40
         sheet.column_dimensions["M"].width = 40
-        # /var/src/documents/<companyid>/<userid>/<cte types>/<name/id>_<timestamp>.xlsx
-        # Unknown: companyID, userID, CTETypes, name/id
-        # workbook.save('/var/src/documents/' + filename + " " + datetime.datetime.now + '.xlsx')
 
     def save_as_xlsx(self, filename: str):
-        # will filename include .xlsx extentsion?
+        # will filename include .xlsx extension?
         workbook = load_workbook(filename)
         workbook.save(filename)

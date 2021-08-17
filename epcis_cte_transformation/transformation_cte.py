@@ -1,5 +1,5 @@
 from abc import ABC, abstractclassmethod, abstractmethod
-from typing import List, Type
+from typing import List, Type, ValuesView
 import os, sys
 import datetime
 import json
@@ -21,7 +21,7 @@ from JSONDeserialization.epcis_event import (
 )
 
 from epcis_cte_transformation.cte import CTEBase
-
+from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl import Workbook, load_workbook
 from tools.serializer import JSONValueProvider, jsonid, map_from_json, map_to_json
 
@@ -37,6 +37,8 @@ class TransformationCTE(CTEBase):
             Location of Transformation : str
             New Traceability Product : List
             Unit of Measure : List
+            Date Completed : datetime
+            New Traceability Lot Code : List
     """
 
     def __init__(self):
@@ -47,6 +49,8 @@ class TransformationCTE(CTEBase):
         self._location_of_transformation = ""
         self._new_traceability_product = []
         self._unit_of_measure = []
+        self._date_completed: datetime.datetime(1, 1, 1)
+        self._new_traceability_lot_code = []
 
     @classmethod
     def new_from_data(cls, data: dict):
@@ -63,6 +67,10 @@ class TransformationCTE(CTEBase):
                 output.location_of_transformation = event.read_point.value
             except ValueError:
                 output.location_of_transformation = ""
+            try:
+                output.date_completed = event.event_time_local
+            except ValueError:
+                output.date_completed = ""
             for qe in event.input_quantity_list:
                 output.quantity_of_input.append(qe.quantity)
                 output.unit_of_measure.append(qe.uom)
@@ -77,6 +85,10 @@ class TransformationCTE(CTEBase):
                 output.location_of_transformation = event.read_point.value
             except ValueError:
                 output.location_of_transformation = ""
+            try:
+                output.date_completed = event.event_time_local
+            except ValueError:
+                output.date_completed = ""
             for qe in event.quantity_list:
                 output.quantity_of_input.append(qe.quantity)
                 output.unit_of_measure.append(qe.uom)
@@ -87,6 +99,10 @@ class TransformationCTE(CTEBase):
                 output.location_of_transformation = event.read_point.value
             except ValueError:
                 output.location_of_transformation = ""
+            try:
+                output.date_completed = event.event_time_local
+            except ValueError:
+                output.date_completed = ""
             for qe in event.child_quantity_list:
                 output.quantity_of_input.append(qe.quantity)
                 output.unit_of_measure.append(qe.uom)
@@ -97,6 +113,10 @@ class TransformationCTE(CTEBase):
                 output.location_of_transformation = event.read_point.value
             except ValueError:
                 output.location_of_transformation = ""
+            try:
+                output.date_completed = event.event_time_local
+            except ValueError:
+                output.date_completed = ""
             for qe in event.quantity_list:
                 output.quantity_of_input.append(qe.quantity)
                 output.unit_of_measure.append(qe.uom)
@@ -107,6 +127,10 @@ class TransformationCTE(CTEBase):
                 output.location_of_transformation = event.read_point.value
             except ValueError:
                 output.location_of_transformation = ""
+            try:
+                output.date_completed = event.event_time_local
+            except ValueError:
+                output.date_completed = ""
         return output
 
     @classmethod
@@ -124,6 +148,8 @@ class TransformationCTE(CTEBase):
             output.location_of_transformation: str,
             output.new_traceability_product: list,
             output.unit_of_measure: list,
+            output.date_completed: datetime.datetime,
+            output.new_traceability_lot_code: list,
         }
 
         map_from_json(json_data, output, types)
@@ -140,7 +166,6 @@ class TransformationCTE(CTEBase):
     def new_from_csv(cls, csv_lines: "list[str]"):
         pass
 
-
     @property
     @jsonid("traceabilityProduct")
     def traceability_product(self) -> str:
@@ -149,8 +174,6 @@ class TransformationCTE(CTEBase):
     @traceability_product.setter
     def traceability_product(self, value: str) -> None:
         self._traceability_product = value
-
-
 
     @property
     @jsonid("inputQuantity")
@@ -161,8 +184,6 @@ class TransformationCTE(CTEBase):
     def quantity_of_input(self, value: str) -> None:
         self._quantity_of_input = value
 
-
-
     @property
     @jsonid("outputQuantity")
     def quantity_of_output(self) -> str:
@@ -171,8 +192,6 @@ class TransformationCTE(CTEBase):
     @quantity_of_output.setter
     def quantity_of_output(self, value: str) -> None:
         self._quantity_of_output = value
-
-
 
     @property
     @jsonid("transformationLocation")
@@ -183,8 +202,6 @@ class TransformationCTE(CTEBase):
     def location_of_transformation(self, value: str) -> None:
         self._location_of_transformation = value
 
-
-
     @property
     @jsonid("newTraceabilityProduct")
     def new_traceability_product(self) -> str:
@@ -193,8 +210,6 @@ class TransformationCTE(CTEBase):
     @new_traceability_product.setter
     def new_traceability_product(self, value: str) -> None:
         self._new_traceability_product = value
-
-
 
     @property
     @jsonid("unit")
@@ -205,6 +220,23 @@ class TransformationCTE(CTEBase):
     def unit_of_measure(self, value: str) -> None:
         self._unit_of_measure = value
 
+    @property
+    @jsonid("newTraceabilityLotCode")
+    def new_traceability_lot_code(self) -> str:
+        return self._new_traceability_lot_code
+
+    @new_traceability_lot_code.setter
+    def new_traceability_lot_code(self, value: str):
+        self.new_traceability_lot_code = value
+
+    @property
+    @jsonid("dateCompleted")
+    def date_completed(self) -> datetime.datetime:
+        return self._date_completed
+
+    @date_completed.setter
+    def date_completed(self, value: datetime.datetime):
+        self._date_completed = value
 
     def output_json(self) -> str:
         """
@@ -213,14 +245,10 @@ class TransformationCTE(CTEBase):
         data = map_to_json(self)
         return json.dumps(data)
 
-    def output_xlsx(self) -> str:
+    def output_xlsx(self, sheet: Worksheet, row) -> str:
         """
         Create an excel spreadsheet
         """
-
-        workbook = Workbook()
-        sheet = workbook.active
-        filename = "transformation_cte.xlsx"
 
         kde_ids = [
             "Traceability Product",
@@ -244,12 +272,13 @@ class TransformationCTE(CTEBase):
             uom_str,
         ]
 
-        for i in range(1, 7):
-            cell = sheet.cell(row=1, column=i)
-            cell.value = kde_ids[i - 1]
+        if row == 1:
+            for i in range(1, 7):
+                cell = sheet.cell(row=row, column=i)
+                cell.value = kde_ids[i - 1]
 
         for i in range(1, 7):
-            cell = sheet.cell(row=2, column=i)
+            cell = sheet.cell(row=row + 1, column=i)
             cell.value = kde_values[i - 1]
 
         sheet.row_dimensions[1].height = 30
@@ -260,13 +289,8 @@ class TransformationCTE(CTEBase):
         sheet.column_dimensions["D"].width = 40
         sheet.column_dimensions["E"].width = 40
         sheet.column_dimensions["F"].width = 40
-        # /var/src/documents/<companyid>/<userid>/<cte types>/<name/id>_<timestamp>.xlsx
-        # Unknown: companyID, userID, CTETypes, name/id
-        # workbook.save('/var/src/documents/' + filename + " " + datetime.datetime.now + '.xlsx')
-        workbook.save(filename)
-        return filename
 
     def save_as_xlsx(self, filename: str):
-        # will filename include .xlsx extentsion?
+        # will filename include .xlsx extension?
         workbook = load_workbook(filename)
         workbook.save(filename)

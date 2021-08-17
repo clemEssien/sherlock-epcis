@@ -25,6 +25,7 @@ from epcis_cte_transformation.cte import CTEBase
 import json
 import datetime
 from tools.serializer import jsonid
+from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl import Workbook, load_workbook
 from tools.serializer import JSONValueProvider, jsonid, map_from_json, map_to_json
 
@@ -269,15 +270,33 @@ class GrowingCTE:
         return json.dumps(data)
 
     @classmethod 
-    def output_xlsx(self) -> str:
+    def output_xlsx(self, sheet: Worksheet, row) -> str:
         """
         Create an excel spreadsheet and output the contents to an XML string
         """
 
-        # code here
+        kde_ids = [
+            "Traceability Lot Code",
+            "Growing Area"
+        ]
 
-        v = "foobar"
-        return v
+        kde_values = [
+            self.traceability_lot_code,
+            self.growing_location
+        ]
+        if row == 1:
+            for i in range(1, 3):
+                cell = sheet.cell(row=row, column=i)
+                cell.value = kde_ids[i - 1]
+
+        for i in range(1, 3):
+            cell = sheet.cell(row=row + 1, column=i)
+            cell.value = kde_values[i - 1]
+
+        sheet.row_dimensions[1].height = 30
+        sheet.row_dimensions[2].height = 30
+        sheet.column_dimensions["A"].width = 40
+        sheet.column_dimensions["B"].width = 40
 
     @classmethod 
     def save_as_xlsx(self, filename: str):
