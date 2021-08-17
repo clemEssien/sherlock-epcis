@@ -29,7 +29,6 @@ from neo4j import GraphDatabase
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
 from tools.serializer import map_to_json
-
 from FlaskAPI.routes.user import UserView
 
 from dotenv import load_dotenv
@@ -343,6 +342,19 @@ class TransformationView(FlaskView):
                 return "CTE is an invalid type", 400
 
             # Store data in Neo4j database
+            try:
+                store_event(event)
+            except:
+                return make_response(
+                    {
+                        "result": "fail",
+                        "message": "Could not store event in database",
+                        "code": 0,
+                        "data": {},
+                    },
+                    500,
+                )
+            # Handle FTL and Location Master
             output_types = {}
 
             if cte:
@@ -436,6 +448,10 @@ def epcis_from_xml_file(file: FileStorage) -> "list[epc.EPCISEvent]":
             print("map_from_epcis error:", e)
         event_list.append(event)
     return event_list
+
+
+def store_event(event: epc.EPCISEvent):
+    """Stores a given EPCIS Event in the Neo4j database"""
 
 
 EventView.register(app)
