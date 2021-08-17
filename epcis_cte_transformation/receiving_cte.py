@@ -1,5 +1,5 @@
 # Author: Kevin Zong
-# Last Modified: August 13th, 2021
+# Last Modified: August 17th, 2021
 # Class representing Receiving CTE/KDE data
 
 from abc import ABC, abstractclassmethod, abstractmethod
@@ -24,7 +24,6 @@ from JSONDeserialization.epcis_event import (
 from epcis_cte_transformation.cte import CTEBase
 import json
 import datetime
-from datetime import datetime
 from tools.serializer import jsonid
 from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl import Workbook, load_workbook
@@ -105,7 +104,7 @@ class ReceivingCTE:
         if(issubclass(type(event), CommonEvent)):
             try:
                 #print("Previous Source: " + event.source_list[0].get("source").value)
-                for sour in event.source_list:
+                for source in event.source_list:
                     output.previous_source = source.get("source").value
             except ValueError:
                     output.previous_source = ""
@@ -367,7 +366,7 @@ class ReceivingCTE:
             "Receipt Date and Time",
         ]
 
-        quantity_uom_str = self.quantity_received[0] + " " + self.unit_of_measure[0]
+        quantity_uom_str = str(self.quantity_received[0]) + " " + self.unit_of_measure[0]
 
         kde_values = [
             self.reference_record_number,

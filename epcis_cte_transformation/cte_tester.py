@@ -1,4 +1,4 @@
-import pytest
+#import pytest
 import yaml
 import json
 
@@ -35,16 +35,10 @@ event.quantity_list = [
     QuantityElement(URI("urn:epc:class:lgtin:4012345.012345.998877"), 200, "KGM")
     # QuantityElement(URI("urn:epc:class:lgtin:4012345.012345.998877"), 200, "KGM"),
 ]
-<<<<<<< HEAD
 cte = ReceivingCTE.new_from_epcis(event)
 print(cte.receipt_time)
-print(cte.quantity_received)
+print(str(cte.quantity_received[0]) + " " + cte.unit_of_measure[0])
 print(cte.receiver_location_identifier)
-print(cte.unit_of_measure)
-print(cte.traceability_lot_code)
-print(cte.traceability_product)
+print(cte.traceability_lot_code[0])
+print(cte.traceability_product[0])
 #filename = cte.output_xlsx()
-=======
-cte = CreationCTE.new_from_epcis(event)
-filename = cte.output_xlsx()
->>>>>>> TNT-2_End-To-End

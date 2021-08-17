@@ -1,5 +1,5 @@
 # Author: Kevin Zong
-# Last Modified: August 9th, 2021
+# Last Modified: August 17th, 2021
 # Class representing Growing CTE/KDE data
 
 from abc import ABC, abstractclassmethod, abstractmethod
