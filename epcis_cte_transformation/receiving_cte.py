@@ -1,5 +1,5 @@
 # Author: Kevin Zong
-# Last Modified: August 9th, 2021
+# Last Modified: August 17th, 2021
 # Class representing Receiving CTE/KDE data
 
 from abc import ABC, abstractclassmethod, abstractmethod
@@ -25,6 +25,9 @@ from epcis_cte_transformation.cte import CTEBase
 import json
 import datetime
 from tools.serializer import jsonid
+from openpyxl.worksheet.worksheet import Worksheet
+from openpyxl import Workbook, load_workbook
+from tools.serializer import JSONValueProvider, jsonid, map_from_json, map_to_json
 
 class ReceivingCTE:
     """
@@ -78,6 +81,7 @@ class ReceivingCTE:
         self._point_of_contact_email = ""
         self._receiver_location_identifier = ""
         self._previous_source = ""
+
         self._receipt_time = datetime.datetime(1,1,1)
         self._harvest_date = datetime.datetime(1,1,1)
         self._cooling_location = ""
@@ -93,11 +97,49 @@ class ReceivingCTE:
     @classmethod 
     def new_from_epcis(cls, event: EPCISEvent):
         output = cls()
-
-        output.receipt_time = event.event_time_local
-        
-        
-
+        try:
+            output.receipt_time = event.event_time_local
+        except ValueError:
+            output.receipt_time = "" 
+        if(issubclass(type(event), CommonEvent)):
+            try:
+                #print("Previous Source: " + event.source_list[0].get("source").value)
+                for source in event.source_list:
+                    output.previous_source = source.get("source").value
+            except ValueError:
+                    output.previous_source = ""
+            try:
+                output.receiver_location_identifier = event.read_point.value
+            except ValueError:
+                output.receiver_location_identifier = ""
+        if isinstance(event, ObjectEvent):
+            for qe in event.quantity_list:
+                output.quantity_received.append(qe.quantity)
+                output.unit_of_measure.append(qe.uom)
+                output.traceability_lot_code.append(qe.epc_class.value)
+            for epc in event.epc_list:
+                output.traceability_product.append(epc.value)
+        elif isinstance(event, AggregationEvent):
+            for qe in event.child_quantity_list:
+                output.quantity.append(qe.quantity)
+                output.unit_of_measure.append(qe.uom)
+                output.traceability_lot_code.append(qe.epc_class.value)
+            for epc in event.child_epc_list:
+                output.traceability_product.append(epc.value)
+        elif isinstance(event, TransactionEvent):
+            for qe in event.quantity_list:
+                output.quantity.append(qe.quantity)
+                output.unit_of_measure.append(qe.uom)
+                output.traceability_lot_code.append(qe.epc_class.value)
+            for epc in event.epc_list:
+                output.traceability_product.append(epc.value)
+        elif isinstance(event, TransformationEvent):
+            for qe in event.input_quantity_list:
+                output.quantity.append(qe.quantity)
+                output.unit_of_measure.append(qe.uom)
+                output.traceability_lot_code.append(qe.epc_class.value)
+            for epc in event.input_epc_list:
+                output.traceability_product.append(epc.value)
         return output
 
     @classmethod 
@@ -155,11 +197,11 @@ class ReceivingCTE:
 
     @property
     @jsonid("quantityReceived")
-    def quantity_received(self) -> List:
+    def quantity_received(self) -> list:
         return self._quantity_received
 
     @quantity_received.setter
-    def quantity_received(self, value: List):
+    def quantity_received(self, value: list):
         self._quantity_received = value
 
     @property
@@ -231,7 +273,7 @@ class ReceivingCTE:
         return self._previous_source
 
     @previous_source.setter
-    def previous_sorce(self, value: str):
+    def previous_source(self, value: str):
         self._previous_source = value  
 
     @property
@@ -297,22 +339,80 @@ class ReceivingCTE:
     def catch_location(self, value: List):
         self._catch_location = value
 
-    @classmethod     
     def output_json(self) -> str:
-        pass
+        data = map_to_json(self)
+        return json.dumps(data)
     
-    @classmethod 
-    def output_xlsx(self) -> str:
+    def output_xlsx(self, sheet: Worksheet, row) -> str:
         """
         Create an excel spreadsheet and output the contents to an XML string
         """
 
-        # code here
+        kde_ids = [
+            "Reference Record Type and Number",
+            "Transporter Name",
+            "Import Entry Number",
+            "Traceability Lot Code",
+            "Quantity and Unit of Measure",
+            "Traceability Product Identifier",
+            "Traceability Lot Code Generator Location Identifier",
+            "Traceability Lot Code Generator Point of Contact Name",
+            "Traceability Lot Code Generator Point of Contact Phone",
+            "Traceability Lot Code Generator Point of Contact Email",
+            "Location Identifier for where food was received",
+            "Location Identifier for the immediate previous source",
+            "Receipt Date and Time",
+        ]
 
-        v = "foobar"
-        return v
+        if len(self._quantity_received) and len(self._unit_of_measure):
+            quantity_uom_str = str(self._quantity_received[0]) + " " + self._unit_of_measure[0]
+        else:
+            quantity_uom_str = ""
 
-    @classmethod 
+        kde_values = [
+            self.reference_record_number,
+            self.transporter_name,
+            self.entry_number,
+            self.traceability_lot_code,
+            quantity_uom_str,
+            self.traceability_product,
+            self.receiver_location_identifier,
+            self.point_of_contact_name,
+            self.point_of_contact_phone,
+            self.point_of_contact_email,
+            self.receiver_location_identifier,
+            self.previous_source,
+            self.receipt_time.strftime("%m/%d/%Y, %H:%M:%S")
+        ]
+        if row == 1:
+            for i in range(1, len(kde_ids) + 1):
+                cell = sheet.cell(row=row, column=i)
+                cell.value = kde_ids[i - 1]
+
+        for i in range(1, len(kde_values) + 1):
+            cell = sheet.cell(row=row + 1, column=i)
+            tmpval = kde_values[i - 1]
+            if isinstance(tmpval, list):
+                tmpval = ", ".join(tmpval)
+            cell.value = tmpval
+
+        sheet.row_dimensions[1].height = 30
+        sheet.row_dimensions[2].height = 30
+        sheet.column_dimensions["A"].width = 40
+        sheet.column_dimensions["B"].width = 40
+        sheet.column_dimensions["C"].width = 40
+        sheet.column_dimensions["D"].width = 40
+        sheet.column_dimensions["E"].width = 40
+        sheet.column_dimensions["F"].width = 40
+        sheet.column_dimensions["G"].width = 40
+        sheet.column_dimensions["H"].width = 40
+        sheet.column_dimensions["I"].width = 40
+        sheet.column_dimensions["J"].width = 40
+        sheet.column_dimensions["K"].width = 40
+        sheet.column_dimensions["L"].width = 40
+        sheet.column_dimensions["M"].width = 40
+        
+
     def save_as_xlsx(self, filename: str):
         pass
         # code here

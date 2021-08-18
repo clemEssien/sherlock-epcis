@@ -56,6 +56,16 @@ loc_map = {
     ]
 }
 
+loc_fields = { "locationId": "Location Identifier",
+    "businessName": "Business Name",
+    "physicalLocationName": "Physical Location Name",
+    "phone": "Primary Phone",
+    "address": "Street Address or Geographical Coordinates",
+    "city": "City",
+    "state": "State",
+    "zip": "Zip Code"
+}
+
 def get_map_from_type(key, type):
     if not key in loc_map:
         return None
@@ -170,5 +180,32 @@ class LocationMaster:
     def zip(self, value: str) -> None:
         self._zip = value
 
-    def output_xlsx(self, sheet, row):
-        pass
+    def output_xlsx(self, sheet: Worksheet, row):
+           
+        data = map_to_json(self)
+        i = 1
+        if row == 1:
+            for key in loc_fields.keys():
+                sheet.cell(row, i).value = loc_fields[key]
+                i += 1
+
+        i = 1
+        for key in loc_fields.keys():
+            sheet.cell(row + 1, i).value = data[key]
+            i += 1
+    
+        sheet.row_dimensions[1].height = 30
+        sheet.row_dimensions[2].height = 30
+        sheet.column_dimensions["A"].width = 40
+        sheet.column_dimensions["B"].width = 40
+        sheet.column_dimensions["C"].width = 40
+        sheet.column_dimensions["D"].width = 40
+        sheet.column_dimensions["E"].width = 40
+        sheet.column_dimensions["F"].width = 40
+        sheet.column_dimensions["G"].width = 40
+        sheet.column_dimensions["H"].width = 40
+        sheet.column_dimensions["I"].width = 40
+        sheet.column_dimensions["J"].width = 40
+        sheet.column_dimensions["K"].width = 40
+        sheet.column_dimensions["L"].width = 40
+        sheet.column_dimensions["M"].width = 40
