@@ -64,7 +64,7 @@ class ShippingCTE(CTEBase):
         self._lot_code_poc_name = ""
         self._lot_code_poc_phone = ""
         self._lot_code_poc_email = ""
-        self._shipment_datetime: datetime.datetime(1, 1, 1)
+        self._shipment_datetime: datetime.datetime = datetime.datetime(1, 1, 1)
 
     @classmethod
     def new_from_data(cls, data: dict):
@@ -387,7 +387,10 @@ class ShippingCTE(CTEBase):
 
         for i in range(1, 14):
             cell = sheet.cell(row=row + 1, column=i)
-            cell.value = kde_values[i - 1]
+            tmpval = kde_values[i - 1]
+            if isinstance(tmpval, list):
+                tmpval = ", ".join(tmpval)
+            cell.value = tmpval
 
         sheet.row_dimensions[1].height = 30
         sheet.row_dimensions[2].height = 30

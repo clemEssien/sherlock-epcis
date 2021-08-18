@@ -279,7 +279,10 @@ class TransformationCTE(CTEBase):
 
         for i in range(1, 7):
             cell = sheet.cell(row=row + 1, column=i)
-            cell.value = kde_values[i - 1]
+            tmpval = kde_values[i - 1]
+            if isinstance(tmpval, list):
+                tmpval = ", ".join(tmpval)
+            cell.value = tmpval
 
         sheet.row_dimensions[1].height = 30
         sheet.row_dimensions[2].height = 30

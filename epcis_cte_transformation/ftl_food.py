@@ -63,6 +63,20 @@ ftl_map = {
     ]
 }
 
+ftl_columns = {
+        "productId": "Traceability Product Identifier",
+        "categoryCode": "Category Code or Term",
+        "categoryName": "Category Name",
+        "brandName": "Brand Name",
+        "commodity": "Commodity",
+        "variety": "Variety",
+        "productName": "Product Name",
+        "packagingSize": "Packaging Size",
+        "packagingStyle": "Packaging Style"
+    }
+
+
+
 def get_map_from_type(key, type):
     if not key in ftl_map:
         return None
@@ -211,5 +225,31 @@ class FTLFood:
         self._packaging_style = value
 
 
-    def output_xlsx(self, sheet, row):
-        pass
+    def output_xlsx(self, sheet: Worksheet, row):
+        
+        data = map_to_json(self)
+        i = 1
+        if row == 1:
+            for key in ftl_columns.keys():
+                sheet.cell(row, i).value = ftl_columns[key]
+                i += 1
+
+        i = 1
+        for key in ftl_columns.keys():
+            sheet.cell(row + 1, i).value = data[key]
+            i += 1
+        sheet.row_dimensions[1].height = 30
+        sheet.row_dimensions[2].height = 30
+        sheet.column_dimensions["A"].width = 40
+        sheet.column_dimensions["B"].width = 40
+        sheet.column_dimensions["C"].width = 40
+        sheet.column_dimensions["D"].width = 40
+        sheet.column_dimensions["E"].width = 40
+        sheet.column_dimensions["F"].width = 40
+        sheet.column_dimensions["G"].width = 40
+        sheet.column_dimensions["H"].width = 40
+        sheet.column_dimensions["I"].width = 40
+        sheet.column_dimensions["J"].width = 40
+        sheet.column_dimensions["K"].width = 40
+        sheet.column_dimensions["L"].width = 40
+        sheet.column_dimensions["M"].width = 40    

@@ -197,11 +197,11 @@ class ReceivingCTE:
 
     @property
     @jsonid("quantityReceived")
-    def quantity_received(self) -> List:
+    def quantity_received(self) -> list:
         return self._quantity_received
 
     @quantity_received.setter
-    def quantity_received(self, value: List):
+    def quantity_received(self, value: list):
         self._quantity_received = value
 
     @property
@@ -339,12 +339,10 @@ class ReceivingCTE:
     def catch_location(self, value: List):
         self._catch_location = value
 
-    @classmethod     
     def output_json(self) -> str:
         data = map_to_json(self)
         return json.dumps(data)
     
-    @classmethod 
     def output_xlsx(self, sheet: Worksheet, row) -> str:
         """
         Create an excel spreadsheet and output the contents to an XML string
@@ -366,7 +364,10 @@ class ReceivingCTE:
             "Receipt Date and Time",
         ]
 
-        quantity_uom_str = str(self.quantity_received[0]) + " " + self.unit_of_measure[0]
+        if len(self._quantity_received) and len(self._unit_of_measure):
+            quantity_uom_str = str(self._quantity_received[0]) + " " + self._unit_of_measure[0]
+        else:
+            quantity_uom_str = ""
 
         kde_values = [
             self.reference_record_number,
@@ -375,6 +376,7 @@ class ReceivingCTE:
             self.traceability_lot_code,
             quantity_uom_str,
             self.traceability_product,
+            self.receiver_location_identifier,
             self.point_of_contact_name,
             self.point_of_contact_phone,
             self.point_of_contact_email,
@@ -383,13 +385,16 @@ class ReceivingCTE:
             self.receipt_time.strftime("%m/%d/%Y, %H:%M:%S")
         ]
         if row == 1:
-            for i in range(1, 14):
+            for i in range(1, len(kde_ids) + 1):
                 cell = sheet.cell(row=row, column=i)
                 cell.value = kde_ids[i - 1]
 
-        for i in range(1, 14):
+        for i in range(1, len(kde_values) + 1):
             cell = sheet.cell(row=row + 1, column=i)
-            cell.value = kde_values[i - 1]
+            tmpval = kde_values[i - 1]
+            if isinstance(tmpval, list):
+                tmpval = ", ".join(tmpval)
+            cell.value = tmpval
 
         sheet.row_dimensions[1].height = 30
         sheet.row_dimensions[2].height = 30
@@ -408,7 +413,6 @@ class ReceivingCTE:
         sheet.column_dimensions["M"].width = 40
         
 
-    @classmethod 
     def save_as_xlsx(self, filename: str):
         pass
         # code here

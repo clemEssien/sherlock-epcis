@@ -269,7 +269,6 @@ class GrowingCTE:
         data = map_to_json(self)
         return json.dumps(data)
 
-    @classmethod 
     def output_xlsx(self, sheet: Worksheet, row) -> str:
         """
         Create an excel spreadsheet and output the contents to an XML string
@@ -291,7 +290,11 @@ class GrowingCTE:
 
         for i in range(1, 3):
             cell = sheet.cell(row=row + 1, column=i)
-            cell.value = kde_values[i - 1]
+            tmpval = kde_values[i - 1]
+            if isinstance(tmpval, list):
+                tmpval = ", ".join(tmpval)
+            cell.value = tmpval
+
 
         sheet.row_dimensions[1].height = 30
         sheet.row_dimensions[2].height = 30

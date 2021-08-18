@@ -443,6 +443,8 @@ class TransformationView(FlaskView):
         for ftls in bodyJson["FTLs"]:
             ftl = FTLFood()
             map_from_json(ftls, ftl)
+            cte_list.append(ftl)
+            
             
         filename = compile_ctes(cte_list)
         (dir, name) = os.path.split(filename)
