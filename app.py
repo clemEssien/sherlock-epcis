@@ -429,13 +429,21 @@ class TransformationView(FlaskView):
         bodyJson = json.loads(request.get_data())
 
         cte_list = []
-        for cte_type in bodyJson:
+        for cte_type in bodyJson["CTEs"]:
             cte_class = key_to_cte_class[cte_type]
-            for cte in bodyJson[cte_type]:
+            for cte in bodyJson["CTEs"][cte_type]:
                 cte_obj = cte_class()
                 map_from_json(cte, cte_obj)
                 cte_list.append(cte_obj)
-
+        for locs in bodyJson["Locations"]:
+            loc = LocationMaster()
+            map_from_json(locs, loc)
+            cte_list.append(loc)
+            
+        for ftls in bodyJson["FTLs"]:
+            ftl = FTLFood()
+            map_from_json(ftls, ftl)
+            
         filename = compile_ctes(cte_list)
         (dir, name) = os.path.split(filename)
         # return send_from_directory(
