@@ -1,5 +1,5 @@
 # Author: Kevin Zong
-# Last Modified: August 9th, 2021
+# Last Modified: August 17th, 2021
 # Class representing Growing CTE/KDE data
 
 from abc import ABC, abstractclassmethod, abstractmethod
@@ -25,6 +25,9 @@ from epcis_cte_transformation.cte import CTEBase
 import json
 import datetime
 from tools.serializer import jsonid
+from openpyxl.worksheet.worksheet import Worksheet
+from openpyxl import Workbook, load_workbook
+from tools.serializer import JSONValueProvider, jsonid, map_from_json, map_to_json
 
 class GrowingCTE:
     """
@@ -81,8 +84,10 @@ class GrowingCTE:
         output = cls()
 
         if(issubclass(type(event), CommonEvent)):
-            output.growing_location = event.business_location.value
-
+            try:
+                output.growing_location = event.business_location.value
+            except ValueError:
+                output.growing_location = ""
         if isinstance(event, ObjectEvent):
             for epc in event.epc_list:
                 output.traceability_lot_code.append(epc.value)
@@ -259,16 +264,39 @@ class GrowingCTE:
     def seed_lot_code_production_dates(self, value: List):
         self._seed_lot_code_production_dates = value          
 
+    @classmethod
+    def output_json(self) -> str:
+        data = map_to_json(self)
+        return json.dumps(data)
+
     @classmethod 
-    def output_xlsx(self) -> str:
+    def output_xlsx(self, sheet: Worksheet, row) -> str:
         """
         Create an excel spreadsheet and output the contents to an XML string
         """
 
-        # code here
+        kde_ids = [
+            "Traceability Lot Code",
+            "Growing Area"
+        ]
 
-        v = "foobar"
-        return v
+        kde_values = [
+            self.traceability_lot_code,
+            self.growing_location
+        ]
+        if row == 1:
+            for i in range(1, 3):
+                cell = sheet.cell(row=row, column=i)
+                cell.value = kde_ids[i - 1]
+
+        for i in range(1, 3):
+            cell = sheet.cell(row=row + 1, column=i)
+            cell.value = kde_values[i - 1]
+
+        sheet.row_dimensions[1].height = 30
+        sheet.row_dimensions[2].height = 30
+        sheet.column_dimensions["A"].width = 40
+        sheet.column_dimensions["B"].width = 40
 
     @classmethod 
     def save_as_xlsx(self, filename: str):
