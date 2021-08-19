@@ -1,6 +1,13 @@
 from epcis_cte_transformation.cte import split_results
+from epcis_cte_transformation.growing_cte import GrowingCTE
+from epcis_cte_transformation.creation_cte import CreationCTE
+from epcis_cte_transformation.receiving_cte import ReceivingCTE
+from epcis_cte_transformation.shipping_cte import ShippingCTE
+from epcis_cte_transformation.transformation_cte import TransformationCTE
 from epcis_cte_transformation.location_master import LocationMaster
 from epcis_cte_transformation.ftl_food import FTLFood
+from epcis_cte_transformation.compile_cte import compile_ctes
+
 import os, sys
 
 import json
@@ -11,6 +18,7 @@ from flask_classful import FlaskView, route
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
 from tools.serializer import map_to_json
+from tools.serializer import map_from_json
 
 from dotenv import load_dotenv
 import json
@@ -194,19 +202,6 @@ class TransformationView(FlaskView):
                 return "CTE is an invalid type", 400
 
             # Store data in Neo4j database
-            try:
-                store_event(event)
-            except:
-                return make_response(
-                    {
-                        "result": "fail",
-                        "message": "Could not store event in database",
-                        "code": 0,
-                        "data": {},
-                    },
-                    500,
-                )
-            # Handle FTL and Location Master
             output_types = {}
 
             if cte:
@@ -253,12 +248,52 @@ class TransformationView(FlaskView):
 
     @route("/cte", methods=["POST"])
     def finish_cte(self):
+        """
         # Edit CTE in database
 
         # Format CTE as desired document type
 
         # Return CTE document
-        pass
+
+        Body:
+            {
+                shipping: ...
+                growing: ...
+                ...
+            }
+        """
+        key_to_cte_class = {
+            "creation": CreationCTE,
+            "growing": GrowingCTE,
+            "shipping": ShippingCTE,
+            "receiving": ReceivingCTE,
+            "transformation": TransformationCTE,
+        }
+        bodyJson = json.loads(request.get_data())
+
+        cte_list = []
+        for cte_type in bodyJson["CTEs"]:
+            cte_class = key_to_cte_class[cte_type]
+            for cte in bodyJson["CTEs"][cte_type]:
+                cte_obj = cte_class()
+                map_from_json(cte, cte_obj)
+                cte_list.append(cte_obj)
+        for locs in bodyJson["Locations"]:
+            loc = LocationMaster()
+            map_from_json(locs, loc)
+            cte_list.append(loc)
+
+        for ftls in bodyJson["FTLs"]:
+            ftl = FTLFood()
+            map_from_json(ftls, ftl)
+            cte_list.append(ftl)
+
+        filename = compile_ctes(cte_list)
+        (dir, name) = os.path.split(filename)
+        # return send_from_directory(
+        #         filename, name, as_attachment=True
+        #     )
+        return {"filename": name}
 
 
 def epcis_from_json_file(file: FileStorage) -> "list[EPCISEvent]":
@@ -266,11 +301,11 @@ def epcis_from_json_file(file: FileStorage) -> "list[EPCISEvent]":
     with open(os.path.join(UPLOAD_FOLDER, secure_filename(file.filename))) as f:
         json_dict = json.load(f)
     # document follows proposed EPCIS2.0 JSON bindings
-    try:
+    if json_dict["isA"].lower() == "epcisdocument":
         json_event_list = json_dict["epcisBody"]["eventList"]
     # document does not follow proposed EPCIS2.0 JSON bindings
-    except:
-        raise ValueError("File does not follow proposed EPCIS2.0 JSON bindings")
+    else:
+        pass
     # populate EPCISEvent object from JSON events
     event_list = []
     for json_event in json_event_list:
@@ -296,8 +331,3 @@ def epcis_from_xml_file(file: FileStorage) -> "list[EPCISEvent]":
             print("map_from_epcis error:", e)
         event_list.append(event)
     return event_list
-
-
-def store_event(event: EPCISEvent):
-    """Stores a given EPCIS Event in the Neo4j database"""
-    pass
