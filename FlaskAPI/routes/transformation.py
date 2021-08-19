@@ -42,6 +42,7 @@ from XMLDeserialization.DeserializeXMLRecursive import parse_xml
 from epcis_cte_transformation.cte_detector import CTEDetector
 
 UPLOAD_FOLDER = "/var/src/uploads"
+UPLOAD_FOLDER = "./uploads"
 ALLOWED_EXTENSIONS = {
     "txt",
     "pdf",
