@@ -25,22 +25,32 @@ def create_relationships(dict_list, node_label):
     
     for key, value in dict_list.items():
         for id in value:
-            print(id)
+            # print(id)
             query = """
                 MATCH (a:"""+node_label+"""), (b:"""+node_label+""") 
                 WHERE a._id = '"""+key +"""' AND b._id = '"""+id +"""'  
                 CREATE (b)-[: next_event]->(a) 
                 RETURN a,b 
             """
-            
-            response = conn.query(query, None)
-            print(response)
-            return response
+            conn.query(query, None)
 
 
 def format_attr_string(attr_str):
     output = attr_str.replace("':", ":").replace(", '",", ").replace("'_id", "_id")
     return output
+
+def delete_nodes_by_label(node_label):
+    '''
+    This method deletes a node using its _id
+    '''
+    global conn
+    if not conn: conn = connectdb()
+    cipher_ql = """ MATCH (n:"""+ node_label + """)
+                    DETACH DELETE n
+                """
+    result = conn.query(cipher_ql,None)
+    return result
+
 
 def create_node_from_json(file, node_label):
     """method takes in a json file and node label 
@@ -85,5 +95,5 @@ def create_node_from_json(file, node_label):
         )
         """
         count += 1
-        response = conn.query(query,None)
-    return create_relationships(relationships,node_label)      
+        conn.query(query,None)
+    create_relationships(relationships,node_label)      
