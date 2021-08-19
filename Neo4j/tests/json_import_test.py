@@ -14,10 +14,10 @@ def test_import_json_2():
    result = js.create_node_from_json("Neo4j/json_files/9991000100016-CT001.json", "Cut_Tomato")
    assert result is None
 
-def test_delete_nodes_by_label():
+def test_delete_nodes_by_label_1():
    result = js.delete_nodes_by_label("Tomato")
    assert len(result) == 0
 
-def test_delete_nodes_by_label():
+def test_delete_nodes_by_label_2():
    result = js.delete_nodes_by_label("Cut_Tomato")
    assert len(result) == 0
