@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-import db_connect as db_con
+from Neo4j import db_connect as db_con
 from collections import defaultdict
 
 global conn 

@@ -5,17 +5,18 @@ currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
-import Company as c
-import ItemClass as ic
-import ItemInstance as it
-import Location as l
-import LocationDate as ld
-import User as us
-import nodes as n
+from Neo4j import Company as c
+from Neo4j import ItemClass as ic
+from Neo4j import ItemInstance as it
+from Neo4j import Location as l
+from Neo4j import LocationDate as ld
+from Neo4j import User as us
+from Neo4j import nodes as n
 
 from JSONDeserialization import epcis_event as epc
 from uuid import UUID
-
+from Neo4j import crud_ops as cu
+from Neo4j import json_import as js
 from _pytest.python import pytest_pycollect_makeitem
 from _pytest.python_api import raises
 import pytest
@@ -27,9 +28,7 @@ location = l.Location('urn:epc:id:sgln:0012345.11111.0',"")
 location_date = ld.LocationDate('urn:epc:id:sgln:0614141.00888.0', '2021-07-22')
 item_instance = it.ItemInstance('urn:epc:id:sgln:0456432.0096.0')
 
-
 user = us.User(uuid.UUID("f5cefc07-0c34-4b55-b3bf-671e5fd9835b"),"Clement")
-
 
 obj_event = epc.ObjectEvent()
 agg_event = epc.AggregationEvent()
@@ -146,3 +145,52 @@ def test_create_epc_class_relationship():
 def test_create_date_relationship():
     relationship = n.create_date_relationship(location, location_date)
     assert isinstance(relationship,list) and len(relationship) >=1
+
+def test_delete_agg_event():
+    node = cu.Node(agg_event)
+    assert node.delete_node() == []
+    
+def test_delete_qty_event():
+    node = cu.Node(qty_event)
+    assert node.delete_node() == []
+
+def test_delete_trans_event():
+    node = cu.Node(trans_event)
+    assert node.delete_node() == []
+
+def test_delete_trans_event1():
+    node = cu.Node(trans_event1)
+    assert node.delete_node() == []
+
+def test_delete_tx_event():
+    node = cu.Node(tx_event)
+    assert node.delete_node() == []
+
+def test_delete_obj_event():
+    node = cu.Node(obj_event)
+    assert node.delete_node() == []
+
+def test_delete_item_class():
+    node = js.delete_nodes_by_label("ItemClass")
+    assert node == []
+
+def test_delete_company():
+    node = js.delete_nodes_by_label("Company")
+    assert node == []
+
+def test_delete_location():
+    node = js.delete_nodes_by_label("Location")
+    assert node == []
+
+def test_delete_location_date():
+    node = js.delete_nodes_by_label("LocationDate")
+    assert node == []
+
+def test_delete_user():
+    node = js.delete_nodes_by_label("User")
+    assert node == []
+
+def test_delete_item_instance():
+    node = js.delete_nodes_by_label("ItemInstance")
+    assert node == []
+
