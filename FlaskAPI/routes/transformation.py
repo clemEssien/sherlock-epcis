@@ -8,6 +8,12 @@ from epcis_cte_transformation.location_master import LocationMaster
 from epcis_cte_transformation.ftl_food import FTLFood
 from epcis_cte_transformation.compile_cte import compile_ctes
 
+from Neo4j.ItemInstance import ItemInstance
+from Neo4j.ItemClass import ItemClass
+from Neo4j.Location import Location
+from Neo4j.LocationDate import LocationDate
+import Neo4j.nodes as nodes
+
 import os, sys
 
 import json
@@ -202,6 +208,9 @@ class TransformationView(FlaskView):
                 return "CTE is an invalid type", 400
 
             # Store data in Neo4j database
+            upload_event_to_neo4j(event)
+
+            # Process CTEs for output
             output_types = {}
 
             if cte:
@@ -331,3 +340,52 @@ def epcis_from_xml_file(file: FileStorage) -> "list[EPCISEvent]":
             print("map_from_epcis error:", e)
         event_list.append(event)
     return event_list
+
+
+def upload_event_to_neo4j(event: EPCISEvent):
+    """Takes an EPCISEvent and creates the necessary nodes and relationships
+    to represent it in the graph database.
+
+    Currently unfinished.
+    The graph database needs to be queried to check if location and
+    location_date nodes already exist for the given location and location_date
+    before adding them to the database.
+    For the ObjectEvents, the database should be queried to check if ItemInstance and
+    ItemClass nodes already exist for the given item instances and classes.
+    For all other event types, they need to be broken down into the nodes and relationships
+    specified in the Data Model folder in the Food Traceability (Innovation) team."""
+    location = Location(id=event.business_location, name="")
+    location_date = LocationDate(
+        id=event.business_location, date=event.event_time.date()
+    )
+    nodes.create_event_node(event)
+
+    # if location node does not exist
+    nodes.create_location_node(location)
+
+    # if location_date node does not exist
+    nodes.create_location_date_node(location_date)
+    nodes.create_date_relationship(location, location_date)
+
+    # Connect event and location nodes
+    nodes.create_biz_location_relationship(event, location_date)
+
+    if isinstance(event, ObjectEvent):
+        item_instances = [ItemInstance(epc) for epc in event.epc_list]
+        item_classes = [ItemClass(qe.epc_class) for qe in event.quantity_list]
+        for item_instance in item_instances:
+            # if item_instance node does not exist
+            nodes.create_item_instance_node(item_instance)
+            nodes.create_epc_list_item_relationship(item_instance, event)
+        for item_class in item_classes:
+            # if item_class node does not exist
+            nodes.create_item_class_node(item_class)
+            nodes.create_quantity_list_item_relationship(item_class, event)
+    elif isinstance(event, TransactionEvent):
+        pass
+    elif isinstance(event, TransformationEvent):
+        pass
+    elif isinstance(event, AggregationEvent):
+        pass
+    elif isinstance(event, QuantityEvent):
+        pass
