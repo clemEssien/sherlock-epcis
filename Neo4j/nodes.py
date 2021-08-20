@@ -8,8 +8,8 @@ sys.path.append(parentdir)
 import json
 from dotenv import load_dotenv
 load_dotenv()
-import db_connect as db_con
-import utils as ut
+from Neo4j import db_connect as db_con
+from Neo4j import utils as ut
 
 node_names: "dict[str]" = {
     "ObjectEvent": "objevt",

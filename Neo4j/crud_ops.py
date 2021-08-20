@@ -1,6 +1,6 @@
-import utils as ut
+from Neo4j import utils as ut
 import json
-import db_connect as db_con
+from Neo4j import db_connect as db_con
 import os
 
 from dotenv import load_dotenv
