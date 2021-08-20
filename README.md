@@ -33,7 +33,7 @@ python3 -m app
 ```
 The main Flask app is in [app.py](app.py), while the routes are defined in their own files in [/FlaskAPI/routes](./FlaskAPI/routes).
 
-To transform an EPCIS event into a CTE, upload an EPCIS file that uses either the [EPCIS1.2](https://www.gs1.org/sites/default/files/docs/epc/EPCIS-Standard-1.2-r-2016-09-29.pdf) XML bindings, or the proposed [EPCIS2.0](https://github.com/gs1/EPCIS) JSON bindings, in a POST request to http:/example.ip:5000/api/transformation/.
+To transform an EPCIS event into a CTE, upload an EPCIS file that uses either the [EPCIS1.2](https://www.gs1.org/sites/default/files/docs/epc/EPCIS-Standard-1.2-r-2016-09-29.pdf) XML bindings or the proposed [EPCIS2.0](https://github.com/gs1/EPCIS) JSON bindings in a POST request to http:/example.ip:5000/api/transformation/. This endpoint will currently transform an EPCIS event to a CTE, but does upload the event to the Neo4j database.
 ## Database configuration
 Sherlock-epcis uses [Neo4j 4.1.9](https://neo4j.com/download-center/)
 ### Neo4j service setup
@@ -70,9 +70,11 @@ To enable json file import into the Neo4j database, add the following lines at t
 apoc.import.file.enabled=true 
 apoc.import.file.use_neo4j_config=false 
 ```
-### EPCIS Event Classes
+## EPCIS Event Classes
+Classes used to represent the EPCIS events along with the URI and QuantityElement data types can be found in [/JSONDeserialization/epcis_event.py](./JSONDeserialization/epcis_event.py).  
+All EPCIS event classes contain the relevant fields defined in section 7.4 of [EPCIS1.2](https://www.gs1.org/sites/default/files/docs/epc/EPCIS-Standard-1.2-r-2016-09-29.pdf).
 
-### CTE Classes
+## CTE Classes
 
 ## Contribution guidelines ##
 
