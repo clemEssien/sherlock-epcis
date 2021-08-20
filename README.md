@@ -1,23 +1,41 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Version badge](https://img.shields.io/badge/version-0.0-purple.svg)](https://shields.io/)
 
-# README #
+# README 
 
 This README documents the steps necessary to get your application up and running.
 
-### What is this repository for? ###
+### What is this repository for?
 
-#### Quick summary ####
+#### Quick summary 
 sherlock-epcis is the backend server responsible for converting EPCIS GS1 data to FDA CTEs & KDEs for reporting purposes.
 
-### How do I get set up? ###
+## Content
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+* [FlaskAPI](#FlaskAPI)
+* [Database Configuration](#Database-configuration)
+* [EPCIS Event Classes](#EPCIS-Event-Classes)
+* [CTE Classes](#CTE-Classes)
+* [Contribution guidelines](#Contribution-guidelines)
+
+
+## FlaskAPI
+
+## Database configuration
+Sherlock-epcis uses Neo4j 4.1.9
+The following modifications need to be made to the configuration file
+- sudo nano /etc/neo4j/neo4j.conf (elevated privileges are required for this operation) 
+- Uncomment line 70 i.e. dbms.default_listen_address=0.0.0.0  
+- Uncomment lines 94-96 
+
+```dbms.connector.http.enabled=true 
+dbms.connector.http.listen_address=:7474 
+dbms.connector.http.advertised_address=:7474
+```
+
+### EPCIS Event Classes
+
+### CTE Classes
 
 ### Contribution guidelines ###
 
