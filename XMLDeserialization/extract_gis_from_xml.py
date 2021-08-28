@@ -31,7 +31,6 @@ def map_xml_to_dict(parent):
 
     return xml_dict
 
-
 def read_uri(uri):
     """ method returns URI string from a URI"""
     if type(uri) == list:
@@ -80,7 +79,7 @@ def attr_type_check(instvar, data, attr):
                 arr.append(item)
             else:
                 arr.append(data)
-        dict_out= arr[0]
+        dict_out= arr
         value = dict_out
 
     elif isinstance(instvar, dict):
@@ -128,8 +127,8 @@ def map_from_epcis(epcis_event_obj,epcis_json):
         try:
             instvar = getattr(epcis_event_obj, attr)
             value = epcis_json[schema_doc['attr_key_mapping'][attr]]
-            formated_value = attr_type_check(instvar, value, attr)
-            setattr(epcis_event_obj, attr, formated_value)
+            formatted_value = attr_type_check(instvar, value, attr)
+            setattr(epcis_event_obj, attr, formatted_value)
 
         except Exception:
             pass
@@ -137,8 +136,8 @@ def map_from_epcis(epcis_event_obj,epcis_json):
     epcis_json_keys = epcis_json.keys()
     schema_values = schema_doc["attr_key_mapping"].values()
     ext_keys = (set(epcis_json_keys) - set(schema_values))
-    ext_dict = {}
+    ext_list = []
     for k in ext_keys:
-        ext_dict[k] = epcis_json[k]
-    setattr(epcis_event_obj, 'extensions', ext_dict)
+        ext_list.append(epcis_json[k])
+    setattr(epcis_event_obj, 'extensions', ext_list)
     return epcis_event_obj
